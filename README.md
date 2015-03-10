@@ -42,9 +42,7 @@ Libraries Planned to Use
 
 + GLSL for GPU shader
 
-+ GLFW for cross-platform window and OpenGL context
-
-+ CEGUI for GUI rendering
++ CEGUI for GUI rendering and OpenGL context
 
 Author
 ------
