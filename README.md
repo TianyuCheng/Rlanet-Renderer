@@ -44,6 +44,8 @@ Libraries Planned to Use
 
 + CEGUI for GUI rendering and OpenGL context
 
++ CMake for Project Management
+
 Author
 ------
 Tianyu Cheng
