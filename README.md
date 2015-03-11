@@ -42,7 +42,7 @@ Libraries Planned to Use
 
 + GLSL for GPU shader
 
-+ CEGUI for GUI rendering and OpenGL context
++ Qt for GUI and OpenGL context
 
 + CMake for Project Management
 
