@@ -42,6 +42,7 @@ include_directories(${Qt5OpenGL_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5OpenGL_EXECUTABLE_COMPILE_FLAGS}")
 
 # Combine all Qt libraries into QT_LIBRARIES
+set(QT_USE_QTOPENGL TRUE)
 set(QT_LIBRARIES ${Qt5Widgets_LIBRARIES} ${Qt5OpenGL_LIBRARIES})
 
 # Build submodules as libraries
@@ -54,10 +55,11 @@ file(GLOB UI_SRCS
 file(GLOB UI_FORMS
     src/ui_forms/*.ui
 )
+include_directories("${PROJECT_SOURCE_DIR}/ui")
 # Manually create UI because of the version error in UI form
 qt5_wrap_ui(UIS_HDRS ${UI_FORMS})
 
-add_library(PlanetGUI ${UI_HDRS} ${UI_SRCS} ${UIS_HDRS} ${MOC_SRCS})
+add_library(PlanetGUI ${UI_HDRS} ${UI_SRCS} ${UIS_HDRS})
 set_target_properties(PlanetGUI PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(PlanetGUI ${QT_LIBRARIES})
 
@@ -67,4 +69,5 @@ target_include_directories(PlanetGUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Executable PlanetRenderer
 add_executable(PlanetRenderer src/main.cpp)
-target_link_libraries(PlanetRenderer PUBLIC PlanetGUI ${OPENGL_gl_LIBRARIES} ${OPENGL_glu_LIBRARIES} ${QT_LIBRARIES})
+qt5_use_modules(PlanetRenderer Core Gui Widgets OpenGL)
+target_link_libraries(PlanetRenderer PlanetGUI ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})
