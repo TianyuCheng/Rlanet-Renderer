@@ -54,8 +54,7 @@ file(GLOB UI_SRCS
 file(GLOB UI_FORMS
     src/ui_forms/*.ui
 )
-# Manually moc incase auto-moc does not work
-qt5_wrap_cpp(MOC_SRCS ${UI_SRCS})
+# Manually create UI because of the version error in UI form
 qt5_wrap_ui(UIS_HDRS ${UI_FORMS})
 
 add_library(PlanetGUI ${UI_HDRS} ${UI_SRCS} ${UIS_HDRS} ${MOC_SRCS})
