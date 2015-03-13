@@ -7,8 +7,8 @@ set (PlanetRenderer_VERSION_MAJOR 1)
 set (PlanetRenderer_VERSION_MINOR 0)
 
 # Set directory variables
-set(PROJECT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(PROJECT_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+#set(PROJECT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+#set(PROJECT_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 # Update the moudule path to find CEGUI
 set(CMAKE_MODULE_PATH "./cmake/modules/;${CMAKE_MODULE_PATH}")
@@ -20,14 +20,17 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 # Set the the output path
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
 # Package OpenGL
 find_package (OpenGL REQUIRED)
 # Use OpenGL Library
 include_directories(${OPENGL_INCLUDE_DIR})
+# Include our own directories
+include_directories(src/)
+include_directories(src/ui/)
 
 # Find the QtWidgets library
 find_package(Qt5Widgets REQUIRED)
