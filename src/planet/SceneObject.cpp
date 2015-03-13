@@ -97,20 +97,31 @@ void SceneObject::setShader(QGLShader::ShaderType type, QString filename) {
     setShader(shader);
 }
 
+void SceneObject::initialize() {
+    attributes["vertex"] = program.attributeLocation("vertex");
+    // uniforms["matrix"] = program.uniformLocation("matrix");
+    // uniforms["color"] = program.uniformLocation("color");
+}
+
 void SceneObject::doubleCheck() const { 
     Q_ASSERT(program.hasOpenGLShaderPrograms());
 }
 
 void SceneObject::render() {
-    program.bind();
+    int vertexLocation = attributes["vertex"];
+    program.bind();                                         // glUseProgram(program.id)
+    program.enableAttributeArray(vertexLocation);           // enable attribute array
+    // program.setAttributeArray(vertexLocation, vertices, 3); // vertices attributes
     uniform();
 
-    // program.enableAttributeArray(vertexLocation);
-    // program.setAttributeArray(vertexLocation, triangleVertices, 3);
-    // program.setUniformValue(matrixLocation, pmvMatrix);
-    // program.setUniformValue(colorLocation, color);
-    //  
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
-    //  
-    // program.disableAttributeArray(vertexLocation);
+    // Draw the triangles !
+    glDrawElements(
+            GL_TRIANGLES,      // mode
+            indices.size(),    // count
+            GL_UNSIGNED_INT,   // type
+            (void*)0);         // element array buffer offset
+
+    program.disableAttributeArray(vertexLocation);
+
+    program.release();                                       // glUseProgram(0)
 }

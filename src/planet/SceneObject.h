@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QString>
 #include <QGLShader>
+#include <QVector3D>
 #include <QFile>
 #include <QDir>
 
@@ -31,11 +32,17 @@ public:
     void setShader(QGLShader::ShaderType type, QString shaderFile);
 
     /**
-     * Wrapper for the real render function.
-     * It performs shader programs switching
-     * */ 
-    void render();
+     * Initialization of locations
+     * */
+    virtual void initialize();
 
+    /**
+     * Wrapper for the real render function.
+     * It performs shader programs switching.
+     * One could overwrite it, but it is not
+     * encouraged.
+     * */ 
+    virtual void render();
 
     /**
      * Update all kinds of information, 
@@ -67,9 +74,9 @@ public:
 protected:
     // rendering related variables
     // vertex array, index array, locations, etc.
-    QMap<QString, int> attibutes;
+    QMap<QString, int> attributes;
     QMap<QString, int> uniforms;
-    QVector<float> vertices;
+    QVector<QVector3D> vertices;
     QVector<int> indices;
 
 private:

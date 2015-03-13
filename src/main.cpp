@@ -15,8 +15,8 @@ int main(int argc, char *argv[])
     w.show();
 
     // OpenGL Context has been created
-    Scene scene;
-    Planet planet("test object");
+    Scene scene("Test Scene", 600, 400);
+    Planet planet("Test Object");
     scene.addObject(&planet);
 
     return a.exec();
