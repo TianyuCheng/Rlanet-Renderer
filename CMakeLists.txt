@@ -6,12 +6,17 @@ project (PlanetRenderer)
 set (PlanetRenderer_VERSION_MAJOR 1)
 set (PlanetRenderer_VERSION_MINOR 0)
 
+# set(CMAKE_DISABLE_SOURCE_CHANGES ON)
+# set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
+
+message(${CMAKE_BINARY_DIR})
+
 # Set directory variables
-set(PROJECT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(PROJECT_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+# set(PROJECT_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
+# set(PROJECT_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 # Update the moudule path to find CEGUI
-set(CMAKE_MODULE_PATH "./cmake/modules/;${CMAKE_MODULE_PATH}")
+set(CMAKE_MODULE_PATH "cmake/modules/;${CMAKE_MODULE_PATH}")
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -31,6 +36,9 @@ include_directories(${OPENGL_INCLUDE_DIR})
 # Include our own directories
 include_directories(src/)
 include_directories(src/ui/)
+include_directories(src/planet/)
+# include_directories("${PROJECT_SOURCE_DIR}/ui")
+# include_directories("${PROJECT_SOURCE_DIR}/planet")
 
 # Find the QtWidgets library
 find_package(Qt5Widgets REQUIRED)
@@ -59,9 +67,6 @@ file(GLOB UI_FORMS
     src/ui_forms/*.ui
 )
 
-include_directories("${PROJECT_SOURCE_DIR}/planet")
-include_directories("${PROJECT_SOURCE_DIR}/ui")
-
 # Manually create UI because of the version error in UI form
 qt5_wrap_ui(UIS_HDRS ${UI_FORMS})
 
@@ -80,7 +85,6 @@ set_target_properties(PlanetEssential PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(PlanetEssential ${QT_LIBRARIES})
 
 # Link executable with modules
-target_include_directories(PlanetGUI PUBLIC ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
 target_include_directories(PlanetGUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 AUX_SOURCE_DIRECTORY(src/ SRC)

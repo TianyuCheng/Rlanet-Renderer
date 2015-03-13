@@ -8,7 +8,7 @@
 class Planet : public SceneObject
 {
 public:
-    Planet(QString n) : SceneObject(n, "glsl/torus.vert", "glsl/red.frag") {
+    Planet(QString n) : SceneObject(n, "../glsl/torus.vert", "../glsl/red.frag") {
     }
 
     virtual ~Planet () {
