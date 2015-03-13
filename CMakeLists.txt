@@ -1,5 +1,5 @@
 # CMake Version Requirements
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.0)
 
 # Project Name
 project (PlanetRenderer)
@@ -67,7 +67,13 @@ target_link_libraries(PlanetGUI ${QT_LIBRARIES})
 target_include_directories(PlanetGUI PUBLIC ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
 target_include_directories(PlanetGUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+AUX_SOURCE_DIRECTORY(src/ SRC)
 # Executable PlanetRenderer
-add_executable(PlanetRenderer src/main.cpp)
+add_executable(PlanetRenderer ${SRC})
 qt5_use_modules(PlanetRenderer Core Gui Widgets OpenGL)
 target_link_libraries(PlanetRenderer PlanetGUI ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})
+
+set(ALL_SRC ${SRC})
+string(REPLACE ";" "\n" ALL_SRC "${ALL_SRC}")
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/cscope.files "${ALL_SRC}")
+
