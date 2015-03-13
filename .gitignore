@@ -64,3 +64,9 @@ Makefile*
 *.qmlproject.user.*
 
 *_automoc.cpp
+
+# Temp files
+*.swp
+
+# Cscope files
+cscope.files
