@@ -1,5 +1,5 @@
 # CMake Version Requirements
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.0)
 
 # Project Name
 project (PlanetRenderer)
@@ -20,14 +20,17 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 # Set the the output path
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
 # Package OpenGL
 find_package (OpenGL REQUIRED)
 # Use OpenGL Library
 include_directories(${OPENGL_INCLUDE_DIR})
+# Include our own directories
+include_directories(src/)
+include_directories(src/ui/)
 
 # Find the QtWidgets library
 find_package(Qt5Widgets REQUIRED)
@@ -80,7 +83,13 @@ target_link_libraries(PlanetEssential ${QT_LIBRARIES})
 target_include_directories(PlanetGUI PUBLIC ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
 target_include_directories(PlanetGUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+AUX_SOURCE_DIRECTORY(src/ SRC)
 # Executable PlanetRenderer
-add_executable(PlanetRenderer src/main.cpp)
+add_executable(PlanetRenderer ${SRC})
 qt5_use_modules(PlanetRenderer Core Gui Widgets OpenGL)
+
 target_link_libraries(PlanetRenderer PlanetGUI PlanetEssential ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})
+
+set(ALL_SRC ${SRC})
+string(REPLACE ";" "\n" ALL_SRC "${ALL_SRC}")
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/cscope.files "${ALL_SRC}")
