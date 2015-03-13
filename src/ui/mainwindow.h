@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "Scene.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -15,6 +17,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     virtual ~MainWindow();
 
+    void setScene(Scene *scene);
 private:
     Ui::MainWindow *ui;
 };

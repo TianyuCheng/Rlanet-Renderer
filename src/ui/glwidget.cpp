@@ -15,9 +15,7 @@ GLWidget::GLWidget(QWidget *parent)
     xRot = 0;
     yRot = 0;
     zRot = 0;
-
-    qtGreen = QColor::fromCmykF(0.40, 0.0, 1.0, 0.0);
-    qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
+    scene = nullptr;
 }
 
 GLWidget::~GLWidget()
@@ -32,6 +30,10 @@ QSize GLWidget::minimumSizeHint() const
 QSize GLWidget::sizeHint() const
 {
     return QSize(400, 400);
+}
+
+void GLWidget::setScene(Scene *scene) {
+    this->scene = scene;
 }
 
 static void qNormalizeAngle(int &angle)
@@ -74,16 +76,12 @@ void GLWidget::setZRotation(int angle)
 
 void GLWidget::initializeGL()
 {
-    qglClearColor(qtPurple.dark());
-
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glShadeModel(GL_SMOOTH);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_MULTISAMPLE);
-    static GLfloat lightPosition[4] = { 0.5, 5.0, 7.0, 1.0 };
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+    glShadeModel(GL_SMOOTH);
 }
 
 void GLWidget::paintGL()
@@ -94,6 +92,8 @@ void GLWidget::paintGL()
     // glClearColor(0.0, 1.0, 1.0, 0.0);
 
     glLoadIdentity();
+
+    if (scene) scene->render();
 }
 
 void GLWidget::resizeGL(int width, int height)

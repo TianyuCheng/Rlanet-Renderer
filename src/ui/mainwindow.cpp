@@ -12,3 +12,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::setScene(Scene *scene) {
+    ui->openGLWidget->setScene(scene);
+}

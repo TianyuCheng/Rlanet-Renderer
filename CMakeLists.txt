@@ -33,7 +33,7 @@ include_directories(${OPENGL_INCLUDE_DIR})
 find_package(Qt5Widgets REQUIRED)
 add_definitions(${Qt5Widgets_DEFINITIONS})
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "--std=c++11 -ggdb3 ${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 # Find the QtOpenGL library
 find_package(Qt5OpenGL REQUIRED)
@@ -55,13 +55,26 @@ file(GLOB UI_SRCS
 file(GLOB UI_FORMS
     src/ui_forms/*.ui
 )
+
+include_directories("${PROJECT_SOURCE_DIR}/planet")
 include_directories("${PROJECT_SOURCE_DIR}/ui")
+
 # Manually create UI because of the version error in UI form
 qt5_wrap_ui(UIS_HDRS ${UI_FORMS})
 
 add_library(PlanetGUI ${UI_HDRS} ${UI_SRCS} ${UIS_HDRS})
 set_target_properties(PlanetGUI PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(PlanetGUI ${QT_LIBRARIES})
+
+file(GLOB PLANET_HDRS
+    src/planet/*.h
+)
+file(GLOB PLANET_SRCS
+    src/planet/*.cpp
+)
+add_library(PlanetEssential ${PLANET_HDRS} ${PLANET_SRCS})
+set_target_properties(PlanetEssential PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(PlanetEssential ${QT_LIBRARIES})
 
 # Link executable with modules
 target_include_directories(PlanetGUI PUBLIC ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
@@ -70,4 +83,4 @@ target_include_directories(PlanetGUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # Executable PlanetRenderer
 add_executable(PlanetRenderer src/main.cpp)
 qt5_use_modules(PlanetRenderer Core Gui Widgets OpenGL)
-target_link_libraries(PlanetRenderer PlanetGUI ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})
+target_link_libraries(PlanetRenderer PlanetGUI PlanetEssential ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})

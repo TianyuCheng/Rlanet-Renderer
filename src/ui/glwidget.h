@@ -3,6 +3,8 @@
 
 #include <QGLWidget>
 
+#include "Scene.h"
+
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
@@ -13,6 +15,8 @@ public:
 
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
+
+    void setScene(Scene *scene);
 
 public slots:
     void setXRotation(int angle);
@@ -36,8 +40,7 @@ private:
     int yRot;
     int zRot;
     QPoint lastPos;
-    QColor qtGreen;
-    QColor qtPurple;
+    Scene *scene;
 };
 
 #endif
