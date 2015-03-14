@@ -4,13 +4,18 @@
 #include <QMap>
 #include <QVector>
 #include <QString>
-#include <QGLShader>
-#include <QVector3D>
 #include <QFile>
 #include <QDir>
 
+#include <QGLShader>
+#include <QVector3D>
+#include <QGLFunctions>
+
+class Scene;
+
 class SceneObject
 {
+    friend class Scene;
 public:
 
     // Constructor with only name
@@ -74,17 +79,17 @@ public:
 protected:
     // rendering related variables
     // vertex array, index array, locations, etc.
-    QMap<QString, int> attributes;
-    QMap<QString, int> uniforms;
+    QMap<QString, GLuint> attributes;
+    QMap<QString, GLuint> uniforms;
     QVector<QVector3D> vertices;
-    QVector<int> indices;
+    QVector<unsigned int> indices;
 
 private:
     // name of the objects, for debugging and display
     QString name;
 
-    QGLShaderProgram program;
     // shader-based rendering
+    QGLShaderProgram program;
     QGLShader *vShader;
     QGLShader *fShader;
 };

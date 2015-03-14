@@ -99,8 +99,16 @@ void SceneObject::setShader(QGLShader::ShaderType type, QString filename) {
 
 void SceneObject::initialize() {
     attributes["vertex"] = program.attributeLocation("vertex");
-    // uniforms["matrix"] = program.uniformLocation("matrix");
-    // uniforms["color"] = program.uniformLocation("color");
+    // uniforms["matrix"] = program.attributeLocation("matrix");
+    // uniforms["color"] = program.attributeLocation("color");
+
+    program.bind();
+
+    GLuint vertexLocation = attributes["vertex"];
+    program.enableAttributeArray(vertexLocation);           // enable attribute array
+    program.setAttributeArray(vertexLocation, vertices.constData()); // vertices attributes
+
+    program.release();
 }
 
 void SceneObject::doubleCheck() const { 
@@ -108,10 +116,9 @@ void SceneObject::doubleCheck() const {
 }
 
 void SceneObject::render() {
-    int vertexLocation = attributes["vertex"];
-    program.bind();                                         // glUseProgram(program.id)
-    program.enableAttributeArray(vertexLocation);           // enable attribute array
-    // program.setAttributeArray(vertexLocation, vertices, 3); // vertices attributes
+    /** program.bind() will be called by Scene.
+     * This allows us to focus on rendering.
+     * */
     uniform();
 
     // Draw the triangles !
@@ -119,9 +126,5 @@ void SceneObject::render() {
             GL_TRIANGLES,      // mode
             indices.size(),    // count
             GL_UNSIGNED_INT,   // type
-            (void*)0);         // element array buffer offset
-
-    program.disableAttributeArray(vertexLocation);
-
-    program.release();                                       // glUseProgram(0)
+            indices.constData());         // element array buffer offset
 }

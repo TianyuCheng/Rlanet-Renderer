@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
     Scene scene("Test Scene", 600, 400);
     Planet planet("Test Object");
     scene.addObject(&planet);
+    w.setScene(&scene);
 
     return a.exec();
 }

@@ -3,6 +3,11 @@
 
 #include <QVector>
 #include <QOpenGLFramebufferObject>
+#include <QGLFunctions>
+#include <QImage>
+#include <QMatrix4x4>
+#include <QVector3D>
+#include <QMap>
 
 #include "SceneObject.h"
 
@@ -24,17 +29,33 @@ public:
      * Render uses a framebuffer, therefore possible
      * for render-to-texture and post-processing.
      * */
-    void render();
+    QImage render();
+
+private:
+    // uniform the necessary matrices
+    void uniformMatrices(QGLShaderProgram &program);
+
+    /**
+     * Replace the OpenGL's matrices.
+     * This requires all shaders for this engine
+     * to provide uniform variables for these three
+     * matrices.
+     */
+    QMatrix4x4 uMVMatrix;   // model-view matrix (model -> view space)
+    QMatrix4x4 uPMatrix;    // projection matrix (view -> projection space)
+    QMatrix4x4 uNMatrix;    // normal matrix (inverse of transpose of model-view matrix)
 
 private:
     // Name for debugging and displaying
     QString name;
 
-    // list of objects inside the scene
+    // List of objects inside the scene
     QVector<SceneObject*> objects;
 
-    // framebuffer for texture rendering
+    // Framebuffer for texture rendering
     QOpenGLFramebufferObject framebuffer;
+    // Result of rendering
+    QImage image;
 };
 
 #endif /* end of include guard: SCENE_H */

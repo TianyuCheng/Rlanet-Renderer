@@ -77,37 +77,49 @@ void GLWidget::setZRotation(int angle)
 void GLWidget::initializeGL()
 {
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_MULTISAMPLE);
+
+    // Disable lighting because we are drawing
+    // scenes to textures. 2D image is sufficent
+    glDisable(GL_LIGHTING);
+
     glShadeModel(GL_SMOOTH);
 }
 
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // uncomment this to test basic effects of OpenGL
-    // glClearColor(0.0, 1.0, 1.0, 0.0);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
 
     glLoadIdentity();
 
-    if (scene) scene->render();
+    // Draw the scene's snapshot if there is a scene
+    if (scene) {
+        QImage image = scene->render();
+        GLuint texture = bindTexture(image, GL_TEXTURE_2D, GL_RGBA);
+        drawTexture(QRectF(QPointF(-1, 1), QPointF(1, -1)), texture);
+        deleteTexture(texture);
+    }
+
+    // could use an interval here, but currently just refresh it
+    swapBuffers();
+    // updateScreen();
 }
 
 void GLWidget::resizeGL(int width, int height)
 {
-    int side = qMin(width, height);
-    glViewport((width - side) / 2, (height - side) / 2, side, side);
+    // Change the viewport to the whole screen
+    glViewport(0, 0, width, height);
 
+    // Clear current buffers
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Adjust the project matrix
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-#ifdef QT_OPENGL_ES_1
-    glOrthof(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
-#else
-    glOrtho(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
-#endif
+
+    // use gluOrtho2D
+    glOrtho(-1.0, +1.0, -1.0, +1.0, -1.0, 1.0);
+
     glMatrixMode(GL_MODELVIEW);
 }
 
