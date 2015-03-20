@@ -8,6 +8,7 @@
 #include <QMatrix4x4>
 #include <QVector3D>
 #include <QMap>
+#include <QTime>
 
 #include "SceneObject.h"
 
@@ -31,6 +32,7 @@ public:
      * */
     QImage render();
 
+    void start() { time.start(); }
 private:
     // uniform the necessary matrices
     void uniformMatrices(QGLShaderProgram &program);
@@ -45,6 +47,7 @@ private:
     QMatrix4x4 uPMatrix;    // projection matrix (view -> projection space)
     QMatrix4x4 uNMatrix;    // normal matrix (inverse of transpose of model-view matrix)
 
+    QTime time;
 private:
     // Name for debugging and displaying
     QString name;

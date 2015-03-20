@@ -119,8 +119,6 @@ void SceneObject::render() {
     /** program.bind() will be called by Scene.
      * This allows us to focus on rendering.
      * */
-    uniform();
-
     // Draw the triangles !
     glDrawElements(
             GL_TRIANGLES,      // mode

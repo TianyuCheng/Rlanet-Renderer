@@ -41,6 +41,7 @@ private:
     int zRot;
     QPoint lastPos;
     Scene *scene;
+    bool init;
 };
 
 #endif

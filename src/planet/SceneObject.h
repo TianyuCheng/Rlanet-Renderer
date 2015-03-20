@@ -84,12 +84,14 @@ protected:
     QVector<QVector3D> vertices;
     QVector<unsigned int> indices;
 
+    // used for user customization
+    QGLShaderProgram program;
+
 private:
     // name of the objects, for debugging and display
     QString name;
 
     // shader-based rendering
-    QGLShaderProgram program;
     QGLShader *vShader;
     QGLShader *fShader;
 };

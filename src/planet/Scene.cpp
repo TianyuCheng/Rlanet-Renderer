@@ -7,11 +7,7 @@ Scene::Scene(QString n, int width, int height)
     uPMatrix.setToIdentity();
     uNMatrix.setToIdentity();
 
-
-    uMVMatrix.translate(0.0, 0.0, -10.0);
     uPMatrix.perspective(45.0, (float)width/(float)height, 1.0, 500.0);
-
-    // uPMatrix.ortho(-1.0, +1.0, -1.0, +1.0, -1.0, 1.0);
 }
 
 
@@ -46,6 +42,11 @@ QImage Scene::render() {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
+    uMVMatrix.setToIdentity();
+    uMVMatrix.translate(0.0, 0.0, -20.0);
+    // uMVMatrix.rotate(90, 1.0, 0.0, 0.0);
+    uMVMatrix.rotate(time.elapsed() * 0.005, 0.0, 1.0, 0.0);
+
     // Render all objects in the scene.
     // This could be done in a smarter way
     for (auto iter = objects.constBegin(); iter != objects.constEnd(); ++iter) {
@@ -57,7 +58,10 @@ QImage Scene::render() {
         SceneObject *object = *iter;
         object->program.bind();
 
+        object->update();
+
         uniformMatrices(object->program);
+        object->uniform();
         object->render();
 
         object->program.release();

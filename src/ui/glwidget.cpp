@@ -16,6 +16,7 @@ GLWidget::GLWidget(QWidget *parent)
     yRot = 0;
     zRot = 0;
     scene = nullptr;
+    init = true;
 }
 
 GLWidget::~GLWidget()
@@ -87,6 +88,11 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
+    if (init && scene) {
+        scene->start();
+        init = false;
+    }
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
@@ -102,7 +108,7 @@ void GLWidget::paintGL()
 
     // could use an interval here, but currently just refresh it
     swapBuffers();
-    // updateScreen();
+    update();
 }
 
 void GLWidget::resizeGL(int width, int height)
