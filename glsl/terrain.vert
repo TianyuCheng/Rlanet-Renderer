@@ -42,7 +42,7 @@ void main()
     float height = texture2D(uHeightmap, uv).x * uHeightScale;
 
     vec4 pos = uPMatrix * uMVMatrix * vec4(worldPos.x, height, worldPos.y, 1.0);
-    pos.z -= 5.0;
+    // pos.z -= 5.0;
 
     gl_Position = pos;
 

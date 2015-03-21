@@ -7,7 +7,7 @@ Scene::Scene(QString n, int width, int height)
     uPMatrix.setToIdentity();
     uNMatrix.setToIdentity();
 
-    uPMatrix.perspective(45.0, (float)width/(float)height, 0.01, 500.0);
+    uPMatrix.perspective(45.0, (float)width/(float)height, 0.01, 1000.0);
 }
 
 
@@ -53,8 +53,8 @@ QImage Scene::render() {
     
     // Uncomment this to view from the side
     uMVMatrix.lookAt(
-            QVector3D(0.0, 10.0, -30),
-            QVector3D(1.0, 0.0, 15.0),
+            QVector3D(0.0, 10.0, 0.0),
+            QVector3D(1.0, 0.0, 25.0),
             QVector3D(0.0, 1.0, 0.0)
     );
 

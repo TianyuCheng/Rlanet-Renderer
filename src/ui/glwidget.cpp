@@ -78,6 +78,8 @@ void GLWidget::setZRotation(int angle)
 void GLWidget::initializeGL()
 {
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
     // Disable lighting because we are drawing
     // scenes to textures. 2D image is sufficent

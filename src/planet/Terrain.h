@@ -72,6 +72,13 @@ public:
             // Generate Interior Trim
             generateFootprints(m - 1, m - 1, 2 * m + 1, 2);
             generateFootprints(m - 1, m, 2, 2 * m + 1);
+
+            // For most levels we render up to this point
+            indexSize = indices.size();
+
+            // For the finest level, we render the interior as well
+            // Generate Ring Interior
+            generateFootprints(m, m, 2 * m + 1, 2 * m + 1);
         }
 
         // Print Debug Info
@@ -90,6 +97,7 @@ public:
     }
 
     void update() {
+        viewpos += QVector2D(10, 10);
     }
 
     void uniform() {
@@ -119,11 +127,12 @@ public:
         float denom = 1 << levels;
         float scaleFactor = 1.0;
         for (int i = 0; i <= levels; i++) {
-
             QVector4D fineBlockOrig = QVector4D(
                     scaleFactor / denom,
                     scaleFactor / denom,
-                    0.5, 0.5
+                    // 0.5, 0.5
+                    (viewpos.x() - denom * gridSize / 2.0) / (denom * gridSize),
+                    (viewpos.y() - denom * gridSize / 2.0) / (denom * gridSize)
             );
             program.setUniformValue("uFineBlockOrig", fineBlockOrig);
 
@@ -137,7 +146,7 @@ public:
             glDrawElements(
                     GL_TRIANGLES,      // mode
                     // GL_LINES,
-                    indices.size(),    // count
+                    i == 0 ? indices.size() : indexSize,
                     GL_UNSIGNED_INT,   // type
                     indices.constData());         // element array buffer offset
         }
@@ -184,6 +193,7 @@ private:
     int levels;
     int gridSize;
 
+    int indexSize;
     QVector2D viewpos;
 
     QOpenGLTexture *decalmap;
