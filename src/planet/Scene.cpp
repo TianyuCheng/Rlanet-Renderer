@@ -7,7 +7,7 @@ Scene::Scene(QString n, int width, int height)
     uPMatrix.setToIdentity();
     uNMatrix.setToIdentity();
 
-    uPMatrix.perspective(45.0, (float)width/(float)height, 1.0, 500.0);
+    uPMatrix.perspective(45.0, (float)width/(float)height, 0.01, 500.0);
 }
 
 
@@ -43,9 +43,16 @@ QImage Scene::render() {
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
     uMVMatrix.setToIdentity();
-    uMVMatrix.translate(0.0, 0.0, -20.0);
+    uMVMatrix.translate(0.0, 0.0, -30.0f);
+    // uMVMatrix.lookAt(
+    //         QVector3D(0.0, 15.0, 0),
+    //         QVector3D(0.0, 0.0, 10.0),
+    //         QVector3D(0.0, 1.0, 0.0)
+    // );
+
     // uMVMatrix.rotate(90, 1.0, 0.0, 0.0);
-    uMVMatrix.rotate(time.elapsed() * 0.005, 0.0, 1.0, 0.0);
+    // uMVMatrix.rotate(time.elapsed() * 0.005, 0.0, 1.0, 0.0);
+    
 
     // Render all objects in the scene.
     // This could be done in a smarter way

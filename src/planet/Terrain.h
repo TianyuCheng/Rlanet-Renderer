@@ -1,6 +1,8 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 
+#include <cmath>
+
 #include <QString>
 #include <QOpenGLTexture>
 
@@ -10,83 +12,170 @@
 class Terrain : public SceneObject
 {
 public:
-    Terrain (QString n) : SceneObject(n, "../glsl/terrain.vert", "../glsl/terrain.frag")
+    Terrain (QString n, int _levels, int _gridSize) 
+        : SceneObject(n, "../glsl/terrain.vert", "../glsl/terrain.frag"), 
+        levels(_levels), gridSize(_gridSize)
     {
+        // Initialize the starting view position
         viewpos = QVector2D(0, 0);
-        grid = 32;
-        levels = 10;
-        for (int j = 0; j < grid + 1; j++)
-            for (int i = 0; i < grid + 2; i++) {
-                for (int k = 0; k < (i == 0 ? 2 : 1); k++) {
-                    vertices.append(QVector3D(float(i)/ grid, 0, float(j) / grid));
-                }
-                ++j;
-                for (int k = 0; k < (i == grid + 1 ? 2 : 1); k++) {
-                    vertices.append(QVector3D(float(i)/ grid, 0, float(j) / grid));
-                }
-                --j;
-            }
 
-        heightmap = new QOpenGLTexture(QImage("../heightmaps/test.jpg"));
+        // Load the textures
+        {
+            QImage decal("../textures/decalmap.jpg");
+            QImage height("../textures/heightmap2.jpg");
+            if (decal.isNull() || height.isNull()) {
+                qDebug() << "Decal/Height map for terrain has not been found!";
+                exit(-1);
+            }
+            decalmap  = new QOpenGLTexture(decal);
+            heightmap = new QOpenGLTexture(height);
+
+            // Adjusting grid size to 2^n - 1
+            gridSize = pow(2, ceil(log(gridSize)/log(2))) - 1;
+        }
+
+        // Initialize Terrain Ring
+        {
+            int n = gridSize;
+            int m = (n + 1) / 4;
+            int k = n - 4 * m;
+
+            // Generate 12 mxm footprints
+            generateFootprints(0, 0, m, m);
+            generateFootprints(m - 1, 0, m, m);
+            generateFootprints(n - 2 * m + 1, 0, m, m);
+            generateFootprints(n - m, 0, m, m);
+
+            generateFootprints(0, m - 1, m, m);
+            generateFootprints(n - m, m - 1, m, m);
+            generateFootprints(0, n - 2 * m + 1, m, m);
+            generateFootprints(n - m, n - 2 * m + 1, m, m);
+
+            generateFootprints(0, n - m, m, m);
+            generateFootprints(m - 1, n - m, m, m);
+            generateFootprints(n - 2 * m + 1, n - m, m, m);
+            generateFootprints(n - m, n - m, m, m);
+
+            // Generate trims fix-ups
+            generateFootprints(0, 2 * m - 2, m, 3);
+            generateFootprints(n - m, 2 * m - 2, m, 3);
+
+            generateFootprints(2 * m - 2, 0, 3, m);
+            generateFootprints(2 * m - 2, n - m, 3, m);
+
+            // Generate Interior Trim
+            generateFootprints(m - 1, m - 1, 2 * m + 1, 2);
+            generateFootprints(m - 1, m, 2, 2 * m + 1);
+        }
+
+        // Print Debug Info
+        {
+            qDebug() << "Generating Clipmap Terrain with" << levels << "levels";
+            qDebug() << "Terrain Grid Size:" << gridSize;
+            qDebug() << "Terrain Vertex Numbers:" << vertices.size();
+            qDebug() << "Terrain Index Numbers:" << indices.size();
+        } 
     }
 
     virtual ~Terrain ()
     {
+        delete decalmap;
         delete heightmap;
     }
 
     void update() {
-        // viewpos.setX(viewpos.x() + 10.0);
-        // viewpos.setY(viewpos.y() + 10.0);
     }
 
     void uniform() {
+        glActiveTexture(GL_TEXTURE0);
         heightmap->bind(0);
         program.setUniformValue("uHeightmap", 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        decalmap->bind(1);
+        program.setUniformValue("uDecalmap", 1);
+
+        qDebug() << heightmap->isBound(0) << decalmap->isBound(1);
+        
+        int heightScaleLocation = program.uniformLocation("uHeightScale");
+        program.setUniformValue(heightScaleLocation, 5.0f);
     }
 
     void render() {
-        float sxz = 10.0;
-        program.setUniformValue("uMapPosition", QVector4D(
-                    int(-viewpos.x() / float(2 * 512 * grid)),
-                    0,
-                    int(-viewpos.y() / float(2 * 512 * grid)),
-                    0
-        ));
+        // Draw all levels with different details 
+        // using the same set of vertices, but different
+        // scales and offsets
+        float denom = 1 << levels;
+        float scaleFactor = 1.0;
+        for (int i = 0; i <= levels; i++) {
 
-        for (int i = 0; i < levels; i++) {
-            float ox = (int(viewpos.x() * (1 << i)) & 511) / float(512 * grid);
-            float oy = (int(viewpos.y() * (1 << i)) & 511) / float(512 * grid);
-            // qDebug() << ox << "\t" << oy;
+            QVector4D fineBlockOrig = QVector4D(
+                    scaleFactor / denom,
+                    scaleFactor / denom,
+                    0.5, 0.5
+            );
+            program.setUniformValue("uFineBlockOrig", fineBlockOrig);
 
-            QVector4D scale(sxz / 4.0, 1.0, sxz / 4.0, 1.0);
-            program.setUniformValue("uScale", scale);
-            program.setUniformValue("level", float(i + 1) / levels);
-            // qDebug() << float(i + 1) / levels;
+            QVector2D scale(scaleFactor, scaleFactor);
+            QVector2D offset(-scaleFactor / 2.0 - scaleFactor / (2 * gridSize), -scaleFactor / 2.0 - scaleFactor / (2 * gridSize));
+            scaleFactor *= 2.0;
 
-            for (int k = -2; k < 2; k++) 
-                for (int j = -2; j < 2; j++) {
-                    if (i != levels - 1) if (k == -1 || k == 0) if (j == -1 || j == 0) continue;
+            program.setUniformValue("uScale", scale) ;
+            program.setUniformValue("uOffset", offset) ;
 
-                    QVector4D offset(ox + float(j), 0, oy + float(k), 0);
-                    if (k >= 0) offset.setZ(offset.z() - 1.0 / float(grid));
-                    if (j >= 0) offset.setX(offset.x() - 1.0 / float(grid));
-
-                    // not doing frustum culling now
-
-                    program.setUniformValue("uOffset", offset);
-                    // glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
-                    glDrawArrays(GL_LINES, 0, vertices.size());
-                }
-            
-            sxz *= 0.5;
+            glDrawElements(
+                    GL_TRIANGLES,      // mode
+                    // GL_LINES,
+                    indices.size(),    // count
+                    GL_UNSIGNED_INT,   // type
+                    indices.constData());         // element array buffer offset
         }
     }
 
 private:
-    int grid;
+    /**
+     * x: starting horizontal position
+     * y: starting vertical position
+     * w: width of footprint
+     * h: height of footprint
+     * */
+    void generateFootprints(int x, int y, int w, int h) {
+        // Used later for indices generation
+        int indexOffset = vertices.size();
+
+        // Calculate the size for each square/triangle
+        
+        // Insert the vertices
+        float size = 1.0 / gridSize;
+        for (int j = 0; j < h; j++) {
+            for (int i = 0; i < w; i++) {
+                vertices << QVector3D((x + i) * size, (y + j) * size, 0);
+            }
+        }
+
+        // Insert the indices
+        for (int j = 0; j < h - 1; j++) {
+            for (int i = 0; i < w - 1; i++) {
+                // Upper triangle
+                indices << (indexOffset + j * (w + 0) + i) 
+                        << (indexOffset + (j + 1) * (w + 0) + i + 1) 
+                        << (indexOffset + j * (w + 0) + i + 1);
+
+                // Bottom triangle
+                indices << (indexOffset + j * (w + 0) + i) 
+                        << (indexOffset + (j + 1) * (w + 0) + i) 
+                        << (indexOffset + (j + 1) * (w + 0) + i + 1);
+            }
+        }
+    }
+
+private:
     int levels;
+    int gridSize;
+
     QVector2D viewpos;
+
+    QOpenGLTexture *decalmap;
     QOpenGLTexture *heightmap;
 };
 

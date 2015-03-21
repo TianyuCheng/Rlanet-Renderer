@@ -1,29 +1,33 @@
 #version 130
 
-attribute vec3 vertex;
+attribute vec3 aVertex;
 
-// transformation
+// Used in the vertex transformation
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 uniform mat4 uNMatrix;
 
-uniform vec4 uScale;
-uniform vec4 uOffset;
-uniform vec4 uMapPosition;
-
+// Used in the clipmap
+uniform vec2 uScale;
+uniform vec2 uOffset;
+uniform vec4 uFineBlockOrig;
 uniform sampler2D uHeightmap;
-uniform float level;
 
-varying vec4 color;
+uniform float uHeightScale;
+
+// Used in the fragment shader
+varying vec2 vDecalTex;
+varying vec4 vColor;
 
 const float PI = 3.1415926;
 
-vec3 sphere(vec2 xz, float y) {
+// Transform a xz-plane to sphere
+vec3 sphere(float radius, vec2 xz, float y) {
     vec2 uv = xz * 2 * PI;
     float theta = uv.x;
     float phi = uv.y;
 
-    float rho = 5.0 + y;
+    float rho = radius + y;
     return vec3(
             rho * cos(theta) * cos(phi),
             rho * sin(phi),
@@ -33,19 +37,16 @@ vec3 sphere(vec2 xz, float y) {
 
 void main()
 {
-    /* vec3 pos = vertex; */
-    /* pos.y = texture2D(uHeightmap, pos.xz).x - 1.0; */
-    /* gl_Position = uPMatrix * uMVMatrix * vec4(pos, 1); */
+    vec2 worldPos = aVertex.xy * uScale + uOffset;
+    vec2 uv = (aVertex.xy - vec2(0.5, 0.5)) * uFineBlockOrig.xy + uFineBlockOrig.zw;
+    float height = texture2D(uHeightmap, uv).x * uHeightScale;
 
-    vec4 pos = uScale * (uOffset + vec4(vertex, 1.0));
-    vec4 pos_map = (pos + uMapPosition) * 2.0;
-    pos.y = texture2D(uHeightmap, pos_map.xz).x;
-    pos.y *= 0.5;
-    /* pos.y -= 1.0; */
-    /* gl_Position = uPMatrix * uMVMatrix * pos; */
+    vec4 pos = uPMatrix * uMVMatrix * vec4(worldPos, height, 1.0);
+    pos.z -= 3.0;
 
-    vec3 spherical = sphere(pos.xz, pos.y);
-    gl_Position = uPMatrix * uMVMatrix * vec4(spherical, 1.0);
+    /* gl_Position = pos.xzyw; */
+    gl_Position = pos;
 
-    color = vec4(level, 1 - level, 0.0, 1.0);
+    vDecalTex = uv;
+    vColor = vec4(height / uHeightScale, 1.0 - height / uHeightScale, 0.0, 1.0);
 }
