@@ -16,7 +16,7 @@ uniform sampler2D uHeightmap;
 uniform float uHeightScale;
 
 // Used in the fragment shader
-varying vec2 vDecalTex;
+varying vec2 vDecalTexCoord;
 varying vec4 vColor;
 
 const float PI = 3.1415926;
@@ -41,12 +41,11 @@ void main()
     vec2 uv = (aVertex.xy - vec2(0.5, 0.5)) * uFineBlockOrig.xy + uFineBlockOrig.zw;
     float height = texture2D(uHeightmap, uv).x * uHeightScale;
 
-    vec4 pos = uPMatrix * uMVMatrix * vec4(worldPos, height, 1.0);
-    pos.z -= 3.0;
+    vec4 pos = uPMatrix * uMVMatrix * vec4(worldPos.x, height, worldPos.y, 1.0);
+    pos.z -= 5.0;
 
-    /* gl_Position = pos.xzyw; */
     gl_Position = pos;
 
-    vDecalTex = uv;
+    vDecalTexCoord = uv;
     vColor = vec4(height / uHeightScale, 1.0 - height / uHeightScale, 0.0, 1.0);
 }

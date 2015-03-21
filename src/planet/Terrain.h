@@ -22,13 +22,19 @@ public:
         // Load the textures
         {
             QImage decal("../textures/decalmap.jpg");
-            QImage height("../textures/heightmap2.jpg");
+            QImage height("../textures/heightmap.jpg");
             if (decal.isNull() || height.isNull()) {
                 qDebug() << "Decal/Height map for terrain has not been found!";
                 exit(-1);
             }
             decalmap  = new QOpenGLTexture(decal);
             heightmap = new QOpenGLTexture(height);
+
+            decalmap->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+            decalmap->setMagnificationFilter(QOpenGLTexture::Linear);
+
+            heightmap->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+            heightmap->setMagnificationFilter(QOpenGLTexture::Linear);
 
             // Adjusting grid size to 2^n - 1
             gridSize = pow(2, ceil(log(gridSize)/log(2))) - 1;
@@ -87,18 +93,23 @@ public:
     }
 
     void uniform() {
-        glActiveTexture(GL_TEXTURE0);
-        heightmap->bind(0);
-        program.setUniformValue("uHeightmap", 0);
-
-        glActiveTexture(GL_TEXTURE1);
+        /**
+         * I do not understand why this works, but it just works.
+         * If I put this in the reversed order. Nothing appears.
+         * Like this:
+         *  heightmap->bind(0);
+         *  decalmap->bind(1);
+         * */
         decalmap->bind(1);
-        program.setUniformValue("uDecalmap", 1);
+        heightmap->bind(0);
 
-        qDebug() << heightmap->isBound(0) << decalmap->isBound(1);
+        int heightLocation = program.uniformLocation("uHeightmap");
+        int decalLocation = program.uniformLocation("uDecalmap");
+        program.setUniformValue(heightLocation, 0);
+        program.setUniformValue(decalLocation, 1);
         
         int heightScaleLocation = program.uniformLocation("uHeightScale");
-        program.setUniformValue(heightScaleLocation, 5.0f);
+        program.setUniformValue(heightScaleLocation, 3.0f);
     }
 
     void render() {

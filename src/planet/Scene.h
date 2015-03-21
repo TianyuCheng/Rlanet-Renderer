@@ -3,7 +3,7 @@
 
 #include <QVector>
 #include <QOpenGLFramebufferObject>
-#include <QGLFunctions>
+#include <QOpenGLFunctions>
 #include <QImage>
 #include <QMatrix4x4>
 #include <QVector3D>
@@ -35,7 +35,7 @@ public:
     void start() { time.start(); }
 private:
     // uniform the necessary matrices
-    void uniformMatrices(QGLShaderProgram &program);
+    void uniformMatrices(QOpenGLShaderProgram &program);
 
     /**
      * Replace the OpenGL's matrices.

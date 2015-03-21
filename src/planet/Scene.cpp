@@ -21,7 +21,7 @@ void Scene::addObject(SceneObject* object) {
 }
 
 
-void Scene::uniformMatrices(QGLShaderProgram &program) {
+void Scene::uniformMatrices(QOpenGLShaderProgram &program) {
     // uniform modelview matrix
     program.setUniformValue("uMVMatrix", uMVMatrix);
     // uniform project matrix
@@ -43,16 +43,20 @@ QImage Scene::render() {
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
     uMVMatrix.setToIdentity();
-    uMVMatrix.translate(0.0, 0.0, -30.0f);
-    // uMVMatrix.lookAt(
-    //         QVector3D(0.0, 15.0, 0),
-    //         QVector3D(0.0, 0.0, 10.0),
-    //         QVector3D(0.0, 1.0, 0.0)
-    // );
 
-    // uMVMatrix.rotate(90, 1.0, 0.0, 0.0);
-    // uMVMatrix.rotate(time.elapsed() * 0.005, 0.0, 1.0, 0.0);
+    // Uncomment this to view from the top
+    // uMVMatrix.lookAt(
+    //         QVector3D(0.0, 40.0, 0),
+    //         QVector3D(0.0, 0.0, 0.0),
+    //         QVector3D(0.0, 0.0, 1.0)
+    // );
     
+    // Uncomment this to view from the side
+    uMVMatrix.lookAt(
+            QVector3D(0.0, 10.0, -30),
+            QVector3D(1.0, 0.0, 15.0),
+            QVector3D(0.0, 1.0, 0.0)
+    );
 
     // Render all objects in the scene.
     // This could be done in a smarter way

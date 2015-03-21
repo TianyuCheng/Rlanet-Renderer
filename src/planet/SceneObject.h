@@ -7,9 +7,9 @@
 #include <QFile>
 #include <QDir>
 
-#include <QGLShader>
 #include <QVector3D>
-#include <QGLFunctions>
+#include <QOpenGLShader>
+#include <QOpenGLFunctions>
 
 class Scene;
 
@@ -25,7 +25,7 @@ public:
     SceneObject(QString n, QString _vShader, QString _fShader);
 
     // Constructor with name and shader
-    SceneObject(QString n, QGLShader *_vShader, QGLShader *_fShader);
+    SceneObject(QString n, QOpenGLShader *_vShader, QOpenGLShader *_fShader);
 
     // Copy Constructor
     SceneObject(SceneObject &obj);
@@ -33,8 +33,8 @@ public:
     virtual ~SceneObject();
 
     // Set the vertex shader or fragment shader
-    void setShader(QGLShader *shader);
-    void setShader(QGLShader::ShaderType type, QString shaderFile);
+    void setShader(QOpenGLShader *shader);
+    void setShader(QOpenGLShader::ShaderType type, QString shaderFile);
 
     /**
      * Initialization of locations
@@ -85,15 +85,15 @@ protected:
     QVector<unsigned int> indices;
 
     // used for user customization
-    QGLShaderProgram program;
+    QOpenGLShaderProgram program;
 
 private:
     // name of the objects, for debugging and display
     QString name;
 
     // shader-based rendering
-    QGLShader *vShader;
-    QGLShader *fShader;
+    QOpenGLShader *vShader;
+    QOpenGLShader *fShader;
 };
 
 #endif /* end of include guard: SCENEOBJECT_H */

@@ -9,11 +9,11 @@ SceneObject::SceneObject(QString n, QString _vShader, QString _fShader)
     : name(n) {
     vShader = nullptr;
     fShader = nullptr;
-    setShader(QGLShader::Vertex, _vShader);
-    setShader(QGLShader::Fragment, _fShader);
+    setShader(QOpenGLShader::Vertex, _vShader);
+    setShader(QOpenGLShader::Fragment, _fShader);
 }
 
-SceneObject::SceneObject(QString n, QGLShader *_vShader, QGLShader *_fShader) 
+SceneObject::SceneObject(QString n, QOpenGLShader *_vShader, QOpenGLShader *_fShader) 
     : name(n) {
     vShader = nullptr;
     fShader = nullptr;
@@ -36,12 +36,12 @@ SceneObject::~SceneObject() {
 }
 
 // Set the vertex shader or fragment shader
-void SceneObject::setShader(QGLShader *shader) {
+void SceneObject::setShader(QOpenGLShader *shader) {
     // Check whether shader is compiled
     QString where = "SceneObject.cpp: setShader()";
     QString what  = "%1 Shader of %2 is null";
     Q_ASSERT_X(
-            type == QGLShader::ShaderType::Vertex || type == QGLShader::ShaderType::Fragment,
+            type == QOpenGLShader::ShaderType::Vertex || type == QOpenGLShader::ShaderType::Fragment,
             "SceneObject.cpp: setShader()", 
             QString("The type of shader for ") + name + QString(" is neither Vertex nor Fragment"));
     Q_ASSERT_X(shader->isCompiled(), "SceneObject.cpp: setShader()", 
@@ -49,11 +49,11 @@ void SceneObject::setShader(QGLShader *shader) {
 
     // assign the shader
     switch (shader->shaderType()) {
-        case QGLShader::Vertex:
+        case QOpenGLShader::Vertex:
             if (vShader) delete vShader;
             vShader = shader;
             break;
-        case QGLShader::Fragment:
+        case QOpenGLShader::Fragment:
             if (fShader) delete fShader;
             fShader = shader;
             break;
@@ -70,7 +70,7 @@ void SceneObject::setShader(QGLShader *shader) {
     }
 }
 
-void SceneObject::setShader(QGLShader::ShaderType type, QString filename) {
+void SceneObject::setShader(QOpenGLShader::ShaderType type, QString filename) {
     // Read from file to compile the source
     QFile file(QDir::currentPath() + QDir::separator() + filename);
 
@@ -85,7 +85,7 @@ void SceneObject::setShader(QGLShader::ShaderType type, QString filename) {
     QTextStream in(&file);
     QString source = in.readAll();
     
-    QGLShader *shader = new QGLShader(type);
+    QOpenGLShader *shader = new QOpenGLShader(type);
     
     // Check whether the shader compiles
     if (!shader->compileSourceCode(source)) {
