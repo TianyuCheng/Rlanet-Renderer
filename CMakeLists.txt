@@ -94,6 +94,6 @@ qt5_use_modules(PlanetRenderer Core Gui Widgets OpenGL)
 
 target_link_libraries(PlanetRenderer PlanetGUI PlanetEssential ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})
 
-set(ALL_SRC ${SRC})
+set(ALL_SRC ${SRC} ${PLANET_HDRS} ${PLANET_SRCS} ${UI_HDRS} ${UI_SRCS})
 string(REPLACE ";" "\n" ALL_SRC "${ALL_SRC}")
 file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/cscope.files "${ALL_SRC}")
