@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     // OpenGL Context has been created
     Scene scene("Test Scene", 600, 400);
 
-    Terrain terrain("Test Terrain", 8, 255);
+    Terrain terrain("Test Terrain", 5, 128);
     scene.addObject(&terrain);
 
     w.setScene(&scene);

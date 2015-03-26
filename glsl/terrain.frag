@@ -6,5 +6,6 @@ varying vec4 vColor;
 
 void main()
 {
+    /* gl_FragColor = texture2D(uDecalmap, vDecalTexCoord); */
     gl_FragColor = vColor * texture2D(uDecalmap, vDecalTexCoord);
 }

@@ -46,15 +46,15 @@ QImage Scene::render() {
 
     // // Uncomment this to view from the top
     // uMVMatrix.lookAt(
-    //         QVector3D(0.0, 200.0, 0),
+    //         QVector3D(0.0, 10, 0),
     //         QVector3D(0.0, 0.0, 0.0),
     //         QVector3D(0.0, 0.0, 1.0)
     // );
 
     // Uncomment this to view from the side
     uMVMatrix.lookAt(
-            QVector3D(0.0, 60.0, -5.0),
-            QVector3D(1.0, 0.0, 100.0),
+            QVector3D(0.0, 0.4, -0.5),
+            QVector3D(0.0, 0.0, 1.0),
             QVector3D(0.0, 1.0, 0.0)
     );
 
