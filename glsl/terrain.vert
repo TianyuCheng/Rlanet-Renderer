@@ -38,7 +38,7 @@ vec3 sphere(float radius, vec2 xz, float y) {
 void main()
 {
     vec2 worldPos = aVertex.xy * uScale + uOffset;
-    vec2 uv = (aVertex.xy - vec2(0.5, 0.5)) * uFineBlockOrig.xy + uFineBlockOrig.zw;
+    vec2 uv = (aVertex.xy) * uFineBlockOrig.xy + uFineBlockOrig.zw;
     float height = texture2D(uHeightmap, uv).x * uHeightScale;
 
     vec4 pos = uPMatrix * uMVMatrix * vec4(worldPos.x, height, worldPos.y, 1.0);

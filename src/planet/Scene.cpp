@@ -44,17 +44,17 @@ QImage Scene::render() {
 
     uMVMatrix.setToIdentity();
 
-    // Uncomment this to view from the top
+    // // Uncomment this to view from the top
     // uMVMatrix.lookAt(
-    //         QVector3D(0.0, 40.0, 0),
+    //         QVector3D(0.0, 200.0, 0),
     //         QVector3D(0.0, 0.0, 0.0),
     //         QVector3D(0.0, 0.0, 1.0)
     // );
-    
+
     // Uncomment this to view from the side
     uMVMatrix.lookAt(
-            QVector3D(0.0, 10.0, 0.0),
-            QVector3D(1.0, 0.0, 25.0),
+            QVector3D(0.0, 60.0, -5.0),
+            QVector3D(1.0, 0.0, 100.0),
             QVector3D(0.0, 1.0, 0.0)
     );
 
