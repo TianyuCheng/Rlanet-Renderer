@@ -102,7 +102,7 @@ void GLWidget::paintGL()
 
     // Draw the scene's snapshot if there is a scene
     if (scene) {
-        QImage image = scene->render();
+        QImage image = scene->renderScene();
         GLuint texture = bindTexture(image, GL_TEXTURE_2D, GL_RGBA);
         drawTexture(QRectF(QPointF(-1, 1), QPointF(1, -1)), texture);
         deleteTexture(texture);

@@ -2,8 +2,9 @@
 #define SCENEOBJECT_H
 
 #include <QMap>
-#include <QVector>
+#include <QtMath>
 #include <QString>
+#include <QVector>
 #include <QFile>
 #include <QDir>
 
@@ -19,13 +20,13 @@ class SceneObject
 public:
 
     // Constructor with only name
-    SceneObject(QString n);
+    SceneObject(QString n, SceneObject *parent = nullptr);
 
     // Constructor with name and shader sources
-    SceneObject(QString n, QString _vShader, QString _fShader);
+    SceneObject(QString n, QString _vShader, QString _fShader, SceneObject *parent = nullptr);
 
     // Constructor with name and shader
-    SceneObject(QString n, QOpenGLShader *_vShader, QOpenGLShader *_fShader);
+    SceneObject(QString n, QOpenGLShader *_vShader, QOpenGLShader *_fShader, SceneObject *parent = nullptr);
 
     // Copy Constructor
     SceneObject(SceneObject &obj);
@@ -72,9 +73,24 @@ public:
      * */
     void doubleCheck() const;
 
+    /**
+     * Object transformation manipulation
+     * translate, scale, rotate
+     * */
+    void loadIdentity();
+    void scale(double s);
+    void translate(QVector3D offset);
+    void rotate(double angle, QVector3D axis);
+
+    // Compute the transformation matrix with scene graph
+    QMatrix4x4 computeTransformFromRoot();
+
     // setter and getter
     void setName(QString n) { name = n; }
     QString getName() const { return name; }
+
+    // Render with GL_TRIANGLES, GL_LINES, GL_QUADS, GL_TRIANGLE_STRIPS, etc
+    void setDrawMode(GLenum mode) { drawMode = mode; }
 
 protected:
     // rendering related variables
@@ -94,6 +110,12 @@ private:
     // shader-based rendering
     QOpenGLShader *vShader;
     QOpenGLShader *fShader;
+
+    QMatrix4x4 transform;
+    SceneObject *parent;
+
+    // GL_TRIANGLES, GL_TRIANGLE_STRIP, etc
+    GLenum drawMode;
 };
 
 #endif /* end of include guard: SCENEOBJECT_H */

@@ -1,12 +1,10 @@
-#include "Scene.h"
+#include <Scene.h>
 
 Scene::Scene(QString n, int width, int height) 
-    : name(n), framebuffer(width, height) {
-    // Initialize the matrices
-    uMVMatrix.setToIdentity();
-    uPMatrix.setToIdentity();
-    uNMatrix.setToIdentity();
-
+    : SceneObject(n), 
+      name(n), 
+      camera(n + QString("'s camera'")),
+      framebuffer(width, height) {
     uPMatrix.perspective(45.0, (float)width/(float)height, 0.01, 1000.0);
 }
 
@@ -30,7 +28,7 @@ void Scene::uniformMatrices(QOpenGLShaderProgram &program) {
     program.setUniformValue("uNMatrix", uNMatrix);
 }
 
-QImage Scene::render() {
+QImage Scene::renderScene() {
     
     // use this framebuffer instead of the default buffer
     if (!framebuffer.bind()) {
@@ -51,12 +49,12 @@ QImage Scene::render() {
     //         QVector3D(0.0, 0.0, 1.0)
     // );
 
-    // Uncomment this to view from the side
-    uMVMatrix.lookAt(
-            QVector3D(0.0, 0.4, -0.5),
-            QVector3D(0.0, 0.0, 1.0),
-            QVector3D(0.0, 1.0, 0.0)
-    );
+    // // Uncomment this to view from the side
+    // uMVMatrix.lookAt(
+    //         QVector3D(0.0, 0.4, -0.5),
+    //         QVector3D(0.0, 0.0, 1.0),
+    //         QVector3D(0.0, 1.0, 0.0)
+    // );
 
     // Render all objects in the scene.
     // This could be done in a smarter way
@@ -87,4 +85,30 @@ QImage Scene::render() {
     }
 
     return image;
+}
+
+// Time control functions for the scene
+void Scene::start() { 
+    time.start();
+    elapsedTime = 0;
+}
+
+void Scene::pause() { 
+    elapsedTime = time.elapsed(); 
+}
+
+void Scene::resume() {
+    // subtracting the time just before we pause it
+    // go back in time to fake pause/resume
+    int diff = time.elapsed() - elapsedTime;
+    time.addMSecs(-elapsedTime);
+}
+
+void Scene::restart() {
+    time.restart();
+}
+
+double Scene::timeElapsed() const
+{ 
+    return time.elapsed() / 1000.0; 
 }

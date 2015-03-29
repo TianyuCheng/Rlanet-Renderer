@@ -1,30 +1,39 @@
-#include "SceneObject.h"
+#include <SceneObject.h>
 
-SceneObject::SceneObject(QString n) : name(n) {
+SceneObject::SceneObject(QString n, SceneObject *p) : name(n), parent(p) {
     vShader = nullptr;
     fShader = nullptr;
+    transform.setToIdentity();
+    drawMode = GL_TRIANGLES;
 }
 
-SceneObject::SceneObject(QString n, QString _vShader, QString _fShader)
-    : name(n) {
+SceneObject::SceneObject(QString n, QString _vShader, QString _fShader, SceneObject *p)
+    : name(n), parent(p) {
     vShader = nullptr;
     fShader = nullptr;
     setShader(QOpenGLShader::Vertex, _vShader);
     setShader(QOpenGLShader::Fragment, _fShader);
+    transform.setToIdentity();
+    drawMode = GL_TRIANGLES;
 }
 
-SceneObject::SceneObject(QString n, QOpenGLShader *_vShader, QOpenGLShader *_fShader) 
-    : name(n) {
+SceneObject::SceneObject(QString n, QOpenGLShader *_vShader, QOpenGLShader *_fShader, SceneObject *p) 
+    : name(n), parent(p) {
     vShader = nullptr;
     fShader = nullptr;
     setShader(_vShader);
     setShader(_fShader);
+    transform.setToIdentity();
+    drawMode = GL_TRIANGLES;
 }
 
 SceneObject::SceneObject(SceneObject &obj) {
+    name      = obj.name;
+    parent    = obj.parent;
+    transform = obj.transform;
+    drawMode = obj.drawMode;
     vShader = nullptr;
     fShader = nullptr;
-    name    = obj.name;
     setShader(obj.vShader);
     setShader(obj.fShader);
 }
@@ -116,13 +125,36 @@ void SceneObject::doubleCheck() const {
 }
 
 void SceneObject::render() {
-    /** program.bind() will be called by Scene.
+    /** 
+     * program.bind() will be called by Scene.
      * This allows us to focus on rendering.
      * */
-    // Draw the triangles !
     glDrawElements(
-            GL_TRIANGLES,      // mode
+            drawMode, 
             indices.size(),    // count
             GL_UNSIGNED_INT,   // type
             indices.constData());         // element array buffer offset
+}
+
+void SceneObject::loadIdentity() {
+    transform.setToIdentity();
+}
+
+void SceneObject::scale(double s) {
+    transform.scale(s);
+}
+
+void SceneObject::translate(QVector3D offset) {
+    transform.translate(offset);
+}
+
+void SceneObject::rotate(double angle, QVector3D axis) {
+    transform.rotate(angle, axis);
+}
+
+// Compute the transformation matrix with scene graph
+QMatrix4x4 SceneObject::computeTransformFromRoot() {
+    if (parent == nullptr) 
+        return transform;
+    return transform * parent->computeTransformFromRoot();
 }

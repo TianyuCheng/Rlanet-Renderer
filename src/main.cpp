@@ -1,4 +1,4 @@
-/**
+/**utilities 
  * main.cpp
  * */
 #include <QApplication>  
@@ -6,7 +6,6 @@
 #include "mainwindow.h"
 #include "Scene.h"
 #include "Planet.h"
-#include "Terrain.h"
 
 int main(int argc, char *argv[])  
 {  
@@ -18,8 +17,8 @@ int main(int argc, char *argv[])
     // OpenGL Context has been created
     Scene scene("Test Scene", 600, 400);
 
-    Terrain terrain("Test Terrain", 5, 128);
-    scene.addObject(&terrain);
+    Planet planet("Test Planet");
+    scene.addObject(&planet);
 
     w.setScene(&scene);
 

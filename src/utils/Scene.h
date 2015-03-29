@@ -10,9 +10,10 @@
 #include <QMap>
 #include <QTime>
 
-#include "SceneObject.h"
+#include <SceneObject.h>
+#include <Camera.h>
 
-class Scene
+class Scene : private SceneObject
 {
 public:
     Scene(QString name, int width, int height);
@@ -30,9 +31,31 @@ public:
      * Render uses a framebuffer, therefore possible
      * for render-to-texture and post-processing.
      * */
-    QImage render();
+    QImage renderScene();
 
-    void start() { time.start(); }
+    /**
+     * Scene Update
+     * */
+    void update() {}
+    void uniform() {}
+
+    /**
+     * Camera
+     * */
+    Camera* getCamera() { return &camera; }
+
+    /**
+     * Time Utils
+     * Scene time control with start, pause, resume, and restart.
+     * As there is no pause and stop in the Qt, we fake it through
+     * subtracting the elapsed time right before paused.
+     * */
+    void start();
+    void pause();
+    void resume();
+    void restart();
+    double timeElapsed() const;
+
 private:
     // uniform the necessary matrices
     void uniformMatrices(QOpenGLShaderProgram &program);
@@ -47,18 +70,25 @@ private:
     QMatrix4x4 uPMatrix;    // projection matrix (view -> projection space)
     QMatrix4x4 uNMatrix;    // normal matrix (inverse of transpose of model-view matrix)
 
-    QTime time;
 private:
     // Name for debugging and displaying
     QString name;
+
+    // Camera object encapsulation
+    Camera camera;
 
     // List of objects inside the scene
     QVector<SceneObject*> objects;
 
     // Framebuffer for texture rendering
     QOpenGLFramebufferObject framebuffer;
+
     // Result of rendering
     QImage image;
+
+    // Use QTime for underlying time management
+    QTime time;
+    int elapsedTime;
 };
 
 #endif /* end of include guard: SCENE_H */

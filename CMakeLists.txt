@@ -24,11 +24,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Auto-moc for Qt
 set(CMAKE_AUTOMOC ON)
 
-# Set the the output path
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-
 # Package OpenGL
 find_package (OpenGL REQUIRED)
 # Use OpenGL Library
@@ -36,7 +31,7 @@ include_directories(${OPENGL_INCLUDE_DIR})
 # Include our own directories
 include_directories(src/)
 include_directories(src/ui/)
-include_directories(src/planet/)
+include_directories(src/utils/)
 # include_directories("${PROJECT_SOURCE_DIR}/ui")
 # include_directories("${PROJECT_SOURCE_DIR}/planet")
 
@@ -75,10 +70,10 @@ set_target_properties(PlanetGUI PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(PlanetGUI ${QT_LIBRARIES})
 
 file(GLOB PLANET_HDRS
-    src/planet/*.h
+    src/utils/*.h
 )
 file(GLOB PLANET_SRCS
-    src/planet/*.cpp
+    src/utils/*.cpp
 )
 add_library(PlanetEssential ${PLANET_HDRS} ${PLANET_SRCS})
 set_target_properties(PlanetEssential PROPERTIES LINKER_LANGUAGE CXX)
