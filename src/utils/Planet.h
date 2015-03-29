@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#include "SceneObject.h"
+#include <SceneObject.h>
 
 class Planet : public SceneObject
 {
