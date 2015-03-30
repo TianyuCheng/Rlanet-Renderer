@@ -10,6 +10,8 @@ class Planet : public SceneObject
 public:
     Planet(QString n) : SceneObject(n, "../glsl/sphere.vert", "../glsl/red.frag") {
 
+        angle = 0;
+
         vertices.append(QVector3D( 1, -1, 1));
         vertices.append(QVector3D( 1,  1, 1));
         vertices.append(QVector3D(-1,  1, 1));
@@ -49,7 +51,9 @@ public:
     }
 
     void update() {
-        // qDebug() << "Planet Update";
+        angle += 5.0;
+        transform.setToIdentity();
+        transform.rotate(angle, QVector3D(0.0, 1.0, 1.0));
     }
 
     void uniform() {
@@ -58,6 +62,7 @@ public:
 
 private:
     /* data */
+    float angle;
 };
 
 #endif /* end of include guard: PLANET_H_ */
