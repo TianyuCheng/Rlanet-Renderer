@@ -1,11 +1,18 @@
 #include <Scene.h>
 
-Scene::Scene(QString n, int width, int height) 
+Scene::Scene(QString n, int w, int h) 
     : SceneObject(n), 
-      name(n), 
+      name(n), width(w), height(h),
       camera(n + QString("'s camera'")),
       framebuffer(width, height) {
-    uPMatrix.perspective(45.0, (float)width/(float)height, 0.01, 1000.0);
+
+    camera.setPerspective(60.0, (float)width/(float)height, 0.01, 1000.0);
+
+    camera.lookAt(
+            QVector3D(0.0, 0.0, -5.0),
+            QVector3D(0.0, 0.0, 0.0),
+            QVector3D(0.0, 1.0, 0.0)
+    );
 }
 
 
@@ -18,16 +25,6 @@ void Scene::addObject(SceneObject* object) {
     object->initialize();
 }
 
-
-void Scene::uniformMatrices(QOpenGLShaderProgram &program) {
-    // uniform modelview matrix
-    program.setUniformValue("uMVMatrix", uMVMatrix);
-    // uniform project matrix
-    program.setUniformValue("uPMatrix", uPMatrix);
-    // uniform normal matrix
-    program.setUniformValue("uNMatrix", uNMatrix);
-}
-
 QImage Scene::renderScene() {
     
     // use this framebuffer instead of the default buffer
@@ -36,25 +33,15 @@ QImage Scene::renderScene() {
         exit(-1);
     }
 
+    // Change the viewport to the whole screen
+    glViewport(0, 0, width, height);
+
     // Clear out buffer before drawing anything
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
-    uMVMatrix.setToIdentity();
-
-    // // Uncomment this to view from the top
-    // uMVMatrix.lookAt(
-    //         QVector3D(0.0, 10, 0),
-    //         QVector3D(0.0, 0.0, 0.0),
-    //         QVector3D(0.0, 0.0, 1.0)
-    // );
-
-    // // Uncomment this to view from the side
-    // uMVMatrix.lookAt(
-    //         QVector3D(0.0, 0.4, -0.5),
-    //         QVector3D(0.0, 0.0, 1.0),
-    //         QVector3D(0.0, 1.0, 0.0)
-    // );
+    // camera.moveForward(0.1);
+    camera.moveBackward(0.1);
 
     // Render all objects in the scene.
     // This could be done in a smarter way
@@ -69,8 +56,14 @@ QImage Scene::renderScene() {
 
         object->update();
 
-        uniformMatrices(object->program);
+        // Uniform the camera matrix
+        camera.uniformMatrices(object->program);
+        // Uniform the object variables
+        object->program.setUniformValue("uTransform", object->transform);
+
+        // User defined uniform variables
         object->uniform();
+
         object->render();
 
         object->program.release();

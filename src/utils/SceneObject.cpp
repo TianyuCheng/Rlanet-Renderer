@@ -108,11 +108,10 @@ void SceneObject::setShader(QOpenGLShader::ShaderType type, QString filename) {
 
 void SceneObject::initialize() {
     attributes["vertex"] = program.attributeLocation("aVertex");
-    // uniforms["matrix"] = program.attributeLocation("matrix");
-    // uniforms["color"] = program.attributeLocation("color");
 
     program.bind();
 
+    // Send vertex data
     GLuint vertexLocation = attributes["vertex"];
     program.enableAttributeArray(vertexLocation);                    // enable attribute array
     program.setAttributeArray(vertexLocation, vertices.constData()); // vertices attributes

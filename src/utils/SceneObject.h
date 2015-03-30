@@ -103,6 +103,9 @@ protected:
     // used for user customization
     QOpenGLShaderProgram program;
 
+    QMatrix4x4 transform;
+    SceneObject *parent;
+
 private:
     // name of the objects, for debugging and display
     QString name;
@@ -110,9 +113,6 @@ private:
     // shader-based rendering
     QOpenGLShader *vShader;
     QOpenGLShader *fShader;
-
-    QMatrix4x4 transform;
-    SceneObject *parent;
 
     // GL_TRIANGLES, GL_TRIANGLE_STRIP, etc
     GLenum drawMode;
