@@ -8,9 +8,9 @@ varying vec3 vNormal;
 
 void main()
 {
-    /* gl_FragColor = texture2D(uDecalmap, vDecalTexCoord); */
-    /* gl_FragColor = vColor * texture2D(uDecalmap, vDecalTexCoord); */
-    /* gl_FragColor = vec4(vNormal, 1.0) * texture2D(uDecalmap, vDecalTexCoord); */
+    // gl_FragColor = texture2D(uDecalmap, vDecalTexCoord);
+    // gl_FragColor = vColor * texture2D(uDecalmap, vDecalTexCoord);
+    // gl_FragColor = vec4(vNormal, 1.0) * texture2D(uDecalmap, vDecalTexCoord);
 
     // I am going to fake a light here
     // Uniform for light will be implemented later

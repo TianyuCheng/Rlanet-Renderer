@@ -123,7 +123,7 @@ Terrain::~Terrain() {
 void Terrain::updatePatches() {
     Camera* camera = dynamic_cast<Scene*>(parent)->getCamera();
     QVector3D cameraPos = camera->getPosition();
-    // cameraPos.setY(0.0);
+    cameraPos.setY(0.0);
 
     int far = qNextPowerOfTwo(int(camera->getFar()));
     int size = int(ranges[levels].first);
@@ -195,8 +195,17 @@ void Terrain::update() {
 
 void Terrain::render() {
     // Drawing only using line mode for LOD visualization
-    // drawMode = GL_LINES;
+    // drawMode = GL_LINE;
+    /**
+     * Using GL_FRONT on GL_FILL gives me 1280 error,
+     * but it renders fine; using GL_FRONT_AND_BACK 
+     * does not render anything but a line in GL_LINE
+     * mode
+     */
+    // glPolygonMode( GL_FRONT_AND_BACK, drawMode );
+    glPolygonMode( GL_FRONT, drawMode );
 
+    // qDebug() << "Children:" << children.size() << "Selected:" << selectedPatches.size();
     for (int i = 0; i < selectedPatches.size(); i++) {
         TerrainPatch *patch = selectedPatches[i];
         double scaleFactor = ranges[patch->level].first;
@@ -208,7 +217,7 @@ void Terrain::render() {
 
         // draw all the triangles
         glDrawElements(
-                drawMode, 
+                GL_TRIANGLES, 
                 indices.size(),    // count
                 GL_UNSIGNED_INT,   // type
                 indices.constData());         // element array buffer offset

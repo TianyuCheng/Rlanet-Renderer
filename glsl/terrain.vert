@@ -74,11 +74,10 @@ vec2 morphVertex(vec2 gridPos, vec2 vertex, float morphK) {
 void main()
 {
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
-    vec2 uv = fract(pos.xz / 8192.0) - vec2(0.5, 0.5);
-    pos.y = texture2D(heightmap, uv).x * 1400.0 - 700;
-    vec2 morphedPos = morphVertex(aVertex.xz, pos.xz, 0.3);
-    pos.xz = morphedPos;
-    gl_Position = uPMatrix * uMVMatrix * uTransform * vec4(pos, 1.0);
+    vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, 0.3), 0.0).xzy;
+    vec2 uv = fract(morphedPos.xz / 8192.0) - vec2(0.5, 0.5);
+    morphedPos.y = texture2D(heightmap, uv).x * 1400.0 - 700;
+    gl_Position = uPMatrix * uMVMatrix * uTransform * vec4(morphedPos, 1.0);
 
     if (uLevel <= 0)      vColor = vec4(1.0, 0.0, 0.0, 1.0);
     else if (uLevel <= 1) vColor = vec4(1.0, 1.0, 0.0, 1.0);
@@ -93,9 +92,9 @@ void main()
     else if (uLevel <= 9) vColor = vec4(0.6, 0.6, 1.0, 1.0);
     else vColor = vec4(1.0, 1.0, 1.0, 1.0);
 
-    vColor = vec4(1.0, 1.0, 1.0, 1.0);
-    vDecalTexCoord = fract(pos.xz / 1024.0);
+    vColor = vec4((700 + morphedPos.y) / 1400.0, 1.0 - (700 + morphedPos.y) / 1400.0, 0.0, 1.0);
+    vDecalTexCoord = morphedPos.xz / 1024.0;
 
-    vView = (uMVMatrix * uTransform * vec4(pos, 1.0)).xyz;
+    vView = (uMVMatrix * uTransform * vec4(morphedPos, 1.0)).xyz;
     vNormal = computeNormal(aVertex.xz);
 }

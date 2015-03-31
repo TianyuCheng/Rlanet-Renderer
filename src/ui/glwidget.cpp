@@ -9,6 +9,8 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
+static GLenum drawMode = GL_FILL;
+
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
@@ -80,7 +82,9 @@ void GLWidget::initializeGL()
 {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_FRONT);
+    // glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
     // Disable lighting because we are drawing
     // scenes to textures. 2D image is sufficent
@@ -167,6 +171,12 @@ void GLWidget::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_Down:
             camera->moveBackward(50);
             break;
+        case Qt::Key_Space:
+            if (drawMode == GL_FILL)
+                drawMode = GL_LINE;
+            else 
+                drawMode = GL_FILL;
+            scene->setDrawMode(drawMode);
         default:
             event->ignore();
             break;

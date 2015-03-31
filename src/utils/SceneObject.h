@@ -106,7 +106,7 @@ protected:
     QMatrix4x4 transform;
     SceneObject *parent;
 
-    // GL_TRIANGLES, GL_TRIANGLE_STRIP, etc
+    // GL_FILL, GL_LINE, etc
     GLenum drawMode;
 private:
     // name of the objects, for debugging and display
