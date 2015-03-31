@@ -64,7 +64,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
 
     {
         QImage decal("../textures/decal_dirt.jpg");
-        QImage height("../textures/heightmap.jpg");
+        QImage height("../textures/heightmap4.jpg");
         if (decal.isNull() || height.isNull()) {
             qDebug() << "Decal/Height map for terrain has not been found!";
             exit(-1);
@@ -123,7 +123,7 @@ Terrain::~Terrain() {
 void Terrain::updatePatches() {
     Camera* camera = dynamic_cast<Scene*>(parent)->getCamera();
     QVector3D cameraPos = camera->getPosition();
-    cameraPos.setY(0.0);
+    // cameraPos.setY(0.0);
 
     int far = qNextPowerOfTwo(int(camera->getFar()));
     int size = int(ranges[levels].first);
@@ -137,7 +137,7 @@ void Terrain::updatePatches() {
             QPair<int, int> key(x + i, y + j);
             if (!children.contains(key)) {
                 children.insert(key, new TerrainPatch(QVector2D(x + i, y + j), levels, &ranges));
-                qDebug() << "Insert: " << key;
+                // qDebug() << "Insert: " << key;
             }
         }
     }
