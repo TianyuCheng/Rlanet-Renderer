@@ -13,35 +13,38 @@ Camera::~Camera() {
 void Camera::initialize() {
 }
 
-void Camera::setLook(QVector3D look) {
-    this->look = look;
-    this->direction = look - center;
-    uMVMatrix.lookAt(look, center, up);
+void Camera::setCenter(QVector3D l) {
+    this->lookAt(eye, l, up);
 }
 
-void Camera::setCenter(QVector3D center) {
-    this->center = center;
-    this->direction = look - center;
-    uMVMatrix.lookAt(look, center, up);
+void Camera::setEye(QVector3D e) {
+    this->lookAt(e, center, up);
 }
 
-void Camera::setUp(QVector3D up) {
-    this->up = up;
-    uMVMatrix.lookAt(look, center, up);
+void Camera::setUp(QVector3D u) {
+    this->lookAt(eye, center, u);
 }
 
-void Camera::lookAt(QVector3D look, QVector3D center, QVector3D up) {
-    this->look = look;
+void Camera::lookAt(QVector3D eye, QVector3D center, QVector3D up) {
+    this->eye = eye;
     this->center = center;
     this->up = up;
-    this->direction = look - center;
-    uMVMatrix.lookAt(look, center, up);
+    this->look = center - eye;
+
+    uMVMatrix.setToIdentity();
+    uMVMatrix.lookAt(eye, center, up);
+
+    // modelviewInfo();
 }
 
 void Camera::moveForward(double distance) {
-    QVector3D diff = direction.normalized() * distance;
+    QVector3D diff = look.normalized() * distance;
+    eye += diff;
     center += diff;
-    look += diff;
+    uMVMatrix.setToIdentity();
+    uMVMatrix.lookAt(eye, center, up);
+
+    // modelviewInfo();
 }
 
 void Camera::moveBackward(double distance) {
@@ -49,11 +52,13 @@ void Camera::moveBackward(double distance) {
 }
 
 void Camera::turnLeft(double angle, QVector3D axis) {
-    double radian = qDegreesToRadians(angle);
-    QQuaternion q = QQuaternion(radian, axis);
-    direction = q.rotatedVector(direction);
-    look = center + direction;
-    uMVMatrix.lookAt(look, center, up);
+    QQuaternion q = QQuaternion::fromAxisAndAngle(axis, angle);
+    look = q.rotatedVector(look);
+    center = eye + look;
+    uMVMatrix.setToIdentity();
+    uMVMatrix.lookAt(eye, center, up);
+    
+    // modelviewInfo();
 }
 
 void Camera::turnRight(double angle, QVector3D axis) {
@@ -62,31 +67,37 @@ void Camera::turnRight(double angle, QVector3D axis) {
 
 void Camera::setLeft(double left) { 
     this->left = left; 
+    uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
 }
 
 void Camera::setRight(double right) { 
     this->right = right; 
+    uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
 }
 
 void Camera::setbottom(double bottom) { 
     this->bottom = bottom; 
+    uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
 }
 
 void Camera::setTop(double top) {
     this->top = top; 
+    uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
 }
 
 void Camera::setNear(double near) { 
     this->near = near; 
+    uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
 }
 
 void Camera::setFar(double far) { 
     this->far = far; 
+    uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
 }
 
@@ -99,6 +110,7 @@ void Camera::setFrustum(double left,    double right,
     this->top = top;
     this->near = near; 
     this->far = far;
+    uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far);
 }
 
@@ -118,25 +130,26 @@ void Camera::setAspect(double aspect) {
 
 void Camera::setPerspective(double fovy, double aspect, double zNear, double zFar) {
 
-    double halfHeight = near * qTan(qDegreesToRadians(fovy * 0.5));
+    double halfHeight = zNear * qTan(qDegreesToRadians(fovy * 0.5));
     double halfWidth = halfHeight * aspect;
 
     left = -halfWidth;
     right = halfWidth;
     bottom = -halfHeight;
-    bottom = +halfHeight;
+    top = +halfHeight;
     near = zNear;
     far = zFar;
 
+    uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
+    
+    // projectionInfo();
 }
 
 void Camera::uniformMatrices(QOpenGLShaderProgram &program) {
-    // uniform modelview matrix
+    // uniform matrices
     program.setUniformValue("uMVMatrix", uMVMatrix);
-    // uniform project matrix
     program.setUniformValue("uPMatrix", uPMatrix);
-    // uniform normal matrix
     program.setUniformValue("uNMatrix", uNMatrix);
 }
 

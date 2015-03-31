@@ -21,12 +21,12 @@ public:
     /**
      * ModelView matrix manipulatiuon
      * */
-    void setLook(QVector3D look);
     void setCenter(QVector3D center);
+    void setEye(QVector3D eye);
     void setUp(QVector3D up);
-    void lookAt(QVector3D look, QVector3D center, QVector3D up);
-    void moveForward(double distance);      // move towards the look
-    void moveBackward(double distance);     // move away from look
+    void lookAt(QVector3D eye, QVector3D center, QVector3D up);
+    void moveForward(double distance);      // move towards the center
+    void moveBackward(double distance);     // move away from center
     void turnLeft(double angle, QVector3D axis = QVector3D(0, 1, 0));            // angle is in degree
     void turnRight(double angle, QVector3D axis = QVector3D(0, 1, 0));           // angle is in degree
 
@@ -58,18 +58,50 @@ public:
     };
     Cullable isCullable(BoundingBox box);
     
+    // Getters
+    QVector3D getPosition() const { return eye; }
+
+    // Getting the frustum
+    double getLeft() const { return left; }
+    double getRight() const { return right; }
+    double getTop() const { return top; }
+    double getBottom() const { return bottom; }
+    double getFar() const { return far; }
+    double getNear() const { return near; }
+
+private:
+    /**
+     * Debugging functions
+     * */
+    void modelviewInfo() {
+        qDebug() << "Eye:" << eye;
+        qDebug() << "Center:" << center;
+        qDebug() << "Up:" << up;
+        qDebug() << "ModelView:" << uMVMatrix;
+    }
+
+    void projectionInfo() {
+        qDebug() << "Left:" << left;
+        qDebug() << "Right:" << right;
+        qDebug() << "Bottom:" << bottom;
+        qDebug() << "Top:" << top;
+        qDebug() << "Near:" << near;
+        qDebug() << "Far:" << far;
+        qDebug() << "Projection:" << uPMatrix;
+    }
+
 private:
     QString name;       // For debugging purpose
 
     // Camera position
-    QVector3D look;
+    QVector3D eye;
     QVector3D center;
     QVector3D up;
 
-    // direction is computed using (look - center)
+    // look is computed using (center - eye)
     // It is not normalized because the length of 
-    // direction can be used for turn left/right
-    QVector3D direction;  
+    // look can be used for turn left/right
+    QVector3D look;  
 
     // Viewing frustum
     double near, far;

@@ -1,0 +1,23 @@
+#ifndef LIGHT_H
+#define LIGHT_H
+
+#include <QString>
+#include <QVector3D>
+
+
+class Light
+{
+public:
+    Light(QString n);
+    virtual ~Light ();
+
+    void setPosition(QVector3D p) {}
+    void setColor(QVector3D c) {}
+
+private:
+    QString name;
+    QVector3D position;
+    QVector3D color;
+};
+
+#endif /* end of include guard: LIGHT_H */

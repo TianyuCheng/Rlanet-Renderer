@@ -6,6 +6,7 @@
 #include "mainwindow.h"
 #include "Scene.h"
 #include "Planet.h"
+#include "Terrain.h"
 
 int main(int argc, char *argv[])  
 {  
@@ -17,8 +18,11 @@ int main(int argc, char *argv[])
     // OpenGL Context has been created
     Scene scene("Test Scene", 600, 400);
 
-    Planet planet("Test Planet");
-    scene.addObject(&planet);
+    // Planet planet("Test Planet");
+    // scene.addObject(&planet);
+
+    Terrain terrain(16, 10, &scene);
+    scene.addObject(&terrain);
 
     w.setScene(&scene);
 

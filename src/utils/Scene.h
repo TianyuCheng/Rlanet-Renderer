@@ -13,7 +13,7 @@
 #include <SceneObject.h>
 #include <Camera.h>
 
-class Scene : private SceneObject
+class Scene : public SceneObject
 {
 public:
     Scene(QString name, int width, int height);
@@ -57,22 +57,9 @@ public:
     double timeElapsed() const;
 
 private:
-    // uniform the necessary matrices
-    void uniformMatrices(QOpenGLShaderProgram &program);
-
-    /**
-     * Replace the OpenGL's matrices.
-     * This requires all shaders for this engine
-     * to provide uniform variables for these three
-     * matrices.
-     */
-    QMatrix4x4 uMVMatrix;   // model-view matrix (model -> view space)
-    QMatrix4x4 uPMatrix;    // projection matrix (view -> projection space)
-    QMatrix4x4 uNMatrix;    // normal matrix (inverse of transpose of model-view matrix)
-
-private:
     // Name for debugging and displaying
     QString name;
+    int width, height;
 
     // Camera object encapsulation
     Camera camera;
