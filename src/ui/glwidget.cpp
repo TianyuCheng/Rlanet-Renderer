@@ -17,6 +17,7 @@ GLWidget::GLWidget(QWidget *parent)
     zRot = 0;
     scene = nullptr;
     init = true;
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 GLWidget::~GLWidget()
@@ -149,4 +150,25 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         setZRotation(zRot + 8 * dx);
     }
     lastPos = event->pos();
+}
+
+void GLWidget::keyPressEvent(QKeyEvent *event) {
+    Camera *camera = scene->getCamera();
+    switch(event->key()) {
+        case Qt::Key_Left:
+            camera->turnLeft(5);
+            break;
+        case Qt::Key_Right:
+            camera->turnRight(5);
+            break;
+        case Qt::Key_Up:
+            camera->moveForward(50);
+            break;
+        case Qt::Key_Down:
+            camera->moveBackward(50);
+            break;
+        default:
+            event->ignore();
+            break;
+    }
 }

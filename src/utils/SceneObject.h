@@ -106,6 +106,8 @@ protected:
     QMatrix4x4 transform;
     SceneObject *parent;
 
+    // GL_TRIANGLES, GL_TRIANGLE_STRIP, etc
+    GLenum drawMode;
 private:
     // name of the objects, for debugging and display
     QString name;
@@ -113,9 +115,6 @@ private:
     // shader-based rendering
     QOpenGLShader *vShader;
     QOpenGLShader *fShader;
-
-    // GL_TRIANGLES, GL_TRIANGLE_STRIP, etc
-    GLenum drawMode;
 };
 
 #endif /* end of include guard: SCENEOBJECT_H */
