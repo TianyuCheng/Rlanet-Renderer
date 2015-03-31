@@ -52,12 +52,13 @@ void Camera::moveBackward(double distance) {
 }
 
 void Camera::turnLeft(double angle, QVector3D axis) {
-    double radian = qDegreesToRadians(angle);
-    QQuaternion q = QQuaternion(radian, axis);
+    QQuaternion q = QQuaternion::fromAxisAndAngle(axis, angle);
     look = q.rotatedVector(look);
     center = eye + look;
     uMVMatrix.setToIdentity();
     uMVMatrix.lookAt(eye, center, up);
+    
+    // modelviewInfo();
 }
 
 void Camera::turnRight(double angle, QVector3D axis) {
@@ -141,7 +142,8 @@ void Camera::setPerspective(double fovy, double aspect, double zNear, double zFa
 
     uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
-    projectionInfo();
+    
+    // projectionInfo();
 }
 
 void Camera::uniformMatrices(QOpenGLShaderProgram &program) {

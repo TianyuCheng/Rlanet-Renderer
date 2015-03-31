@@ -58,6 +58,17 @@ public:
     };
     Cullable isCullable(BoundingBox box);
     
+    // Getters
+    QVector3D getPosition() const { return eye; }
+
+    // Getting the frustum
+    double getLeft() const { return left; }
+    double getRight() const { return right; }
+    double getTop() const { return top; }
+    double getBottom() const { return bottom; }
+    double getFar() const { return far; }
+    double getNear() const { return near; }
+
 private:
     /**
      * Debugging functions

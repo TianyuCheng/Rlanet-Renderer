@@ -13,7 +13,7 @@
 #include <SceneObject.h>
 #include <Camera.h>
 
-class Scene : private SceneObject
+class Scene : public SceneObject
 {
 public:
     Scene(QString name, int width, int height);

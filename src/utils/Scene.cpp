@@ -6,11 +6,17 @@ Scene::Scene(QString n, int w, int h)
       camera(n + QString("'s camera'")),
       framebuffer(width, height) {
 
-    camera.setPerspective(60.0, (float)width/(float)height, 0.01, 1000.0);
+    camera.setPerspective(60.0, (float)width/(float)height, 0.01, 5000.0);
+
+    // camera.lookAt(
+    //         QVector3D(0.0, 90.0, 0.0),
+    //         QVector3D(0.0, 0.0, 0.0),
+    //         QVector3D(0.0, 0.0, 1.0)
+    // );
 
     camera.lookAt(
-            QVector3D(0.0, 0.0, -5.0),
-            QVector3D(0.0, 0.0, 0.0),
+            QVector3D(0.0, 500.0, 0.0),
+            QVector3D(0.0, 500.0, 120.0),
             QVector3D(0.0, 1.0, 0.0)
     );
 }
@@ -41,7 +47,9 @@ QImage Scene::renderScene() {
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
     // camera.moveForward(0.1);
-    camera.moveBackward(0.1);
+    // camera.moveBackward(0.1);
+    // camera.turnLeft(1);
+    // camera.turnRight(1);
 
     // Render all objects in the scene.
     // This could be done in a smarter way
@@ -94,7 +102,7 @@ void Scene::resume() {
     // subtracting the time just before we pause it
     // go back in time to fake pause/resume
     int diff = time.elapsed() - elapsedTime;
-    time.addMSecs(-elapsedTime);
+    time.addMSecs(-diff);
 }
 
 void Scene::restart() {
