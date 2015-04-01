@@ -4,6 +4,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSize>
+#include <QtCore/QMutex>
 #include <QtQuick/QSGSimpleTextureNode> 
 #include <QtQuick/QQuickWindow> 
 
