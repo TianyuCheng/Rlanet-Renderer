@@ -25,13 +25,14 @@ public:
     void addObject(SceneObject* object);
 
     /**
-     * Render all the visible objects in the scene.
-     * Currently just draw all the objects in the 
+     * Render all visible objects to framebuffer.
+     *
+     * Output: current Framebuffer object
+     *
+     * Note: Currently it just draws all the objects in the 
      * scene, but possible to optimize. 
-     * Render uses a framebuffer, therefore possible
-     * for render-to-texture and post-processing.
      * */
-    QImage renderScene();
+    void renderScene();
 
     /**
      * Scene Update

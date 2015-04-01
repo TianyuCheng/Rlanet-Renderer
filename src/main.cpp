@@ -7,24 +7,24 @@
 #include "Scene.h"
 #include "Planet.h"
 #include "Terrain.h"
+#include "Mangekyou.h"
+#include "nexus.h"
 
 int main(int argc, char *argv[])  
 {  
-    QApplication a(argc, argv);
-    MainWindow w;
+	QGuiApplication app(argc, argv);
+	qmlRegisterType<Mangekyou>("Mangekyou", 1, 0, "Renderer");
 
-    w.show();
-
-    // OpenGL Context has been created
-    Scene scene("Test Scene", 600, 400);
-
-    // Planet planet("Test Planet");
-    // scene.addObject(&planet);
-
-    Terrain terrain(16, 10, &scene);
-    scene.addObject(&terrain);
-
-    w.setScene(&scene);
-
-    return a.exec();
+	{
+		QQuickView view;
+		view.setFormat(nexus::select_gl(view.format()));
+		view.setPersistentOpenGLContext(true);
+		view.setPersistentSceneGraph(true);
+		view.setResizeMode(QQuickView::SizeRootObjectToView);
+		view.setSource(QUrl("qrc:///main.qml"));
+		view.show();
+		int ret = app.exec();
+	} // After this view will be destructed
+	nexus::terminate();
+	return ret;
 }

@@ -4,8 +4,8 @@ Scene::Scene(QString n, int w, int h)
     : SceneObject(n), 
       name(n), width(w), height(h),
       camera(n + QString("'s camera'")),
-      framebuffer(width, height, QOpenGLFramebufferObject::Depth) {
-
+      framebuffer(width, height, QOpenGLFramebufferObject::Depth)
+{
     // Initialize GL
     glEnable(GL_DEPTH_TEST);
 
@@ -34,13 +34,15 @@ void Scene::addObject(SceneObject* object) {
     object->initialize();
 }
 
-QImage Scene::renderScene() {
-    
+QImage Scene::renderScene()
+{
+#if 0 // We don't need this in quick version
     // use this framebuffer instead of the default buffer
     if (!framebuffer.bind()) {
         qDebug() << "Failed to bind framebuffer";
         exit(-1);
     }
+#endif
 
     // Change the viewport to the whole screen
     glViewport(0, 0, width, height);
@@ -68,7 +70,7 @@ QImage Scene::renderScene() {
          * scene takes care of that.
          * */
         SceneObject *object = *iter;
-        object->program.bind();
+        object->program.bind(); // TODO: Do we really need to bind a different program?
 
         object->setDrawMode(drawMode);
         object->update();
@@ -86,6 +88,7 @@ QImage Scene::renderScene() {
         object->program.release();
     }
     
+#if 0
     // Render the buffer to image
     image = framebuffer.toImage();
 
@@ -93,8 +96,7 @@ QImage Scene::renderScene() {
     if (!framebuffer.release()) {
         qDebug() << "Failed to release framebuffer";
     }
-
-    return image;
+#endif
 }
 
 // Time control functions for the scene
