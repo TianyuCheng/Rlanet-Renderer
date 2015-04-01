@@ -17,9 +17,11 @@ class BoundingBox {
 	double bArea;
 	double bVolume;
 
+    QVector3D corners[8];
+
 public:
 
-	BoundingBox() : bEmpty(true) {}
+	BoundingBox() : bEmpty(true), dirty(true) {}
 	BoundingBox(QVector3D bMin, QVector3D bMax) : bmin(bMin), bmax(bMax), bEmpty(false), dirty(true) {}
 
 	QVector3D getMin() const { return bmin; }
@@ -96,6 +98,17 @@ public:
 	// 	 return true; // it made it past all 3 axes.
 	// }
 
+    bool intersectSphere(QVector3D center, double radius) {
+        if (dirty) updateCorners();
+        
+        int count = 0;
+        for (int i = 0; i < 8; i++) {
+            double distance = (center - corners[i]).length();
+            if (distance < radius) return true;
+        }
+        return false;
+    }
+
 	void operator=(const BoundingBox& target) {
 		bmin = target.bmin;
 		bmax = target.bmax;
@@ -108,7 +121,8 @@ public:
 	double area() {
 		if (bEmpty) return 0.0;
 		else if (dirty) {
-			bArea = 2.0 * ((bmax[0] - bmin[0]) * (bmax[1] - bmin[1]) + (bmax[1] - bmin[1]) * (bmax[2] - bmin[2]) + (bmax[2] - bmin[2]) * (bmax[0] - bmin[0]));
+			// bArea = 2.0 * ((bmax[0] - bmin[0]) * (bmax[1] - bmin[1]) + (bmax[1] - bmin[1]) * (bmax[2] - bmin[2]) + (bmax[2] - bmin[2]) * (bmax[0] - bmin[0]));
+            updateCorners();
 			dirty = false;
 		}
 		return bArea;
@@ -117,7 +131,8 @@ public:
 	double volume() {
 		if (bEmpty) return 0.0;
 		else if (dirty) {
-			bVolume = ((bmax[0] - bmin[0]) * (bmax[1] - bmin[1]) * (bmax[2] - bmin[2]));
+			// bVolume = ((bmax[0] - bmin[0]) * (bmax[1] - bmin[1]) * (bmax[2] - bmin[2]));
+            updateCorners();
 			dirty = false;
 		}
 		return bVolume;
@@ -132,6 +147,38 @@ public:
 		dirty = true;
 		bEmpty = false;
 	}
+
+    void updateCorners() {
+        double length = bmax.x() - bmin.x();
+        double width  = bmax.z() - bmin.z();
+        double height = bmax.y() - bmin.y();
+
+        double x = bmin.x();
+        double y = bmin.y();
+        double z = bmin.z();
+
+        // bottom 4 corners
+        corners[0] = bmin;
+        corners[1] = QVector3D(x + length, y, z);
+        corners[2] = QVector3D(x, y, z + width);
+        corners[3] = QVector3D(x + length, y, z + width);
+
+        // top 4 corners
+        corners[4] = QVector3D(x, y + height, z);
+        corners[5] = QVector3D(x, y + height, z + width);
+        corners[6] = QVector3D(x + length, y + height, z);
+        corners[7] = bmax;
+
+        bArea = 2.0 * ((bmax[0] - bmin[0]) * (bmax[1] - bmin[1]) + (bmax[1] - bmin[1]) * (bmax[2] - bmin[2]) + (bmax[2] - bmin[2]) * (bmax[0] - bmin[0]));
+        bVolume = ((bmax[0] - bmin[0]) * (bmax[1] - bmin[1]) * (bmax[2] - bmin[2]));
+
+        dirty = false;
+    }
+
+    QVector3D* getCorners() {
+        if (dirty) updateCorners() ;
+        return corners;
+    }
 };
 
 

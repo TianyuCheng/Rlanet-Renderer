@@ -1,6 +1,6 @@
 #include <Camera.h>
 
-Camera::Camera(QString n) : name(n) {
+Camera::Camera(QString n) : name(n), dirty(true) {
     // Initialize the matrices
     uMVMatrix.setToIdentity();
     uPMatrix.setToIdentity();
@@ -31,8 +31,12 @@ void Camera::lookAt(QVector3D eye, QVector3D center, QVector3D up) {
     this->up = up;
     this->look = center - eye;
 
+    this->up.normalize();
+
     uMVMatrix.setToIdentity();
     uMVMatrix.lookAt(eye, center, up);
+
+    dirty = true;
 
     // modelviewInfo();
 }
@@ -44,6 +48,7 @@ void Camera::moveForward(double distance) {
     uMVMatrix.setToIdentity();
     uMVMatrix.lookAt(eye, center, up);
 
+    dirty = true;
     // modelviewInfo();
 }
 
@@ -58,6 +63,7 @@ void Camera::turnLeft(double angle, QVector3D axis) {
     uMVMatrix.setToIdentity();
     uMVMatrix.lookAt(eye, center, up);
     
+    dirty = true;
     // modelviewInfo();
 }
 
@@ -69,36 +75,42 @@ void Camera::setLeft(double left) {
     this->left = left; 
     uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
+    dirty = true;
 }
 
 void Camera::setRight(double right) { 
     this->right = right; 
     uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
+    dirty = true;
 }
 
 void Camera::setbottom(double bottom) { 
     this->bottom = bottom; 
     uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
+    dirty = true;
 }
 
 void Camera::setTop(double top) {
     this->top = top; 
     uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
+    dirty = true;
 }
 
 void Camera::setNear(double near) { 
     this->near = near; 
     uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
+    dirty = true;
 }
 
 void Camera::setFar(double far) { 
     this->far = far; 
     uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
+    dirty = true;
 }
 
 void Camera::setFrustum(double left,    double right,
@@ -112,6 +124,7 @@ void Camera::setFrustum(double left,    double right,
     this->far = far;
     uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far);
+    dirty = true;
 }
 
 void Camera::setFOV(double fov) {
@@ -143,6 +156,7 @@ void Camera::setPerspective(double fovy, double aspect, double zNear, double zFa
     uPMatrix.setToIdentity();
     uPMatrix.frustum(left, right, bottom, top, near, far); 
     
+    dirty = true;
     // projectionInfo();
 }
 
@@ -154,7 +168,99 @@ void Camera::uniformMatrices(QOpenGLShaderProgram &program) {
 }
 
 Camera::Cullable Camera::isCullable(BoundingBox box) {
-    // Not implemented yet
-    // This method will be later be used in terrain culling
-    return Camera::Cullable::NOT_CULLABLE;
+
+    // If the frustum has been changed, update it
+    if (dirty) updateFrustum();
+
+    QVector3D* corners = box.getCorners();
+
+    int count = 8;
+
+    /**
+     * The idea is simple, you go through all corners,
+     * and check whether that corner is behind all six planes
+     * of the frustum.
+     * If yes, then the corner is in the frustum.
+     * If no, then the corner is not in the frustum.
+     *
+     * NOT CULLABLE = number of corners in frustum == 8
+     * PARTIALLY_CULLABLE = 0 < number of corners in frustum < 8
+     * TOTALLY_CULLABLE = number of corners in frustum == 0
+     * */
+
+    // Iterate through every corner
+    for (int i = 0; i < 8; i++) {
+        QVector3D corner = corners[i];
+
+        // Test with all planes of frustums
+        for (int j = 0; j < 6; j++) {
+            QPair<QVector3D, QVector3D> plane = frustum[j];
+            if (QVector3D::dotProduct(plane.first, corner - plane.second) > 0) {  // out
+                count--;
+                break;
+            }
+        }
+
+    }
+
+    if (count == 8) return Camera::Cullable::NOT_CULLABLE;
+
+    if (count > 0) return Camera::Cullable::PARTIALLY_CULLABLE;
+
+    return Camera::Cullable::TOTALLY_CULLABLE;
+}
+
+
+void Camera::updateFrustum() {
+    QVector3D corners[8];
+
+    QVector3D normalizedDir = look.normalized();
+    QVector3D center = eye + normalizedDir * near;
+
+    QVector3D baseX = QVector3D::crossProduct(normalizedDir, up).normalized();
+    QVector3D baseY = up;
+
+    /**
+     * 1------0
+     * |      | corners in the near plane
+     * 2------3
+     * */
+    corners[0] = center + 0.5 * (right - left) * baseX + 0.5 * (top - bottom) * baseY;
+    corners[1] = center - 0.5 * (right - left) * baseX + 0.5 * (top - bottom) * baseY;
+    corners[2] = center - 0.5 * (right - left) * baseX - 0.5 * (top - bottom) * baseY;
+    corners[3] = center + 0.5 * (right - left) * baseX - 0.5 * (top - bottom) * baseY;
+
+    center = eye + normalizedDir * far;
+    baseX *= far / near;
+    baseY *= far / near;
+
+    /**
+     * 5------4
+     * |      | corners in the far plane
+     * 6------7
+     * */
+    corners[4] = center + 0.5 * (right - left) * baseX + 0.5 * (top - bottom) * baseY;
+    corners[5] = center - 0.5 * (right - left) * baseX + 0.5 * (top - bottom) * baseY;
+    corners[6] = center - 0.5 * (right - left) * baseX - 0.5 * (top - bottom) * baseY;
+    corners[7] = center + 0.5 * (right - left) * baseX - 0.5 * (top - bottom) * baseY;
+
+    frustum.clear();
+
+    // near plane and far plane
+    frustum << qMakePair(-normalizedDir, corners[0]);
+    frustum << qMakePair(normalizedDir, corners[4]);
+
+    // left plane and right plane
+    QVector3D leftNormal = QVector3D::crossProduct(corners[5] - corners[1], corners[2] - corners[1]);
+    QVector3D rightNormal = QVector3D::crossProduct(corners[7] - corners[3], corners[0] - corners[3]);
+    frustum << qMakePair(leftNormal, corners[1]);
+    frustum << qMakePair(rightNormal, corners[0]);
+
+    // top plane and bottom plane
+    QVector3D topNormal = QVector3D::crossProduct(corners[4] - corners[0], corners[1] - corners[0]);
+    QVector3D bottomNormal = QVector3D::crossProduct(corners[6] - corners[2], corners[3] - corners[2]);
+    frustum << qMakePair(topNormal, corners[0]);
+    frustum << qMakePair(bottomNormal, corners[2]);
+
+    dirty = false;
 }

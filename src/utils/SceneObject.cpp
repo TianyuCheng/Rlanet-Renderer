@@ -4,7 +4,7 @@ SceneObject::SceneObject(QString n, SceneObject *p) : name(n), parent(p) {
     vShader = nullptr;
     fShader = nullptr;
     transform.setToIdentity();
-    drawMode = GL_TRIANGLES;
+    drawMode = GL_FILL;
 }
 
 SceneObject::SceneObject(QString n, QString _vShader, QString _fShader, SceneObject *p)
@@ -128,8 +128,9 @@ void SceneObject::render() {
      * program.bind() will be called by Scene.
      * This allows us to focus on rendering.
      * */
+    glPolygonMode(GL_FRONT_AND_BACK, drawMode);
     glDrawElements(
-            drawMode, 
+            GL_TRIANGLES, 
             indices.size(),    // count
             GL_UNSIGNED_INT,   // type
             indices.constData());         // element array buffer offset

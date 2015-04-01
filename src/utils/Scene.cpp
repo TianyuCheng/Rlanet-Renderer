@@ -4,12 +4,18 @@ Scene::Scene(QString n, int w, int h)
     : SceneObject(n), 
       name(n), width(w), height(h),
       camera(n + QString("'s camera'")),
-      framebuffer(width, height) {
+      framebuffer(width, height, QOpenGLFramebufferObject::Depth) {
+
+    // Initialize GL
+    glEnable(GL_DEPTH_TEST);
+
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_BACK);
 
     camera.setPerspective(60.0, (float)width/(float)height, 0.01, 5000.0);
 
     // camera.lookAt(
-    //         QVector3D(0.0, 90.0, 0.0),
+    //         QVector3D(0.0, 2000.0, 0.0),
     //         QVector3D(0.0, 0.0, 0.0),
     //         QVector3D(0.0, 0.0, 1.0)
     // );
@@ -41,7 +47,6 @@ QImage Scene::renderScene() {
 
     // Change the viewport to the whole screen
     glViewport(0, 0, width, height);
-
     // Clear out buffer before drawing anything
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -50,6 +55,12 @@ QImage Scene::renderScene() {
     // camera.moveBackward(0.1);
     // camera.turnLeft(1);
     // camera.turnRight(1);
+
+    // camera.lookAt(
+    //         QVector3D(0.0, 2000.0, 100 * timeElapsed()),
+    //         QVector3D(0.0, 0.0,    100 * timeElapsed()),
+    //         QVector3D(0.0, 0.0, 1.0)
+    // );
 
     // Render all objects in the scene.
     // This could be done in a smarter way
@@ -62,6 +73,7 @@ QImage Scene::renderScene() {
         SceneObject *object = *iter;
         object->program.bind();
 
+        object->setDrawMode(drawMode);
         object->update();
 
         // Uniform the camera matrix

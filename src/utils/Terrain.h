@@ -13,6 +13,7 @@
 
 #include <SceneObject.h>
 #include <Scene.h>
+#include <BoundingBox.h>
 
 class Terrain;
 
@@ -23,10 +24,11 @@ public:
     TerrainPatch(QVector2D pos, int level, QVector< QPair<double, double> > *ranges);
     virtual ~TerrainPatch ();
 
-    void selectPatches(QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches);
+    void selectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches);
 private:
     QVector2D pos;     // the position of pos of patch
     int level;
+    BoundingBox bounds;
 
     // Quad-Tree like structure
     /**
@@ -83,7 +85,7 @@ private:
      * This is a recursive call into TerrainPatch.
      * Selected patches will be put into selectedPatches.
      * */
-    void selectPatches(QVector3D &cameraPos);
+    void selectPatches(Camera &camera, QVector3D &cameraPos);
 
     // Debugging ranges and morph area info
     void rangesInfo();
