@@ -12,6 +12,9 @@ public:
 	Mangekyou();
 	~Mangekyou();
 
+public slots:
+	void get_thread_ready();
+
 protected:
 	QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *);
 

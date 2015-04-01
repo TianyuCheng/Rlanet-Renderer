@@ -20,8 +20,14 @@ RenderThread::~RenderThread()
 {
 }
 
+void RenderThread::install_surface(QOffscreenSurface* surface)
+{
+	surface_ = surface;
+}
+
 bool RenderThread::init_context(QOpenGLContext* parent_ctx)
 {
+	qDebug("Calling %s, parent %p\n", __func__, parent_ctx);
 	ctx_.reset(new QOpenGLContext());
 	ctx_->setFormat(parent_ctx->format()); // Do NOT call select_gl, RenderThread's ctx should be the same version as the parent one.
 	ctx_->setShareContext(parent_ctx);
@@ -30,11 +36,8 @@ bool RenderThread::init_context(QOpenGLContext* parent_ctx)
 		return false;
 	}
 	ctx_->moveToThread(this);
+	qDebug("Move ctx %p to thread %p\n", ctx_.get(), this);
 
-	surface_ = new QOffscreenSurface();
-	surface_->setFormat(ctx_->format());
-	surface_->create();
-	surface_->moveToThread(this);
 	return true;
 }
 
@@ -52,11 +55,16 @@ bool RenderThread::init_renderer()
 	scene_.reset(new Scene(nexus::get_scene_name(), size_.width(), size_.height()));
 	terrian_.reset(new Terrain(16, 10, scene_.get()));
 	scene_->addObject(terrian_.get());
+	return true;
 }
 
 void RenderThread::render_next()
 {
+	qDebug("Try to make current ctx %p on surface %p\n",
+			ctx_.get(), surface_);
 	ctx_->makeCurrent(surface_);
+	qDebug("Successfully make current ctx %p on surface %p\n",
+			ctx_.get(), surface_);
 	
 	if (!fbo_ready()) {
 		init_fbos();

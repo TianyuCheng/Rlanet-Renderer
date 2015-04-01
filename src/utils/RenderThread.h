@@ -24,10 +24,12 @@ public:
 	~RenderThread();
 	bool ctx_ready() const { return !!ctx_; }
 	bool fbo_ready() const { return !!renderfbo_; }
+	void install_surface(QOffscreenSurface* surface);
 
 	bool init_context(QOpenGLContext *root_ctx);
 	bool init_fbos();
 	bool init_renderer();
+	QOpenGLContext* context() const { return ctx_.get(); }
 private:
 	unique_ptr<QOpenGLContext> ctx_;
 	QOffscreenSurface *surface_; // QOffscreenSurface needs deleteLater

@@ -1,6 +1,7 @@
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFramebufferObject>
 #include <QtGui/QOffscreenSurface>
+#include <QQuickWindow>
 
 #include "Mangekyou.h"
 #include "RenderThread.h"
@@ -13,6 +14,23 @@ Mangekyou::Mangekyou()
 
 Mangekyou::~Mangekyou()
 {
+}
+
+void Mangekyou::get_thread_ready()
+{
+	qDebug("GL context %p\n", thread_->context());
+	QOffscreenSurface* surface = new QOffscreenSurface();
+	surface->setFormat(thread_->context()->format());
+	surface->create();
+	surface->moveToThread(thread_.get());
+	thread_->install_surface(surface);
+	qDebug("Finishing %s\n", __func__);
+
+	thread_->moveToThread(thread_.get());
+	connect(window(), SIGNAL(sceneGraphInvalidated()),
+			thread_.get(), SLOT(shutdown()), Qt::QueuedConnection);
+	thread_->start();
+	update();
 }
 
 #include "TextureNode.h"
@@ -28,10 +46,7 @@ QSGNode *Mangekyou::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 		thread_->init_context(current);
 		current->makeCurrent(window());
 
-		connect(window(), SIGNAL(sceneGraphInvalidated()),
-			thread_.get(), SLOT(shutdown()), Qt::QueuedConnection);
-		thread_->start();
-		update();
+		QMetaObject::invokeMethod(this, "get_thread_ready");
 		return nullptr;
 	}
 
