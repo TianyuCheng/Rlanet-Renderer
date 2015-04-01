@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     // Planet planet("Test Planet");
     // scene.addObject(&planet);
 
-    Terrain terrain(16, 10, &scene);
+    Terrain terrain(64, 10, &scene);
     scene.addObject(&terrain);
 
     w.setScene(&scene);

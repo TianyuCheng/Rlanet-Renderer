@@ -5,6 +5,17 @@
 TerrainPatch::TerrainPatch(QVector2D p, int l, QVector< QPair<double, double> > *r) : pos(p), level(l), ranges(*r) {
     for (int i = 0; i < 4; i++)
         children[i] = nullptr;
+
+    // set up the bounding box
+    // Note: this bounding box does not contain height information
+    // We just insert a dummy value of 1 for height. However, we can
+    // change it when we generate the heightmap by itself
+    int size = ranges[level].first;
+    QVector3D min = QVector3D(p.x(), 0.0, p.y());
+    QVector3D max = QVector3D(p.x() + size, 1.0, p.y() + size);
+    bounds.setMin(min);
+    bounds.setMax(max);
+    bounds.updateCorners();
 }
 
 TerrainPatch::~TerrainPatch() {
@@ -17,13 +28,19 @@ TerrainPatch::~TerrainPatch() {
     }
 }
 
-void TerrainPatch::selectPatches(QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches) {
-    int size = ranges[level].first;
-    QVector3D center = QVector3D(pos.x() + size / 2.0, 0.0, pos.y() + size / 2.0);
-    double distance = (cameraPos - center).length();
+void TerrainPatch::selectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches) {
+    
+    // Test it first with camera for frustum culling
+    if (camera.isCullable(bounds) == Camera::Cullable::TOTALLY_CULLABLE) return;
 
-    // qDebug() << "Level:" << level << "Camera:" << cameraPos << "Center:" << center << "distance:" << distance;
-    if (ranges[level].first > distance && level > 0) {
+    int size = ranges[level].first;
+
+    if (level == 0 || !bounds.intersectSphere(cameraPos, ranges[level - 1].first)) {
+        // qDebug() << "Add node" << pos << "from level" << level;
+        // Add this node to scene
+        selectedPatches << this;
+    }
+    else {
         for (int i = 0; i < 4; i++) {
             // If the child is never instantiated, create it
             if (!children[i]) {
@@ -45,13 +62,8 @@ void TerrainPatch::selectPatches(QVector3D &cameraPos, QVector<TerrainPatch*> &s
                 // qDebug() << "Created node at " << childPos << "level:" << level - 1;
             }
             // Recursively add children patches
-            children[i]->selectPatches(cameraPos, selectedPatches);
+            children[i]->selectPatches(camera, cameraPos, selectedPatches);
         }
-    }
-    else {
-        // qDebug() << "Add node" << pos << "from level" << level;
-        // Add this node to scene
-        selectedPatches << this;
     }
 }
 
@@ -80,7 +92,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
     }
 
     // Initialize ranges
-    double range = 1.0, morph = 1.0;
+    double range = 1.0, morph = range;
     for (int i = 0; i <= levels; i++) {
         ranges << qMakePair(range, morph);
         range *= 2;
@@ -123,7 +135,7 @@ Terrain::~Terrain() {
 void Terrain::updatePatches() {
     Camera* camera = dynamic_cast<Scene*>(parent)->getCamera();
     QVector3D cameraPos = camera->getPosition();
-    cameraPos.setY(0.0);
+    cameraPos.setY(0.0);     // To test level of detail, uncomment this
 
     int far = qNextPowerOfTwo(int(camera->getFar()));
     int size = int(ranges[levels].first);
@@ -144,15 +156,15 @@ void Terrain::updatePatches() {
 
     // allPatchesInfo();
 
-    selectPatches(cameraPos);
+    selectPatches(*camera, cameraPos);
 }
 
-void Terrain::selectPatches(QVector3D &cameraPos) {
+void Terrain::selectPatches(Camera &camera, QVector3D &cameraPos) {
     selectedPatches.clear();
     QMapIterator< QPair<int, int>, TerrainPatch*> iter(children);
     while (iter.hasNext()) {
         iter.next();
-        iter.value()->selectPatches(cameraPos, selectedPatches);
+        iter.value()->selectPatches(camera, cameraPos, selectedPatches);
     }
 }
 
@@ -196,16 +208,10 @@ void Terrain::update() {
 void Terrain::render() {
     // Drawing only using line mode for LOD visualization
     // drawMode = GL_LINE;
-    /**
-     * Using GL_FRONT on GL_FILL gives me 1280 error,
-     * but it renders fine; using GL_FRONT_AND_BACK 
-     * does not render anything but a line in GL_LINE
-     * mode
-     */
     // glPolygonMode( GL_FRONT_AND_BACK, drawMode );
     glPolygonMode( GL_FRONT, drawMode );
 
-    // qDebug() << "Children:" << children.size() << "Selected:" << selectedPatches.size();
+    qDebug() << "Children:" << children.size() << "Selected:" << selectedPatches.size();
     for (int i = 0; i < selectedPatches.size(); i++) {
         TerrainPatch *patch = selectedPatches[i];
         double scaleFactor = ranges[patch->level].first;

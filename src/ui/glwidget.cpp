@@ -82,9 +82,7 @@ void GLWidget::initializeGL()
 {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
-    // glEnable(GL_CULL_FACE);
-    // glCullFace(GL_FRONT);
-    // glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
     // Disable lighting because we are drawing
     // scenes to textures. 2D image is sufficent

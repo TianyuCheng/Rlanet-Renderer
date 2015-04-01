@@ -4,7 +4,7 @@ SceneObject::SceneObject(QString n, SceneObject *p) : name(n), parent(p) {
     vShader = nullptr;
     fShader = nullptr;
     transform.setToIdentity();
-    drawMode = GL_TRIANGLES;
+    drawMode = GL_FILL;
 }
 
 SceneObject::SceneObject(QString n, QString _vShader, QString _fShader, SceneObject *p)

@@ -1,7 +1,9 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <QPair>
 #include <QtMath>
+#include <QVector>
 #include <QString>
 #include <QVector3D>
 #include <QMatrix4x4>
@@ -90,8 +92,13 @@ private:
         qDebug() << "Projection:" << uPMatrix;
     }
 
+    void updateFrustum();
+
 private:
     QString name;       // For debugging purpose
+
+    bool dirty;         // for lazily generating frustum planes
+    QVector< QPair<QVector3D, QVector3D> > frustum;
 
     // Camera position
     QVector3D eye;
@@ -99,7 +106,7 @@ private:
     QVector3D up;
 
     // look is computed using (center - eye)
-    // It is not normalized because the length of 
+        // It is not normalized because the length of 
     // look can be used for turn left/right
     QVector3D look;  
 

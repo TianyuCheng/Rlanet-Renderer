@@ -9,6 +9,9 @@ Scene::Scene(QString n, int w, int h)
     // Initialize GL
     glEnable(GL_DEPTH_TEST);
 
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_BACK);
+
     camera.setPerspective(60.0, (float)width/(float)height, 0.01, 5000.0);
 
     // camera.lookAt(
