@@ -8,11 +8,11 @@ TerrainPatch::TerrainPatch(QVector2D p, int l, QVector< QPair<double, double> > 
 
     // set up the bounding box
     // Note: this bounding box does not contain height information
-    // We just insert a dummy value of 1 for height. However, we can
+    // We just insert a dummy value of 1000 for height. However, we can
     // change it when we generate the heightmap by itself
     int size = ranges[level].first;
     QVector3D min = QVector3D(p.x(), 0.0, p.y());
-    QVector3D max = QVector3D(p.x() + size, 1.0, p.y() + size);
+    QVector3D max = QVector3D(p.x() + size, 1000.0, p.y() + size);
     bounds.setMin(min);
     bounds.setMax(max);
     bounds.updateCorners();
@@ -36,7 +36,6 @@ void TerrainPatch::selectPatches(Camera &camera, QVector3D &cameraPos, QVector<T
     int size = ranges[level].first;
 
     if (level == 0 || !bounds.intersectSphere(cameraPos, ranges[level - 1].first)) {
-        // qDebug() << "Add node" << pos << "from level" << level;
         // Add this node to scene
         selectedPatches << this;
     }
@@ -59,7 +58,6 @@ void TerrainPatch::selectPatches(Camera &camera, QVector3D &cameraPos, QVector<T
                         childPos = QVector2D(pos.x() + size / 2.0, pos.y());
                 }
                 children[i] = new TerrainPatch(childPos, level - 1, &ranges);
-                // qDebug() << "Created node at " << childPos << "level:" << level - 1;
             }
             // Recursively add children patches
             children[i]->selectPatches(camera, cameraPos, selectedPatches);
@@ -138,6 +136,7 @@ void Terrain::updatePatches() {
     cameraPos.setY(0.0);     // To test level of detail, uncomment this
 
     int far = qNextPowerOfTwo(int(camera->getFar()));
+    // int far = 32;
     int size = int(ranges[levels].first);
     int num = qCeil(far / size);
     
@@ -149,7 +148,6 @@ void Terrain::updatePatches() {
             QPair<int, int> key(x + i, y + j);
             if (!children.contains(key)) {
                 children.insert(key, new TerrainPatch(QVector2D(x + i, y + j), levels, &ranges));
-                // qDebug() << "Insert: " << key;
             }
         }
     }
@@ -211,11 +209,10 @@ void Terrain::render() {
     // glPolygonMode( GL_FRONT_AND_BACK, drawMode );
     glPolygonMode( GL_FRONT, drawMode );
 
-    qDebug() << "Children:" << children.size() << "Selected:" << selectedPatches.size();
+    // qDebug() << "Children:" << children.size() << "Selected:" << selectedPatches.size();
     for (int i = 0; i < selectedPatches.size(); i++) {
         TerrainPatch *patch = selectedPatches[i];
         double scaleFactor = ranges[patch->level].first;
-        // qDebug() << "level:" << patch->level << "pos:" << patch->pos << "scale:" << scaleFactor;
         QVector2D scale(scaleFactor, scaleFactor);
         program.setUniformValue("uOffset", patch->pos);
         program.setUniformValue("uScale", scale);
