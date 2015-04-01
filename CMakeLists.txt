@@ -68,7 +68,8 @@ file(GLOB UI_FORMS
 )
 
 # Manually create UI because of the version error in UI form
-qt5_wrap_ui(UIS_HDRS ${UI_FORMS})
+#qt5_wrap_ui(UIS_HDRS ${UI_FORMS})
+qt5_add_resources(RESOURCES src/quick/quick.qrc)
 
 add_library(PlanetGUI ${UI_HDRS} ${UI_SRCS} ${UIS_HDRS})
 set_target_properties(PlanetGUI PROPERTIES LINKER_LANGUAGE CXX)
@@ -87,7 +88,7 @@ target_include_directories(PlanetGUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 AUX_SOURCE_DIRECTORY(src/ SRC)
 # Executable PlanetRenderer
-add_executable(PlanetRenderer ${SRC})
+add_executable(PlanetRenderer ${SRC} ${RESOURCES})
 qt5_use_modules(PlanetRenderer Quick Core OpenGL)
 
 target_link_libraries(PlanetRenderer PlanetGUI PlanetEssential ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})

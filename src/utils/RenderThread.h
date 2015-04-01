@@ -24,6 +24,7 @@ public:
 	~RenderThread();
 	bool ctx_ready() const { return !!ctx_; }
 	bool fbo_ready() const { return !!renderfbo_; }
+	void install_surface(QOffscreenSurface* surface);
 
 	bool init_context(QOpenGLContext *root_ctx);
 	bool init_fbos();
