@@ -34,7 +34,7 @@ void Scene::addObject(SceneObject* object) {
     object->initialize();
 }
 
-QImage Scene::renderScene()
+void Scene::renderScene()
 {
 #if 0 // We don't need this in quick version
     // use this framebuffer instead of the default buffer

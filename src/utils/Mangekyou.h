@@ -10,6 +10,7 @@ class Mangekyou : public QQuickItem {
 	Q_OBJECT;
 public:
 	Mangekyou();
+	~Mangekyou();
 
 protected:
 	QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *);

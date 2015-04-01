@@ -1,4 +1,5 @@
 #include <QSurfaceFormat>
+#include <QObject>
 #include "nexus.h"
 
 QSurfaceFormat nexus::select_gl(QSurfaceFormat fmt)
@@ -11,4 +12,8 @@ QSurfaceFormat nexus::select_gl(QSurfaceFormat fmt)
 QString nexus::get_scene_name()
 {
 	return QObject::tr("Test scene");
+}
+
+void nexus::terminate()
+{
 }

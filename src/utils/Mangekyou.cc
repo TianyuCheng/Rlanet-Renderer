@@ -11,6 +11,10 @@ Mangekyou::Mangekyou()
 	thread_.reset(new RenderThread());
 }
 
+Mangekyou::~Mangekyou()
+{
+}
+
 #include "TextureNode.h"
 
 QSGNode *Mangekyou::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -25,7 +29,7 @@ QSGNode *Mangekyou::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 		current->makeCurrent(window());
 
 		connect(window(), SIGNAL(sceneGraphInvalidated()),
-			thread_, SLOT(shutdown()), Qt::QueuedConnection);
+			thread_.get(), SLOT(shutdown()), Qt::QueuedConnection);
 		thread_->start();
 		update();
 		return nullptr;
@@ -34,17 +38,17 @@ QSGNode *Mangekyou::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 	if (!node) {
 		node = new TextureNode(window());
 
-		connect(thread_, SIGNAL(textureReady(int,QSize)),
+		connect(thread_.get(), SIGNAL(textureReady(int,QSize)),
 			node, SLOT(newTexture(int,QSize)), Qt::DirectConnection);
 		connect(node, SIGNAL(pendingNewTexture()),
 			window(), SLOT(update()), Qt::QueuedConnection);
 		connect(window(), SIGNAL(beforeRendering()),
 			node, SLOT(prepareNode()), Qt::DirectConnection);
 		connect(node, SIGNAL(textureInUse()),
-			thread_, SLOT(render_next()), Qt::QueuedConnection);
+			thread_.get(), SLOT(render_next()), Qt::QueuedConnection);
 
 		// Get the production of FBO textures started..
-		QMetaObject::invokeMethod(thread_, "render_next", Qt::QueuedConnection);
+		QMetaObject::invokeMethod(thread_.get(), "render_next", Qt::QueuedConnection);
 	}
 	node->setRect(boundingRect());
 	return node;

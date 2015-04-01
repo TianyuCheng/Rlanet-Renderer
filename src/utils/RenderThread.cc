@@ -1,14 +1,22 @@
 #include <algorithm>
 
+#include <QGuiApplication>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFramebufferObject>
+#include <QtGui/QOffscreenSurface>
 #include <QtGlobal>
 
 #include "RenderThread.h"
+#include "Terrain.h"
+#include "Scene.h"
 #include "nexus.h"
 
 RenderThread::RenderThread()
 	:size_(600,400)
+{
+}
+
+RenderThread::~RenderThread()
 {
 }
 
@@ -41,9 +49,9 @@ bool RenderThread::init_fbos()
 
 bool RenderThread::init_renderer()
 {
-	scene_.reset(new Scene(nexus::scene_name(), size_.width(), size_.height()));
-	terrian_.reset(new Terrain(16, 10, scene_));
-	scene_.addObject(terrian_);
+	scene_.reset(new Scene(nexus::get_scene_name(), size_.width(), size_.height()));
+	terrian_.reset(new Terrain(16, 10, scene_.get()));
+	scene_->addObject(terrian_.get());
 }
 
 void RenderThread::render_next()
@@ -59,7 +67,7 @@ void RenderThread::render_next()
 	renderfbo_->bind();
 	// scene_->start(); TODO
 	scene_->renderScene();
-        context->functions()->glFlush();
+        ctx_->functions()->glFlush();
         renderfbo_->release();
 
 	// Double buffering support

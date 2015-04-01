@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSize>
 #include <QtQuick/QSGSimpleTextureNode> 
+#include <QtQuick/QQuickWindow> 
 
 class TextureNode : public QObject, public QSGSimpleTextureNode
 {

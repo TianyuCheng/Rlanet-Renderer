@@ -105,6 +105,7 @@ void GLWidget::paintGL()
 
     glLoadIdentity();
 
+#if 0
     // Draw the scene's snapshot if there is a scene
     if (scene) {
         QImage image = scene->renderScene();
@@ -112,6 +113,7 @@ void GLWidget::paintGL()
         drawTexture(QRectF(QPointF(-1, 1), QPointF(1, -1)), texture);
         deleteTexture(texture);
     }
+#endif
 
     // could use an interval here, but currently just refresh it
     swapBuffers();
