@@ -1,6 +1,7 @@
 #ifndef NEXUS_H
 #define NEXUS_H
 
+#include <vector>
 #include <QtGui/QSurfaceFormat>
 #include <QtCore/QString>
 
@@ -12,6 +13,8 @@ public:
 	static QString get_scene_name();
 	static void register_thread(QThread*);
 	static void terminate();
+private:
+	static std::vector<QThread*> threads_;
 };
 
 #endif

@@ -1,10 +1,13 @@
+#version 330
 uniform sampler2D uDecalmap;
 
-varying vec2 vDecalTexCoord;
-varying vec4 vColor;
+in vec2 vDecalTexCoord;
+in vec4 vColor;
 
-varying vec3 vView;
-varying vec3 vNormal;
+in vec3 vView;
+in vec3 vNormal;
+
+out vec4 frag_color;
 
 void main()
 {
@@ -26,5 +29,5 @@ void main()
     vec3 ambient = lightAmbient;
     vec3 diffuse = lightDiffuse * clamp(0.0, 1.0, max(0.0, dot(n, l)));
 
-    gl_FragColor = vec4((ambient + diffuse) * decal, 1.0);
+    frag_color = vec4((ambient + diffuse) * decal, 1.0);
 }

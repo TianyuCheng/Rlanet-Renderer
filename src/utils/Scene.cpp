@@ -51,7 +51,8 @@ void Scene::renderScene()
     glViewport(0, 0, width, height);
     // Clear out buffer before drawing anything
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0, 0.0, 0.0, 0.0);
+    //glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClearColor(drand48(), drand48(), drand48(), 1.0);
 
     // camera.moveForward(0.1);
     // camera.moveBackward(0.1);
