@@ -174,8 +174,7 @@ Camera::Cullable Camera::isCullable(BoundingBox box) {
 
     QVector3D* corners = box.getCorners();
 
-    int count = 8;
-
+    int total = 0;
     /**
      * The idea is simple, you go through all corners,
      * and check whether that corner is behind all six planes
@@ -188,26 +187,30 @@ Camera::Cullable Camera::isCullable(BoundingBox box) {
      * TOTALLY_CULLABLE = number of corners in frustum == 0
      * */
 
-    // Iterate through every corner
-    for (int i = 0; i < 8; i++) {
-        QVector3D corner = corners[i];
+    // Iterate through every plane
+    for (int i = 0; i < 6; i++) {
+        int count = 8;
+        int point = 1;
 
-        // Test with all planes of frustums
-        for (int j = 0; j < 6; j++) {
-            QPair<QVector3D, QVector3D> plane = frustum[j];
+        QPair<QVector3D, QVector3D> plane = frustum[i];
+
+        // Iterate through every corner
+        for (int j = 0; j < 8; j++) {
+            QVector3D corner = corners[j];
             if (QVector3D::dotProduct(plane.first, corner - plane.second) > 0) {  // out
                 count--;
-                break;
+                point = 0;
             }
         }
 
+        // We are out
+        if (count == 0) return Camera::Cullable::TOTALLY_CULLABLE;
+        total += point;
     }
 
-    if (count == 8) return Camera::Cullable::NOT_CULLABLE;
+    if (total == 8) return Camera::Cullable::NOT_CULLABLE;
 
-    if (count > 0) return Camera::Cullable::PARTIALLY_CULLABLE;
-
-    return Camera::Cullable::TOTALLY_CULLABLE;
+    return Camera::Cullable::PARTIALLY_CULLABLE;
 }
 
 

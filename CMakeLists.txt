@@ -27,7 +27,7 @@ set(CMAKE_AUTOMOC ON)
 # Package OpenGL
 find_package (OpenGL REQUIRED)
 # Use OpenGL Library
-include_directories(${OPENGL_INCLUDE_DIR})
+#include_directories(${OPENGL_INCLUDE_DIR}) # We're not going to use OpenGL direclty
 # Include our own directories
 include_directories(src/)
 include_directories(src/ui/)
@@ -36,16 +36,23 @@ include_directories(src/utils/)
 # include_directories("${PROJECT_SOURCE_DIR}/planet")
 
 # Find the QtWidgets library
-find_package(Qt5Widgets REQUIRED)
-add_definitions(${Qt5Widgets_DEFINITIONS})
-include_directories(${Qt5Widgets_INCLUDE_DIRS})
+#find_package(Qt5Quick REQUIRED)
+#add_definitions(${Qt5Quick_DEFINITIONS})
+#include_directories(${Qt5Quick_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "--std=c++11 -ggdb3 ${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 # Find the QtOpenGL library
-find_package(Qt5OpenGL REQUIRED)
-add_definitions(${Qt5OpenGL_DEFINITIONS})
-include_directories(${Qt5OpenGL_INCLUDE_DIRS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5OpenGL_EXECUTABLE_COMPILE_FLAGS}")
+#find_package(Qt5OpenGL REQUIRED)
+#add_definitions(${Qt5OpenGL_DEFINITIONS})
+#include_directories(${Qt5OpenGL_INCLUDE_DIRS})
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5OpenGL_EXECUTABLE_COMPILE_FLAGS}")
+
+find_package(Qt5 COMPONENTS Quick Core OpenGL REQUIRED)
+include_directories(${Qt5Quick_INCLUDE_DIRS})
+#find_package(Qt5QuickCompiler)
+#qtquick_compiler_add_resources(RESOURCES example.qrc)
+#add_executable(myapp ${SRC_LIST} ${RESOURCES)
+#qt5_use_modules(myapp Quick Core Network)
 
 # Combine all Qt libraries into QT_LIBRARIES
 set(QT_USE_QTOPENGL TRUE)
@@ -55,15 +62,14 @@ set(QT_LIBRARIES ${Qt5Widgets_LIBRARIES} ${Qt5OpenGL_LIBRARIES})
 file(GLOB UI_HDRS
     src/ui/*.h
 )
-file(GLOB UI_SRCS
-    src/ui/*.cpp
-)
+AUX_SOURCE_DIRECTORY(src/ui/ UI_SRC)
 file(GLOB UI_FORMS
     src/ui_forms/*.ui
 )
 
 # Manually create UI because of the version error in UI form
-qt5_wrap_ui(UIS_HDRS ${UI_FORMS})
+#qt5_wrap_ui(UIS_HDRS ${UI_FORMS})
+qt5_add_resources(RESOURCES src/quick/quick.qrc)
 
 add_library(PlanetGUI ${UI_HDRS} ${UI_SRCS} ${UIS_HDRS})
 set_target_properties(PlanetGUI PROPERTIES LINKER_LANGUAGE CXX)
@@ -72,9 +78,7 @@ target_link_libraries(PlanetGUI ${QT_LIBRARIES})
 file(GLOB PLANET_HDRS
     src/utils/*.h
 )
-file(GLOB PLANET_SRCS
-    src/utils/*.cpp
-)
+AUX_SOURCE_DIRECTORY(src/utils/ PLANET_SRCS)
 add_library(PlanetEssential ${PLANET_HDRS} ${PLANET_SRCS})
 set_target_properties(PlanetEssential PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(PlanetEssential ${QT_LIBRARIES})
@@ -84,8 +88,8 @@ target_include_directories(PlanetGUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 AUX_SOURCE_DIRECTORY(src/ SRC)
 # Executable PlanetRenderer
-add_executable(PlanetRenderer ${SRC})
-qt5_use_modules(PlanetRenderer Core Gui Widgets OpenGL)
+add_executable(PlanetRenderer ${SRC} ${RESOURCES})
+qt5_use_modules(PlanetRenderer Quick Core OpenGL)
 
 target_link_libraries(PlanetRenderer PlanetGUI PlanetEssential ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})
 
