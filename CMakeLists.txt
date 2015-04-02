@@ -16,13 +16,17 @@ message(${CMAKE_BINARY_DIR})
 # set(PROJECT_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 # Update the moudule path to find CEGUI
-set(CMAKE_MODULE_PATH "cmake/modules/;${CMAKE_MODULE_PATH}")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/;${CMAKE_MODULE_PATH}")
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Auto-moc for Qt
 set(CMAKE_AUTOMOC ON)
+
+# Package LibNoise
+find_package(LibNoise REQUIRED)
+include_directories(${LibNoise_INCLUDE_DIRS})
 
 # Package OpenGL
 find_package (OpenGL REQUIRED)
@@ -81,7 +85,7 @@ file(GLOB PLANET_HDRS
 AUX_SOURCE_DIRECTORY(src/utils/ PLANET_SRCS)
 add_library(PlanetEssential ${PLANET_HDRS} ${PLANET_SRCS})
 set_target_properties(PlanetEssential PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(PlanetEssential ${QT_LIBRARIES})
+target_link_libraries(PlanetEssential ${QT_LIBRARIES} ${LibNoise_LIBRARIES})
 
 # Link executable with modules
 target_include_directories(PlanetGUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -70,3 +70,5 @@ Makefile*
 
 # Cscope files
 cscope.files
+
+build/
