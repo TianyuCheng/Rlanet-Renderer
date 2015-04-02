@@ -17,6 +17,7 @@ public:
 	{
 		// Our texture node must have a texture, so use the default 0
 		// texture.
+        setTextureCoordinatesTransform(QSGSimpleTextureNode::MirrorVertically);
 		m_texture = m_window->createTextureFromId(0, QSize(1, 1));
 		setTexture(m_texture);
 		setFiltering(QSGTexture::Linear);

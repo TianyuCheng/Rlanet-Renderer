@@ -49,7 +49,7 @@ void Scene::renderScene()
     CHECK_GL_ERROR("Before Clear\n");
 
     // Change the viewport to the whole screen
-    glViewport(0, 0, width, height);
+    glViewport(0, 50, width, height);
     // Clear out buffer before drawing anything
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -57,9 +57,10 @@ void Scene::renderScene()
     //glClearColor(sin(::time(NULL)), 0.0, 0.0, 0.0);
     CHECK_GL_ERROR("After Clear\n");
 
+    camera.moveForward(10);
     // camera.moveForward(0.1);
     // camera.moveBackward(0.1);
-    // camera.turnLeft(1);
+    camera.turnLeft(1);
     // camera.turnRight(1);
 
     // camera.lookAt(
@@ -78,7 +79,7 @@ void Scene::renderScene()
          * */
         SceneObject *object = *iter;
         object->program.bind();
-	//qDebug("Handling %p", object);
+        //qDebug("Handling %p", object);
 
         object->setDrawMode(drawMode);
         object->update();
@@ -137,4 +138,8 @@ void Scene::restart() {
 double Scene::timeElapsed() const
 { 
     return time.elapsed() / 1000.0; 
+}
+
+void Scene::resize(GLuint width, GLuint height) {
+    camera.setAspect((GLfloat)width / (GLfloat)height);
 }

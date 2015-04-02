@@ -57,6 +57,7 @@ public:
     void restart();
     double timeElapsed() const;
 
+    void resize(GLuint width, GLuint height);
 private:
     // Name for debugging and displaying
     QString name;
