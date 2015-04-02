@@ -1,16 +1,12 @@
 #include <SceneObject.h>
 
 SceneObject::SceneObject(QString n, SceneObject *p) : name(n), parent(p) {
-    vShader = nullptr;
-    fShader = nullptr;
     transform.setToIdentity();
     drawMode = GL_FILL;
 }
 
 SceneObject::SceneObject(QString n, QString _vShader, QString _fShader, SceneObject *p)
     : name(n), parent(p) {
-    vShader = nullptr;
-    fShader = nullptr;
     setShader(QOpenGLShader::Vertex, _vShader);
     setShader(QOpenGLShader::Fragment, _fShader);
     transform.setToIdentity();
@@ -19,28 +15,24 @@ SceneObject::SceneObject(QString n, QString _vShader, QString _fShader, SceneObj
 
 SceneObject::SceneObject(QString n, QOpenGLShader *_vShader, QOpenGLShader *_fShader, SceneObject *p) 
     : name(n), parent(p) {
-    vShader = nullptr;
-    fShader = nullptr;
     setShader(_vShader);
     setShader(_fShader);
     transform.setToIdentity();
     drawMode = GL_TRIANGLES;
 }
 
+#if 0
 SceneObject::SceneObject(SceneObject &obj) {
     name      = obj.name;
     parent    = obj.parent;
     transform = obj.transform;
     drawMode = obj.drawMode;
-    vShader = nullptr;
-    fShader = nullptr;
     setShader(obj.vShader);
     setShader(obj.fShader);
 }
+#endif
 
 SceneObject::~SceneObject() {
-    if (vShader) delete vShader;
-    if (fShader) delete fShader;
     program.removeAllShaders();
 }
 
@@ -59,12 +51,10 @@ void SceneObject::setShader(QOpenGLShader *shader) {
     // assign the shader
     switch (shader->shaderType()) {
         case QOpenGLShader::Vertex:
-            if (vShader) delete vShader;
-            vShader = shader;
+            vShader.reset(shader);
             break;
         case QOpenGLShader::Fragment:
-            if (fShader) delete fShader;
-            fShader = shader;
+            fShader.reset(shader);
             break;
     }
 
@@ -107,6 +97,7 @@ void SceneObject::setShader(QOpenGLShader::ShaderType type, QString filename) {
 }
 
 void SceneObject::initialize() {
+	initializeOpenGLFunctions();
     attributes["vertex"] = program.attributeLocation("aVertex");
 
     program.bind();
