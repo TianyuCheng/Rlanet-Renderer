@@ -1318,15 +1318,7 @@ namespace noise
     /// "flattens" these coordinates onto a plane so that it can write the
     /// coherent-noise values into a two-dimensional noise map.
     ///
-    /// <b>Building the Noise Map</b>
-    ///
-    /// To build the noise map, perform the following steps:
-    /// - Pass the bounding coordinates to the SetBounds() method.
-    /// - Pass the noise map size, in points, to the SetDestSize() method.
-    /// - Pass a NoiseMap object to the SetDestNoiseMap() method.
-    /// - Pass a noise module (derived from noise::module::Module) to the
-    ///   SetSourceModule() method.
-    /// - Call the Build() method.
+    /// <b>Build() method.
     ///
     /// You may also pass a callback function to the SetCallback() method.
     /// The Build() method calls this callback function each time it fills a

@@ -75,7 +75,7 @@ void main()
 {
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
     vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, 0.3), 0.0).xzy;
-    vec2 uv = fract(morphedPos.xz / 8192.0) - vec2(0.5, 0.5);
+    vec2 uv = fract(morphedPos.xz / 16384.0) - vec2(0.5, 0.5);
     morphedPos.y = texture2D(uHeightmap, uv).x * 1400.0 - 700;
     gl_Position = uPMatrix * uMVMatrix * uTransform * vec4(morphedPos, 1.0);
 

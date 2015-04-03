@@ -26,7 +26,7 @@ set(CMAKE_AUTOMOC ON)
 
 # Package LibNoise
 find_package(LibNoise REQUIRED)
-include_directories(${LibNoise_INCLUDE_DIRS})
+include_directories(${LIBNOISE_INCLUDE_DIR})
 
 # Package OpenGL
 find_package (OpenGL REQUIRED)
@@ -88,7 +88,7 @@ AUX_SOURCE_DIRECTORY(src/utils/ PLANET_UTIL_SRCS)
 AUX_SOURCE_DIRECTORY(src/scene/ PLANET_SCENE_SRCS)
 add_library(PlanetEssential ${PLANET_HDRS} ${PLANET_UTIL_SRCS} ${PLANET_SCENE_SRCS})
 set_target_properties(PlanetEssential PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(PlanetEssential ${QT_LIBRARIES} ${LibNoise_LIBRARIES})
+target_link_libraries(PlanetEssential ${QT_LIBRARIES} ${LIBNOISE_LIBRARY})
 
 # Link executable with modules
 # target_include_directories(PlanetGUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -98,7 +98,7 @@ AUX_SOURCE_DIRECTORY(src/ SRC)
 add_executable(PlanetRenderer ${SRC} ${RESOURCES})
 qt5_use_modules(PlanetRenderer Quick Core OpenGL)
 
-target_link_libraries(PlanetRenderer PlanetEssential ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})
+target_link_libraries(PlanetRenderer PlanetEssential ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES} ${LIBNOISE_LIBRARY})
 
 set(ALL_SRC ${SRC} ${PLANET_HDRS} ${PLANET_UTIL_SRCS} ${PLANET_SCENE_SRCS})
 string(REPLACE ";" "\n" ALL_SRC "${ALL_SRC}")

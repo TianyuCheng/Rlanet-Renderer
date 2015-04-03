@@ -73,8 +73,17 @@ Terrain::Terrain(int g, int l, Scene *parent) :
     grid(g), levels(l) {
 
     {
+        // Load terrain texture from file
         QImage decal("../textures/decal_dirt.jpg");
-        QImage height("../textures/heightmap4.jpg");
+
+        // Generate heightmap using seed
+        int r = 128;
+        int w  = r * 2 * M_PI;
+        int h = r * M_PI;
+        QImage height(w, h, QImage::Format_RGB32);
+        NoiseGenerator::SphericalHeightmap(height, r, 100);
+
+        // Check whether texture are loaded
         if (decal.isNull() || height.isNull()) {
             qDebug() << "Decal/Height map for terrain has not been found!";
             exit(-1);

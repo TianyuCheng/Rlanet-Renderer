@@ -3,13 +3,13 @@ import QtQuick 2.0
 import Mangekyou 1.0
 
 Item {
-	width: 640
-	height: 640
+	width: 1024
+	height: 768
 
 	Renderer {
 		id: renderer
 		anchors.fill: parent
-		anchors.margins: 10
+		anchors.margins: 0
 	}
 
 	Rectangle {

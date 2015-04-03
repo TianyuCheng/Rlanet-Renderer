@@ -13,7 +13,7 @@
 #include "nexus.h"
 
 RenderThread::RenderThread()
-	:size_(600,400)
+	:size_(1024, 768)
 {
 	nexus::register_thread(this);
 }
@@ -60,7 +60,7 @@ bool RenderThread::init_renderer()
 	vao_->bind();
 
 	scene_.reset(new Scene(nexus::get_scene_name(), size_.width(), size_.height()));
-	terrian_.reset(new Terrain(16, 10, scene_.get()));
+	terrian_.reset(new Terrain(64, 10, scene_.get()));
 	scene_->addObject(terrian_.get());
 	return true;
 }

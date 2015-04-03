@@ -14,6 +14,7 @@
 #include <SceneObject.h>
 #include <Scene.h>
 #include <BoundingBox.h>
+#include <NoiseGenerator.h>
 
 class Terrain;
 
