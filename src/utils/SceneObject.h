@@ -12,6 +12,7 @@ using std::unique_ptr;
 
 #include <QVector3D>
 #include <QOpenGLShader>
+#include <QOpenGLBuffer>
 #include "SelectGL.h"
 
 class Scene;
@@ -117,9 +118,13 @@ private:
     // name of the objects, for debugging and display
     QString name;
 
+protected:
     // shader-based rendering
 	unique_ptr<QOpenGLShader> vShader;
 	unique_ptr<QOpenGLShader> fShader;
+	QOpenGLBuffer vbo_ = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+	QOpenGLBuffer ibo_ = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
+	GLuint vertexLocation_;
 };
 
 #endif /* end of include guard: SCENEOBJECT_H */

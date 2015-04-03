@@ -75,3 +75,7 @@ doc/proposal.pdf
 
 # Cscope files
 cscope.files
+
+# Addition files
+experimental/
+examples/
