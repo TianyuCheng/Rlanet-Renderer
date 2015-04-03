@@ -4,7 +4,6 @@
 #include <QGuiApplication>  
 #include <QQuickView>
 
-#include "mainwindow.h"
 #include "Scene.h"
 #include "Planet.h"
 #include "Terrain.h"

@@ -36,6 +36,7 @@ find_package (OpenGL REQUIRED)
 include_directories(src/)
 include_directories(src/ui/)
 include_directories(src/utils/)
+include_directories(src/scene/)
 # include_directories("${PROJECT_SOURCE_DIR}/ui")
 # include_directories("${PROJECT_SOURCE_DIR}/planet")
 
@@ -62,41 +63,43 @@ include_directories(${Qt5Quick_INCLUDE_DIRS})
 set(QT_USE_QTOPENGL TRUE)
 set(QT_LIBRARIES ${Qt5Widgets_LIBRARIES} ${Qt5OpenGL_LIBRARIES})
 
-# Build submodules as libraries
-file(GLOB UI_HDRS
-    src/ui/*.h
-)
-AUX_SOURCE_DIRECTORY(src/ui/ UI_SRC)
-file(GLOB UI_FORMS
-    src/ui_forms/*.ui
-)
+# # Build submodules as libraries
+# file(GLOB UI_HDRS
+#     src/ui/*.h
+# )
+# AUX_SOURCE_DIRECTORY(src/ui/ UI_SRC)
+# file(GLOB UI_FORMS
+#     src/ui_forms/*.ui
+# )
 
 # Manually create UI because of the version error in UI form
 #qt5_wrap_ui(UIS_HDRS ${UI_FORMS})
 qt5_add_resources(RESOURCES src/quick/quick.qrc)
 
-add_library(PlanetGUI ${UI_HDRS} ${UI_SRCS} ${UIS_HDRS})
-set_target_properties(PlanetGUI PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(PlanetGUI ${QT_LIBRARIES})
+# add_library(PlanetGUI ${UI_HDRS} ${UI_SRCS} ${UIS_HDRS})
+# set_target_properties(PlanetGUI PROPERTIES LINKER_LANGUAGE CXX)
+# target_link_libraries(PlanetGUI ${QT_LIBRARIES})
 
 file(GLOB PLANET_HDRS
-    src/utils/*.h
+    src/utils/*.h,
+    src/scene/*.h
 )
-AUX_SOURCE_DIRECTORY(src/utils/ PLANET_SRCS)
-add_library(PlanetEssential ${PLANET_HDRS} ${PLANET_SRCS})
+AUX_SOURCE_DIRECTORY(src/utils/ PLANET_UTIL_SRCS)
+AUX_SOURCE_DIRECTORY(src/scene/ PLANET_SCENE_SRCS)
+add_library(PlanetEssential ${PLANET_HDRS} ${PLANET_UTIL_SRCS} ${PLANET_SCENE_SRCS})
 set_target_properties(PlanetEssential PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(PlanetEssential ${QT_LIBRARIES} ${LibNoise_LIBRARIES})
 
 # Link executable with modules
-target_include_directories(PlanetGUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# target_include_directories(PlanetGUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 AUX_SOURCE_DIRECTORY(src/ SRC)
 # Executable PlanetRenderer
 add_executable(PlanetRenderer ${SRC} ${RESOURCES})
 qt5_use_modules(PlanetRenderer Quick Core OpenGL)
 
-target_link_libraries(PlanetRenderer PlanetGUI PlanetEssential ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})
+target_link_libraries(PlanetRenderer PlanetEssential ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})
 
-set(ALL_SRC ${SRC} ${PLANET_HDRS} ${PLANET_SRCS} ${UI_HDRS} ${UI_SRCS})
+set(ALL_SRC ${SRC} ${PLANET_HDRS} ${PLANET_UTIL_SRCS} ${PLANET_SCENE_SRCS})
 string(REPLACE ";" "\n" ALL_SRC "${ALL_SRC}")
 file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/cscope.files "${ALL_SRC}")
