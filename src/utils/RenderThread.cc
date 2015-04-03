@@ -13,7 +13,7 @@
 #include "nexus.h"
 
 RenderThread::RenderThread()
-	:size_(1024, 768)
+	:size_(1280,1280)
 {
 	nexus::register_thread(this);
 }

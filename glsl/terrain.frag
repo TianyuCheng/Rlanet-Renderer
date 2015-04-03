@@ -11,9 +11,9 @@ out vec4 frag_color;
 
 void main()
 {
-    // gl_FragColor = texture2D(uDecalmap, vDecalTexCoord);
-    // gl_FragColor = vColor * texture2D(uDecalmap, vDecalTexCoord);
-    // gl_FragColor = vec4(vNormal, 1.0) * texture2D(uDecalmap, vDecalTexCoord);
+    // frag_color = texture2D(uDecalmap, vDecalTexCoord);
+    // frag_color = vColor * texture2D(uDecalmap, vDecalTexCoord);
+    // frag_color = vec4(vNormal, 1.0) * texture2D(uDecalmap, vDecalTexCoord);
 
     // I am going to fake a light here
     // Uniform for light will be implemented later
@@ -25,7 +25,7 @@ void main()
     vec3 v = normalize(-vView);
     vec3 l = normalize(lightPos - vView);
 
-    vec3 decal = texture2D(uDecalmap, vDecalTexCoord).xyz;
+    vec3 decal = texture(uDecalmap, vDecalTexCoord).xyz;
     vec3 ambient = lightAmbient;
     vec3 diffuse = lightDiffuse * clamp(0.0, 1.0, max(0.0, dot(n, l)));
 
