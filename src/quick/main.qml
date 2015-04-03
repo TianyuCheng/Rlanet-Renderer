@@ -9,7 +9,8 @@ Item {
 	Renderer {
 		id: renderer
 		anchors.fill: parent
-		anchors.margins: 10
+		anchors.margins: 0
+		transform: Scale { origin.x: 0; origin.y: parent.height/2; yScale: -1}
 	}
 
 	Rectangle {
