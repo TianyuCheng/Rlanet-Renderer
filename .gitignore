@@ -34,9 +34,9 @@
 # ------------------
 CMakeCache.txt
 CMakeFiles
-Makefile
 cmake_install.cmake
 install_manifest.txt
+build/
 
 PlanetRenderer
 
@@ -52,7 +52,6 @@ PlanetRenderer
 moc_*.cpp
 qrc_*.cpp
 ui_*.h
-Makefile*
 *-build-*
 
 # QtCreator
@@ -68,7 +67,16 @@ Makefile*
 # Temp files
 *.swp
 
+# LaTeX
+*.aux
+*.log
+doc/proposal.pdf
+.DS_Store
+
 # Cscope files
 cscope.files
 
 build/
+# Addition files
+experimental/
+examples/

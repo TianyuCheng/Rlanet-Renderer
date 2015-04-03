@@ -46,12 +46,16 @@ void Scene::renderScene()
         exit(-1);
     }
 #endif
+    CHECK_GL_ERROR("Before Clear\n");
 
     // Change the viewport to the whole screen
     glViewport(0, 0, width, height);
     // Clear out buffer before drawing anything
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
+    //glClearColor(drand48(), drand48(), drand48(), 1.0);
+    //glClearColor(sin(::time(NULL)), 0.0, 0.0, 0.0);
+    CHECK_GL_ERROR("After Clear\n");
 
     // camera.moveForward(0.1);
     // camera.moveBackward(0.1);
@@ -73,7 +77,8 @@ void Scene::renderScene()
          * scene takes care of that.
          * */
         SceneObject *object = *iter;
-        object->program.bind(); // TODO: Do we really need to bind a different program?
+        object->program.bind();
+	//qDebug("Handling %p", object);
 
         object->setDrawMode(drawMode);
         object->update();
@@ -85,11 +90,17 @@ void Scene::renderScene()
 
         // User defined uniform variables
         object->uniform();
+	CHECK_GL_ERROR("Before render some Obj");
 
         object->render();
 
+	CHECK_GL_ERROR("After render some Obj");
+
         object->program.release();
+	CHECK_GL_ERROR("After release the program of some Obj");
     }
+    glFlush();
+    CHECK_GL_ERROR("After flush");
     
 #if 0
     // Render the buffer to image

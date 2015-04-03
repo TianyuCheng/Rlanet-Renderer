@@ -1,6 +1,6 @@
-#version 130
+#version 330
 
-attribute vec3 aVertex;
+in vec3 aVertex;
 
 // Used in the vertex transformation
 uniform mat4 uMVMatrix;
@@ -16,11 +16,11 @@ uniform float uGrid;
 uniform sampler2D heightmap;
 
 // Used in the fragment shader
-varying vec2 vDecalTexCoord;
-varying vec4 vColor;
+out vec2 vDecalTexCoord;
+out vec4 vColor;
 
-varying vec3 vView;
-varying vec3 vNormal;
+out vec3 vView;
+out vec3 vNormal;
 
 const float PI = 3.1415926;
 

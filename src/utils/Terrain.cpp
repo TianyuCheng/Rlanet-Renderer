@@ -197,32 +197,59 @@ void Terrain::uniform() {
     program.setUniformValue(heightLocation, 0);
     program.setUniformValue(decalLocation, 1);
     program.setUniformValue("uGrid", float(grid));
+    CHECK_GL_ERROR("after sets uniforms");
 }
 
 void Terrain::update() {
     updatePatches();
 }
 
-void Terrain::render() {
-    // Drawing only using line mode for LOD visualization
-    // drawMode = GL_LINE;
-    // glPolygonMode( GL_FRONT_AND_BACK, drawMode );
-    glPolygonMode( GL_FRONT, drawMode );
+void Terrain::render()
+{
+	program.bind();
+	int loc = program.uniformLocation("uOffset");
+	//qDebug("uOffset location: %d", loc);
+	// Drawing only using line mode for LOD visualization
+	// drawMode = GL_LINE;
+	// glPolygonMode( GL_FRONT_AND_BACK, drawMode );
+	//glPolygonMode( GL_FRONT, drawMode );
+	CHECK_GL_ERROR("set polygon mode");
 
-    // qDebug() << "Children:" << children.size() << "Selected:" << selectedPatches.size();
-    for (int i = 0; i < selectedPatches.size(); i++) {
-        TerrainPatch *patch = selectedPatches[i];
-        double scaleFactor = ranges[patch->level].first;
-        QVector2D scale(scaleFactor, scaleFactor);
-        program.setUniformValue("uOffset", patch->pos);
-        program.setUniformValue("uScale", scale);
-        program.setUniformValue("uLevel", patch->level);
+	vbo_.bind();
+	CHECK_GL_ERROR("After vbo bind");
+	program.setAttributeBuffer(vertexLocation_, GL_FLOAT, 0, 3);
+	program.enableAttributeArray(vertexLocation_);
+	CHECK_GL_ERROR("After set vertex location");
+	ibo_.bind();
+	CHECK_GL_ERROR("After ibo bind");
 
-        // draw all the triangles
-        glDrawElements(
-                GL_TRIANGLES, 
-                indices.size(),    // count
-                GL_UNSIGNED_INT,   // type
-                indices.constData());         // element array buffer offset
-    } // end of for loop
+#if 0
+	int vbname, ibname;
+	glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &vbname);
+	glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &ibname);
+	qDebug("VB binded to %d, IB binded to %d\n", vbname, ibname);
+#endif
+
+	// qDebug() << "Children:" << children.size() << "Selected:" << selectedPatches.size();
+	for (int i = 0; i < selectedPatches.size(); i++) {
+		TerrainPatch *patch = selectedPatches[i];
+		double scaleFactor = ranges[patch->level].first;
+		QVector2D scale(scaleFactor, scaleFactor);
+		program.setUniformValue("uOffset", patch->pos);
+		//glUniform2f(loc, 1.0f, 1.0f);
+		CHECK_GL_ERROR("After Terrian bind uOffset");
+		program.setUniformValue("uScale", scale);
+		CHECK_GL_ERROR("After Terrian bind uScale");
+		program.setUniformValue("uLevel", patch->level);
+		CHECK_GL_ERROR("After Terrian bind uLevel");
+
+		// draw all the triangles
+		glDrawElements(GL_TRIANGLES, 
+				indices.size(),		// count
+				GL_UNSIGNED_INT,	// type
+				0);			// element array buffer offset
+		CHECK_GL_ERROR("After Terrian draws");
+	} // end of for loop
+	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+	program.release();
 }

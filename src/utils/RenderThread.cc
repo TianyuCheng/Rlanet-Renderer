@@ -4,6 +4,7 @@
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFramebufferObject>
 #include <QtGui/QOffscreenSurface>
+#include <QtGui/QOpenGLVertexArrayObject> 
 #include <QtGlobal>
 
 #include "RenderThread.h"
@@ -14,10 +15,12 @@
 RenderThread::RenderThread()
 	:size_(600,400)
 {
+	nexus::register_thread(this);
 }
 
 RenderThread::~RenderThread()
 {
+	qDebug("VAO ptr: %p", vao_.get());
 }
 
 void RenderThread::install_surface(QOffscreenSurface* surface)
@@ -52,6 +55,10 @@ bool RenderThread::init_fbos()
 
 bool RenderThread::init_renderer()
 {
+	vao_.reset(new QOpenGLVertexArrayObject);
+	vao_->create();
+	vao_->bind();
+
 	scene_.reset(new Scene(nexus::get_scene_name(), size_.width(), size_.height()));
 	terrian_.reset(new Terrain(16, 10, scene_.get()));
 	scene_->addObject(terrian_.get());
@@ -60,11 +67,11 @@ bool RenderThread::init_renderer()
 
 void RenderThread::render_next()
 {
-	qDebug("Try to make current ctx %p on surface %p\n",
-			ctx_.get(), surface_);
+	if (shutdown_)
+		return;
+	//qDebug("Try to make current ctx %p on thread %p\n", ctx_.get(), QThread::currentThread());
 	ctx_->makeCurrent(surface_);
-	qDebug("Successfully make current ctx %p on surface %p\n",
-			ctx_.get(), surface_);
+	//qDebug("Successfully make current ctx %p on surface %p\n", ctx_.get(), surface_);
 	
 	if (!fbo_ready()) {
 		init_fbos();
@@ -85,10 +92,15 @@ void RenderThread::render_next()
 
 void RenderThread::shutdown()
 {
+	shutdown_ = true;
+	qDebug("%s Try to make current ctx %p on thread %p\n", __func__, ctx_.get(), QThread::currentThread());
 	/* Release context and FBOs */
         ctx_->makeCurrent(surface_);
 	displayfbo_.reset();
 	renderfbo_.reset();
+	vao_.reset();
+	scene_.reset();
+	terrian_.reset();
         ctx_->doneCurrent();
 	ctx_.reset();
 

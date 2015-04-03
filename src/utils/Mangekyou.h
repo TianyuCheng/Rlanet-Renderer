@@ -19,7 +19,7 @@ protected:
 	QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *);
 
 private:
-	std::unique_ptr<RenderThread> thread_;
+	RenderThread* thread_;
 };
 
 #endif

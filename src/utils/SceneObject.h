@@ -1,6 +1,8 @@
 #ifndef SCENEOBJECT_H
 #define SCENEOBJECT_H
 
+#include <memory>
+using std::unique_ptr;
 #include <QMap>
 #include <QtMath>
 #include <QString>
@@ -10,11 +12,12 @@
 
 #include <QVector3D>
 #include <QOpenGLShader>
-#include <QOpenGLFunctions>
+#include <QOpenGLBuffer>
+#include "SelectGL.h"
 
 class Scene;
 
-class SceneObject
+class SceneObject : protected GLCore
 {
     friend class Scene;
 public:
@@ -28,8 +31,11 @@ public:
     // Constructor with name and shader
     SceneObject(QString n, QOpenGLShader *_vShader, QOpenGLShader *_fShader, SceneObject *parent = nullptr);
 
+#if 0
     // Copy Constructor
+    // DON'T, copy will cause serious problems right now.
     SceneObject(SceneObject &obj);
+#endif
 
     virtual ~SceneObject();
 
@@ -112,9 +118,13 @@ private:
     // name of the objects, for debugging and display
     QString name;
 
+protected:
     // shader-based rendering
-    QOpenGLShader *vShader;
-    QOpenGLShader *fShader;
+	unique_ptr<QOpenGLShader> vShader;
+	unique_ptr<QOpenGLShader> fShader;
+	QOpenGLBuffer vbo_ = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+	QOpenGLBuffer ibo_ = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
+	GLuint vertexLocation_;
 };
 
 #endif /* end of include guard: SCENEOBJECT_H */
