@@ -19,7 +19,11 @@ set(CMAKE_AUTOMOC ON)
 # Package LibNoise
 ExternalProject_Add(project_libnoise
 	PREFIX ${CMAKE_CURRENT_BINARY_DIR}/libnoise # install to <build dir>/libnoise
-	GIT_SUBMODULES ${CMAKE_SOURCE_DIR}/3rdparty/libnoise/	# update the submodule
+	DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/3rdparty/libnoise/
+	DOWNLOAD_COMMAND git submodule init ${CMAKE_SOURCE_DIR}/3rdparty/libnoise/
+	UPDATE_COMMAND git submodule update ${CMAKE_SOURCE_DIR}/3rdparty/libnoise/
+	#DOWNLOAD_COMMAND "git submodule update ${CMAKE_SOURCE_DIR}/3rdparty/libnoise/"
+	#GIT_SUBMODULES ${CMAKE_SOURCE_DIR}/3rdparty/libnoise/	# update the submodule
 	SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/libnoise/
 	BINARY_DIR ${CMAKE_BINARY_DIR}/3rdparty/libnoise/	    # build under libnoise/build
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
