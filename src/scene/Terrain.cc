@@ -93,9 +93,11 @@ Terrain::Terrain(int g, int l, Scene *parent) :
 
         decalmap->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         decalmap->setMagnificationFilter(QOpenGLTexture::Linear);
+	heightmap->setWrapMode(QOpenGLTexture::Repeat);
 
-        heightmap->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-        heightmap->setMagnificationFilter(QOpenGLTexture::Linear);
+	heightmap->setMinificationFilter(QOpenGLTexture::Linear);
+	heightmap->setMagnificationFilter(QOpenGLTexture::Linear);
+	heightmap->setWrapMode(QOpenGLTexture::Repeat);
     }
 
     // Initialize ranges
@@ -259,6 +261,5 @@ void Terrain::render()
 				0);			// element array buffer offset
 		CHECK_GL_ERROR("After Terrian draws");
 	} // end of for loop
-	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 	program.release();
 }
