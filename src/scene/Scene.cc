@@ -3,8 +3,7 @@
 Scene::Scene(QString n, int w, int h) 
     : SceneObject(n), 
       name(n), width(w), height(h),
-      camera(n + QString("'s camera'")),
-      framebuffer(width, height, QOpenGLFramebufferObject::Depth)
+      camera(n + QString("'s camera'"))
 {
     // Initialize GL
     glEnable(GL_DEPTH_TEST);
@@ -31,8 +30,9 @@ void Scene::addObject(SceneObject* object) {
     object->initialize();
 }
 
-void Scene::renderScene()
+void Scene::renderScene(QOpenGLFramebufferObject* fbo)
 {
+	fbo_ = fbo;
 #if 0 // We don't need this in quick version
     // use this framebuffer instead of the default buffer
     if (!framebuffer.bind()) {

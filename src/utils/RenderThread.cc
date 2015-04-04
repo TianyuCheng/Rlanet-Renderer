@@ -81,7 +81,7 @@ void RenderThread::render_next()
 	// Actual rendering procedure
 	renderfbo_->bind();
 	// scene_->start(); TODO
-	scene_->renderScene();
+	scene_->renderScene(renderfbo_.get());
         ctx_->functions()->glFlush();
         renderfbo_->release();
 

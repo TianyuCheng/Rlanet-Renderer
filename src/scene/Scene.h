@@ -1,12 +1,10 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <memory>
 #include <QVector>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLFunctions>
-#include <QImage>
-#include <QMatrix4x4>
-#include <QVector3D>
 #include <QMap>
 #include <QTime>
 
@@ -32,7 +30,7 @@ public:
      * Note: Currently it just draws all the objects in the 
      * scene, but possible to optimize. 
      * */
-    void renderScene();
+    void renderScene(QOpenGLFramebufferObject*);
 
     /**
      * Scene Update
@@ -70,10 +68,7 @@ private:
     QVector<SceneObject*> objects;
 
     // Framebuffer for texture rendering
-    QOpenGLFramebufferObject framebuffer;
-
-    // Result of rendering
-    QImage image;
+    QOpenGLFramebufferObject *fbo_;
 
     // Use QTime for underlying time management
     QTime time;
