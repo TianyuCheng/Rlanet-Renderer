@@ -88,8 +88,8 @@ Terrain::Terrain(int g, int l, Scene *parent) :
             qDebug() << "Decal/Height map for terrain has not been found!";
             exit(-1);
         }
-        decalmap  = new QOpenGLTexture(decal);
-        heightmap = new QOpenGLTexture(height);
+        decalmap.reset(new QOpenGLTexture(decal));
+        heightmap.reset(new QOpenGLTexture(height));
 
         decalmap->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         decalmap->setMagnificationFilter(QOpenGLTexture::Linear);
@@ -142,7 +142,7 @@ Terrain::~Terrain() {
 void Terrain::updatePatches() {
     Camera* camera = dynamic_cast<Scene*>(parent)->getCamera();
     QVector3D cameraPos = camera->getPosition();
-    cameraPos.setY(0.0);     // To test level of detail, uncomment this
+    // cameraPos.setY(0.0);     // To test level of detail, uncomment this
 
     int far = qNextPowerOfTwo(int(camera->getFar()));
     // int far = 32;

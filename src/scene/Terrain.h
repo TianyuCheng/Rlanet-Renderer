@@ -16,6 +16,8 @@
 #include <BoundingBox.h>
 #include <NoiseGenerator.h>
 
+using std::unique_ptr;
+
 class Terrain;
 
 class TerrainPatch
@@ -97,8 +99,8 @@ private:
     int grid;
     int levels;
 
-    QOpenGLTexture *decalmap;
-    QOpenGLTexture *heightmap;
+    unique_ptr<QOpenGLTexture> decalmap;
+    unique_ptr<QOpenGLTexture> heightmap;
 
     // List of distances ranges for LOD <range, morph>
     QVector< QPair<double, double> > ranges;

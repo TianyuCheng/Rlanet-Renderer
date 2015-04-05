@@ -9,6 +9,7 @@
 
 #include "RenderThread.h"
 #include "Terrain.h"
+#include "TextureSkyDome.h"
 #include "Scene.h"
 #include "nexus.h"
 
@@ -61,7 +62,9 @@ bool RenderThread::init_renderer()
 
 	scene_.reset(new Scene(nexus::get_scene_name(), size_.width(), size_.height()));
 	terrian_.reset(new Terrain(64, 10, scene_.get()));
+    skydome_.reset(new TextureSkyDome(64, scene_.get()));
 	scene_->addObject(terrian_.get());
+    // scene_->addObject(skydome_.get());
 	return true;
 }
 
