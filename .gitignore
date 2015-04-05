@@ -80,3 +80,5 @@ build/
 # Addition files
 experimental/
 examples/
+
+doc/*.pdf
