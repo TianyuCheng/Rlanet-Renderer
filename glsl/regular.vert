@@ -1,6 +1,6 @@
-#version 130
+#version 330
 
-attribute vec3 aVertex;
+in vec3 aVertex;
 
 // transformation
 uniform mat4 uMVMatrix;

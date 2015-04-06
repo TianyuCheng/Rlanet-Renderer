@@ -11,9 +11,9 @@ out vec4 frag_color;
 
 void main()
 {
-    // frag_color = texture2D(uDecalmap, vDecalTexCoord);
-    // frag_color = vColor * texture2D(uDecalmap, vDecalTexCoord);
-    // frag_color = vec4(vNormal, 1.0) * texture2D(uDecalmap, vDecalTexCoord);
+    // frag_color = texture(uDecalmap, vDecalTexCoord);
+    // frag_color = vColor * texture(uDecalmap, vDecalTexCoord);
+    // frag_color = vec4(vNormal, 1.0) * texture(uDecalmap, vDecalTexCoord);
 
     // I am going to fake a light here
     // Uniform for light will be implemented later
