@@ -56,6 +56,7 @@ public:
     double timeElapsed() const;
 
     void resize(GLuint width, GLuint height);
+    void first_frame();
 private:
     // Name for debugging and displaying
     QString name;
@@ -72,6 +73,7 @@ private:
 
     // Use QTime for underlying time management
     QTime time;
+    QTime frametimer_;
     int elapsedTime;
 };
 

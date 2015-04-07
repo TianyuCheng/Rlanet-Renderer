@@ -64,6 +64,7 @@ bool RenderThread::init_renderer()
 	terrian_.reset(new Terrain(64, 10, scene_.get()));
     skydome_.reset(new TextureSkyDome(64, scene_.get()));
 	scene_->addObject(terrian_.get());
+	scene_->first_frame();
     // scene_->addObject(skydome_.get());
 	return true;
 }

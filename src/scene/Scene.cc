@@ -51,7 +51,9 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
     //glClearColor(sin(::time(NULL)), 0.0, 0.0, 0.0);
     CHECK_GL_ERROR("After Clear\n");
 
-    camera.moveForward(10);
+    int msec = frametimer_.elapsed();
+    camera.moveForward(900 * float(msec)/1e3);
+    frametimer_.restart();
     // camera.moveForward(0.1);
     // camera.moveBackward(0.1);
     camera.turnLeft(0.1);
@@ -136,4 +138,9 @@ double Scene::timeElapsed() const
 
 void Scene::resize(GLuint width, GLuint height) {
     camera.setAspect((GLfloat)width / (GLfloat)height);
+}
+
+void Scene::first_frame()
+{
+	frametimer_.start();
 }
