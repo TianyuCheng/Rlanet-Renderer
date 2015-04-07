@@ -16,11 +16,14 @@ uniform float uGrid;
 uniform sampler2D uHeightmap;
 
 // Used in the fragment shader
+out vec2 vHeightUV;
 out vec2 vDecalTexCoord;
 out vec4 vColor;
 
 out vec3 vView;
 out vec3 vNormal;
+
+out float vHeight;
 
 const float PI = 3.1415926;
 
@@ -97,4 +100,5 @@ void main()
 
     vView = (uMVMatrix * uTransform * vec4(morphedPos, 1.0)).xyz;
     vNormal = computeNormal(aVertex.xz);
+    vHeightUV = uv;
 }

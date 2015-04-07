@@ -74,7 +74,9 @@ Terrain::Terrain(int g, int l, Scene *parent) :
 
     {
         // Load terrain texture from file
-        QImage decal("../textures/decal_dirt.jpg");
+        QImage decal_dirt("../textures/decal_dirt.jpg");
+        QImage decal_grass("../textures/decal_grass.jpg");
+        QImage decal_snow("../textures/decal_snow.jpg");
 
         // Generate heightmap using seed
         int r = 128;
@@ -84,20 +86,28 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         NoiseGenerator::SphericalHeightmap(height, r, 100);
 
         // Check whether texture are loaded
-        if (decal.isNull() || height.isNull()) {
+        if (decal_dirt.isNull() || decal_grass.isNull() || decal_snow.isNull() || height.isNull()) {
             qDebug() << "Decal/Height map for terrain has not been found!";
             exit(-1);
         }
-        decalmap.reset(new QOpenGLTexture(decal));
+        decalmap[0].reset(new QOpenGLTexture(decal_grass));
+        decalmap[1].reset(new QOpenGLTexture(decal_dirt));
+        decalmap[2].reset(new QOpenGLTexture(decal_snow));
         heightmap.reset(new QOpenGLTexture(height));
 
-        decalmap->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-        decalmap->setMagnificationFilter(QOpenGLTexture::Linear);
-	heightmap->setWrapMode(QOpenGLTexture::Repeat);
+        decalmap[0]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+        decalmap[0]->setMagnificationFilter(QOpenGLTexture::Linear);
 
-	heightmap->setMinificationFilter(QOpenGLTexture::Linear);
-	heightmap->setMagnificationFilter(QOpenGLTexture::Linear);
-	heightmap->setWrapMode(QOpenGLTexture::Repeat);
+        decalmap[1]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+        decalmap[1]->setMagnificationFilter(QOpenGLTexture::Linear);
+
+        decalmap[2]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+        decalmap[2]->setMagnificationFilter(QOpenGLTexture::Linear);
+
+        heightmap->setWrapMode(QOpenGLTexture::Repeat);
+        heightmap->setMinificationFilter(QOpenGLTexture::Linear);
+        heightmap->setMagnificationFilter(QOpenGLTexture::Linear);
+        heightmap->setWrapMode(QOpenGLTexture::Repeat);
     }
 
     // Initialize ranges
@@ -147,7 +157,6 @@ void Terrain::updatePatches() {
     // cameraPos.setY(0.0);     // To test level of detail, uncomment this
 
     int far = qNextPowerOfTwo(int(camera->getFar()));
-    // int far = 32;
     int size = int(ranges[levels].first);
     int num = qCeil(far / size);
     
@@ -200,13 +209,19 @@ void Terrain::uniform() {
      *  heightmap->bind(0);
      *  decalmap->bind(1);
      * */
-    decalmap->bind(1);
     heightmap->bind(0);
+    decalmap[0]->bind(1);
+    decalmap[1]->bind(2);
+    decalmap[2]->bind(3);
 
     int heightLocation = program.uniformLocation("uHeightmap");
-    int decalLocation = program.uniformLocation("uDecalmap");
+    int decalLocation0 = program.uniformLocation("uDecalmap0");
+    int decalLocation1 = program.uniformLocation("uDecalmap1");
+    int decalLocation2 = program.uniformLocation("uDecalmap2");
     program.setUniformValue(heightLocation, 0);
-    program.setUniformValue(decalLocation, 1);
+    program.setUniformValue(decalLocation0, 1);
+    program.setUniformValue(decalLocation1, 2);
+    program.setUniformValue(decalLocation2, 3);
     program.setUniformValue("uGrid", float(grid));
     CHECK_GL_ERROR("after sets uniforms");
 }
@@ -222,8 +237,7 @@ void Terrain::render()
 	//qDebug("uOffset location: %d", loc);
 	// Drawing only using line mode for LOD visualization
 	// drawMode = GL_LINE;
-	// glPolygonMode( GL_FRONT_AND_BACK, drawMode );
-	//glPolygonMode( GL_FRONT, drawMode );
+	glPolygonMode( GL_FRONT_AND_BACK, drawMode );
 	CHECK_GL_ERROR("set polygon mode");
 
 	vbo_.bind();

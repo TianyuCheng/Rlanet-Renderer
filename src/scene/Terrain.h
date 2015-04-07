@@ -99,7 +99,7 @@ private:
     int grid;
     int levels;
 
-    unique_ptr<QOpenGLTexture> decalmap;
+    unique_ptr<QOpenGLTexture> decalmap[3];
     unique_ptr<QOpenGLTexture> heightmap;
 
     // List of distances ranges for LOD <range, morph>

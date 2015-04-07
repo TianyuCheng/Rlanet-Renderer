@@ -52,7 +52,7 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
     CHECK_GL_ERROR("After Clear\n");
 
     int msec = frametimer_.elapsed();
-    camera.moveForward(900 * float(msec)/1e3);
+    camera.moveForward(500 * float(msec)/1e3);
     frametimer_.restart();
     // camera.moveForward(0.1);
     // camera.moveBackward(0.1);
