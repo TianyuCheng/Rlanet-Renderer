@@ -24,6 +24,7 @@ out vec3 vView;
 out vec3 vNormal;
 
 out float vHeight;
+out float linearZ;
 
 const float PI = 3.1415926;
 
@@ -80,7 +81,9 @@ void main()
     vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, 0.3), 0.0).xzy;
     vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
     morphedPos.y = texture(uHeightmap, uv).x * 1400.0 - 700;
-    gl_Position = uPMatrix * uMVMatrix * uTransform * vec4(morphedPos, 1.0);
+    vec4 noproj = uMVMatrix * uTransform * vec4(morphedPos, 1.0);
+    gl_Position = uPMatrix * noproj;
+    linearZ = (-noproj.z-0.01)/(10000.0-0.01);
 
     if (uLevel <= 0)      vColor = vec4(1.0, 0.0, 0.0, 1.0);
     else if (uLevel <= 1) vColor = vec4(1.0, 1.0, 0.0, 1.0);
