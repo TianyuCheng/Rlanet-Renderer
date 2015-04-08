@@ -54,9 +54,9 @@ vec3 computeNormal(vec2 gridPos) {
     vec3 py = vec3(uScale * vy + uOffset, 0.0).xzy;
     vec3 p = vec3(uScale * gridPos + uOffset, 0.0).xzy;
 
-    vec2 uvx = fract(px.xz / 16384.0) - vec2(0.5, 0.5);
-    vec2 uvy = fract(py.xz / 16384.0) - vec2(0.5, 0.5);
-    vec2 uv = fract(p.xz / 16384.0) - vec2(0.5, 0.5);
+    vec2 uvx = px.xz / 16384.0 - vec2(0.5, 0.5);
+    vec2 uvy = py.xz / 16384.0 - vec2(0.5, 0.5);
+    vec2 uv = p.xz / 16384.0 - vec2(0.5, 0.5);
 
     px.y = texture(uHeightmap, uvx).x * 1400.0 - 700;
     py.y = texture(uHeightmap, uvy).x * 1400.0 - 700;
@@ -78,7 +78,7 @@ void main()
 {
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
     vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, 0.3), 0.0).xzy;
-    vec2 uv = fract(morphedPos.xz / 16384.0) - vec2(0.5, 0.5);
+    vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
     morphedPos.y = texture(uHeightmap, uv).x * 1400.0 - 700;
     gl_Position = uPMatrix * uMVMatrix * uTransform * vec4(morphedPos, 1.0);
 

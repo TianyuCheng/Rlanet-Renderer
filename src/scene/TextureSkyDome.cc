@@ -3,8 +3,10 @@
 TextureSkyDome::TextureSkyDome(int grid, Scene *parent) 
     : SceneObject("Textued SkyDome", "../glsl/skydome.vert", "../glsl/skydome.frag", parent) 
 {
+    // drawMode = GL_LINE;
     // Load texture
-    QImage decal("../textures/decal_sky.jpg");
+    // QImage decal("../textures/decal_sky.jpg");
+    QImage decal("../textures/sky_texture.jpg");
     decalmap.reset(new QOpenGLTexture(decal));
     decalmap->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     decalmap->setMagnificationFilter(QOpenGLTexture::Linear);
@@ -39,8 +41,30 @@ TextureSkyDome::~TextureSkyDome() {
 }
 
 void TextureSkyDome::uniform() {
-    // decalmap->bind(0);
-    // int decalLocation = program.uniformLocation("uDecalmap");
-    // program.setUniformValue(decalLocation, 0);
-    // CHECK_GL_ERROR("after sets uniforms");
+    decalmap->bind(0);
+    int decalLocation = program.uniformLocation("uDecalmap");
+    program.setUniformValue(decalLocation, 0);
+    
+
+    Camera* camera = dynamic_cast<Scene*>(parent)->getCamera();
+    QVector3D cameraPos = camera->getPosition();
+    program.setUniformValue("uCenter", cameraPos);
+
+    CHECK_GL_ERROR("after sets uniforms");
+}
+
+void TextureSkyDome::update() {
+}
+
+void TextureSkyDome::render() {
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(false);
+
+    glCullFace(GL_FRONT);
+    glDepthFunc(GL_LEQUAL);
+
+    SceneObject::render();
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(true);
 }

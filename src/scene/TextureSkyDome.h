@@ -17,10 +17,11 @@ public:
 
     virtual ~TextureSkyDome ();
 
-    void update() {
-    }
+    void update();
 
     void uniform();
+
+    void render();
 
 private:
     unique_ptr<QOpenGLTexture> decalmap;
