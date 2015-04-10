@@ -46,7 +46,7 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
     glViewport(0, 50, width, height);
     // Clear out buffer before drawing anything
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClearColor(1.0, 1.0, 1.0, 0.0);
     //glClearColor(drand48(), drand48(), drand48(), 1.0);
     //glClearColor(sin(::time(NULL)), 0.0, 0.0, 0.0);
     CHECK_GL_ERROR("After Clear\n");

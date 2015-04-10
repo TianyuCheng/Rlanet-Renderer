@@ -11,6 +11,7 @@ uniform mat4 uTransform;
 uniform vec3 uCenter;
 
 out vec2 vUV;
+out vec3 vView;
 
 const float PI = 3.1415926;
 
@@ -33,5 +34,6 @@ void main()
     pos.xz += uCenter.xz;
     gl_Position = uPMatrix * uMVMatrix * uTransform * vec4(pos, 1.0);
     vUV = aVertex.xz;
+    vView = (uMVMatrix * uTransform * vec4(pos, 1.0)).xyz;
 }
 
