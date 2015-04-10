@@ -167,13 +167,13 @@ void SceneObject::render() {
 	program.setAttributeBuffer(vertexLocation_, GL_FLOAT, 0, 3);
 	program.enableAttributeArray(vertexLocation_);
 	ibo_.bind();
-	REPORT_GL_STATUS("After buffer");
+	CHECK_GL_ERROR("After buffer");
 	glDrawElements(
 			GL_TRIANGLES, 
 			indices.size(),		// count
 			GL_UNSIGNED_INT,	// type
 			NULL);			// Does not matter with ibo
-	REPORT_GL_STATUS("After render");
+	CHECK_GL_ERROR("After render");
 	vbo_.release();
 }
 

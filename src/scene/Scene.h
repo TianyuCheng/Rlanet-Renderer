@@ -75,6 +75,9 @@ private:
     QTime time;
     QTime frametimer_;
     int elapsedTime;
+
+    int fps;        // fps counter
+    int fpsCounter;
 };
 
 #endif /* end of include guard: SCENE_H */

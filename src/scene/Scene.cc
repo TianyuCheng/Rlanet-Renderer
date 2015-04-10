@@ -18,6 +18,9 @@ Scene::Scene(QString n, int w, int h)
             QVector3D(0.0, 710.0, 20.0),
             QVector3D(0.0, 1.0, 0.0)
     );
+
+    // fps
+    fps = fpsCounter = 0;
 }
 
 
@@ -52,18 +55,21 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
     CHECK_GL_ERROR("After Clear\n");
 
     int msec = frametimer_.elapsed();
-    camera.moveForward(500 * float(msec)/1e3);
     frametimer_.restart();
-    // camera.moveForward(0.1);
-    // camera.moveBackward(0.1);
-    camera.turnLeft(0.1);
-    // camera.turnRight(1);
 
-    // camera.lookAt(
-    //         QVector3D(0.0, 2000.0, 100 * timeElapsed()),
-    //         QVector3D(0.0, 0.0,    100 * timeElapsed()),
-    //         QVector3D(0.0, 0.0, 1.0)
-    // );
+    // Bookkeeping for time 
+    {
+        fps++;
+        fpsCounter += msec;
+        if (fpsCounter > 1e3) {
+            // qDebug() << "FPS:" << fps;
+            fpsCounter = 0;
+            fps = 0;
+        }
+    }
+
+    camera.moveForward(500 * float(msec)/1e3);
+    camera.turnLeft(0.1);
 
     // Render all objects in the scene.
     // This could be done in a smarter way
