@@ -13,14 +13,23 @@ Scene::Scene(QString n, int w, int h)
 
     camera.setPerspective(45.0, (float)width/(float)height, 0.01, 10000.0);
 
-    camera.lookAt(
-            QVector3D(0.0, 710.0, 0.0),
-            QVector3D(0.0, 710.0, 20.0),
-            QVector3D(0.0, 1.0, 0.0)
-    );
+    // camera.lookAt(
+    //         QVector3D(0.0, 8192 + 710.0, 0.0),
+    //         QVector3D(0.0, 8192 + 710.0, 20.0),
+    //         QVector3D(0.0, 1.0, 0.0)
+    // );
+
+    // camera.lookAt(
+    //         QVector3D(0.0, 0.0, 0.0),
+    //         QVector3D(0.0, 0.0, -20.0),
+    //         QVector3D(0.0, 1.0, 0.0)
+    // );
+
+    // camera.moveBackward(7000);
 
     // fps
     fps = fpsCounter = 0;
+    start();
 }
 
 
@@ -68,8 +77,18 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
         }
     }
 
-    camera.moveForward(500 * float(msec)/1e3);
-    camera.turnLeft(0.1);
+    // camera.moveForward(500 * float(msec)/1e3);
+    // camera.turnLeft(0.1);
+
+    // camera.moveBackward(500 * float(msec)/1e3);
+    
+
+    float t =  timeElapsed() / 10.0;
+    camera.lookAt(
+            QVector3D(6000 * qCos(t), 0.0, 6000 * qSin(t)),
+            QVector3D(0.0, 0.0, 0.0),
+            QVector3D(0.0, 1.0, 0.0)
+    );
 
     // Render all objects in the scene.
     // This could be done in a smarter way
@@ -143,7 +162,7 @@ double Scene::timeElapsed() const
 }
 
 void Scene::resize(GLuint width, GLuint height) {
-    camera.setAspect((GLfloat)width / (GLfloat)height);
+    // camera.setAspect((GLfloat)width / (GLfloat)height);
 }
 
 void Scene::first_frame()

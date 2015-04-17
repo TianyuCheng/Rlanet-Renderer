@@ -12,7 +12,7 @@ TerrainPatch::TerrainPatch(QVector2D p, int l, QVector< QPair<double, double> > 
     // change it when we generate the heightmap by itself
     int size = ranges[level].first;
     QVector3D min = QVector3D(p.x(), 0.0, p.y());
-    QVector3D max = QVector3D(p.x() + size, 1000.0, p.y() + size);
+    QVector3D max = QVector3D(p.x() + size, 10000.0, p.y() + size);
     bounds.setMin(min);
     bounds.setMax(max);
     bounds.updateCorners();
@@ -30,8 +30,8 @@ TerrainPatch::~TerrainPatch() {
 
 void TerrainPatch::selectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches) {
     
-    // Test it first with camera for frustum culling
-    if (camera.isCullable(bounds) == Camera::Cullable::TOTALLY_CULLABLE) return;
+    // // Test it first with camera for frustum culling
+    // if (camera.isCullable(bounds) == Camera::Cullable::TOTALLY_CULLABLE) return;
 
     int size = ranges[level].first;
 
@@ -84,6 +84,8 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         int h = r * M_PI;
         QImage height(w, h, QImage::Format_RGB32);
         NoiseGenerator::SphericalHeightmap(height, r, 100);
+
+        size = 2048;        // put it here temporarily
 
         // Check whether texture are loaded
         if (decal_dirt.isNull() || decal_grass.isNull() || decal_snow.isNull() || height.isNull()) {
@@ -156,15 +158,22 @@ void Terrain::updatePatches() {
     QVector3D cameraPos = camera->getPosition();
     // cameraPos.setY(0.0);     // To test level of detail, uncomment this
 
-    int far = qNextPowerOfTwo(int(camera->getFar()));
+    // int far = qNextPowerOfTwo(int(camera->getFar()));
+    int xfar = qCeil(size * M_PI);
+    int zfar = qCeil(size * M_PI / 2);
     int size = int(ranges[levels].first);
-    int num = qCeil(far / size);
+    int xnum = qCeil(xfar / size);
+    int znum = qCeil(zfar / size);
     
-    int x = qRound(cameraPos.x() / size) * size;
-    int y = qRound(cameraPos.z() / size) * size;
+    // int x = qRound(cameraPos.x() / size) * size;
+    // int y = qRound(cameraPos.z() / size) * size;
+    int x = 0;
+    int y = 0;
 
-    for (int i = (-num - 1) * size; i <= num * size; i += size) {
-        for (int j = (-num - 1) * size; j <= num * size; j += size) {
+    // qDebug() << xnum * (2 * size + 1) << znum * (2 * size + 1);
+
+    for (int i = (-znum - 1) * size; i <= znum * size; i += size) {
+        for (int j = (-xnum - 1) * size; j <= xnum * size; j += size) {
             QPair<int, int> key(x + i, y + j);
             if (!children.contains(key)) {
                 children.insert(key, new TerrainPatch(QVector2D(x + i, y + j), levels, &ranges));

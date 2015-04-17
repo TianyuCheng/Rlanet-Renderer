@@ -98,6 +98,7 @@ private:
     // Number of vertices on one side
     int grid;
     int levels;
+    int size;
 
     unique_ptr<QOpenGLTexture> decalmap[3];
     unique_ptr<QOpenGLTexture> heightmap;

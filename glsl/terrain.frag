@@ -58,6 +58,7 @@ void main()
     vec3 ambient = lightAmbient;
     vec3 diffuse = lightDiffuse * clamp(0.0, 1.0, max(0.0, dot(n, l)));
 
-    frag_color = vec4((ambient + diffuse) * decal, 1.0);
+    frag_color = vec4(decal, 1.0);
+    // frag_color = vec4((ambient + diffuse) * decal, 1.0);
     gl_FragDepth = linearZ;
 }

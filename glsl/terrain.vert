@@ -28,20 +28,6 @@ out float linearZ;
 
 const float PI = 3.1415926;
 
-// Transform a xz-plane to sphere
-vec3 sphere(float radius, vec2 xz, float y) {
-    vec2 uv = xz * 2 * PI - PI;
-    float theta = uv.x;
-    float phi = uv.y;
-
-    float rho = radius + y;
-    return vec3(
-            rho * cos(theta) * cos(phi),
-            rho * sin(phi),
-            rho * sin(theta) * cos(phi)
-    );
-}
-
 /**
  * vertex: normalized coordinate [0,1]
  */
@@ -75,13 +61,44 @@ vec2 morphVertex(vec2 gridPos, vec2 vertex, float morphK) {
     return vertex - fractPart * uScale * morphK;
 }
 
+// Transform a xz-plane to sphere
+vec3 wrap(float radius, vec3 morphedPos) {
+    // float s = morphedPos.x;
+    // float t = morphedPos.z;
+    // // float h = morphedPos.y;
+    // float h = 2000;
+    //
+    // float w = sqrt(s * s + t * t + 1);
+    // return vec3(h * s / w, h * t / w, h / w);
+
+    // float rho = morphedPos.y + radius;
+    // float theta = PI + morphedPos.x / (2.0 * PI * radius);
+    // float phi = PI / 2.0 - morphedPos.z / (PI * radius);
+    // float rho = radius; 
+    float rho = morphedPos.y + radius;
+    float theta = PI + morphedPos.x / (radius);
+    float phi = PI / 2.0 - morphedPos.z / (radius);
+
+    /* float theta = morphedPos.x / (radius); */
+    /* float phi = morphedPos.z / (radius); */
+
+    return vec3(
+            rho * sin(phi) * cos(theta),
+            rho * cos(phi),
+            rho * sin(phi) * sin(theta)
+    );
+}
+
 void main()
 {
+    float radius = 2048.0;
+
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
     vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, 0.3), 0.0).xzy;
-    vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
-    morphedPos.y = texture(uHeightmap, uv).x * 1400.0 - 700;
-    vec4 noproj = uMVMatrix * uTransform * vec4(morphedPos, 1.0);
+    vec2 uv = morphedPos.xz / (12868.0, 6147.0) - vec2(0.5, 0.5);
+    morphedPos.y = texture(uHeightmap, uv).x * 200.0;
+    // vec4 noproj = uMVMatrix * uTransform * vec4(morphedPos, 1.0);
+    vec4 noproj = uMVMatrix * uTransform * vec4(wrap(radius, morphedPos), 1.0);
     gl_Position = uPMatrix * noproj;
     linearZ = (-noproj.z-0.01)/(10000.0-0.01);
 
