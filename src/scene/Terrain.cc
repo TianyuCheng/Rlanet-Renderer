@@ -30,8 +30,8 @@ TerrainPatch::~TerrainPatch() {
 
 void TerrainPatch::selectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches) {
     
-    // // Test it first with camera for frustum culling
-    // if (camera.isCullable(bounds) == Camera::Cullable::TOTALLY_CULLABLE) return;
+    // Test it first with camera for frustum culling
+    if (camera.isCullable(bounds) == Camera::Cullable::TOTALLY_CULLABLE) return;
 
     int size = ranges[level].first;
 
@@ -77,6 +77,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         QImage decal_dirt("../textures/decal_dirt.jpg");
         QImage decal_grass("../textures/decal_grass.jpg");
         QImage decal_snow("../textures/decal_snow.jpg");
+        QImage noise_image("../textures/Noise.png");
 
         // Generate heightmap using seed
         int r = 128;
@@ -96,6 +97,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         decalmap[1].reset(new QOpenGLTexture(decal_dirt));
         decalmap[2].reset(new QOpenGLTexture(decal_snow));
         heightmap.reset(new QOpenGLTexture(height));
+        noisemap.reset(new QOpenGLTexture(noise_image));
 
         decalmap[0]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         decalmap[0]->setMagnificationFilter(QOpenGLTexture::Linear);
@@ -105,6 +107,9 @@ Terrain::Terrain(int g, int l, Scene *parent) :
 
         decalmap[2]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         decalmap[2]->setMagnificationFilter(QOpenGLTexture::Linear);
+
+        noisemap->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+        noisemap->setMagnificationFilter(QOpenGLTexture::Linear);
 
         heightmap->setWrapMode(QOpenGLTexture::Repeat);
         heightmap->setMinificationFilter(QOpenGLTexture::Linear);
@@ -158,17 +163,19 @@ void Terrain::updatePatches() {
     QVector3D cameraPos = camera->getPosition();
     // cameraPos.setY(0.0);     // To test level of detail, uncomment this
 
-    // int far = qNextPowerOfTwo(int(camera->getFar()));
+    int far = qNextPowerOfTwo(int(camera->getFar()));
     int xfar = qCeil(size * M_PI);
     int zfar = qCeil(size * M_PI / 2);
     int size = int(ranges[levels].first);
-    int xnum = qCeil(xfar / size);
-    int znum = qCeil(zfar / size);
+    // int xnum = qCeil(xfar / size);
+    // int znum = qCeil(zfar / size);
+    int xnum = qCeil(far / size);
+    int znum = qCeil(far / size);
     
-    // int x = qRound(cameraPos.x() / size) * size;
-    // int y = qRound(cameraPos.z() / size) * size;
-    int x = 0;
-    int y = 0;
+    int x = qRound(cameraPos.x() / size) * size;
+    int y = qRound(cameraPos.z() / size) * size;
+    // int x = 0;
+    // int y = 0;
 
     // qDebug() << xnum * (2 * size + 1) << znum * (2 * size + 1);
 
@@ -211,26 +218,22 @@ void Terrain::allPatchesInfo() {
 }
 
 void Terrain::uniform() {
-    /**
-     * I do not understand why this works, but it just works.
-     * If I put this in the reversed order. Nothing appears.
-     * Like this:
-     *  heightmap->bind(0);
-     *  decalmap->bind(1);
-     * */
     heightmap->bind(0);
     decalmap[0]->bind(1);
     decalmap[1]->bind(2);
     decalmap[2]->bind(3);
+    noisemap->bind(4);
 
     int heightLocation = program.uniformLocation("uHeightmap");
     int decalLocation0 = program.uniformLocation("uDecalmap0");
     int decalLocation1 = program.uniformLocation("uDecalmap1");
     int decalLocation2 = program.uniformLocation("uDecalmap2");
+    int noiseLocation = program.uniformLocation("uNoisemap");
     program.setUniformValue(heightLocation, 0);
     program.setUniformValue(decalLocation0, 1);
     program.setUniformValue(decalLocation1, 2);
     program.setUniformValue(decalLocation2, 3);
+    program.setUniformValue(noiseLocation, 4);
     program.setUniformValue("uGrid", float(grid));
     CHECK_GL_ERROR("after sets uniforms");
 }

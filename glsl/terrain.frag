@@ -1,5 +1,6 @@
 #version 330
 
+uniform sampler2D uNoisemap;
 uniform sampler2D uHeightmap;
 uniform sampler2D uDecalmap0;
 uniform sampler2D uDecalmap1;
@@ -11,6 +12,7 @@ in vec2 vHeightUV;
 in vec2 vDecalTexCoord;
 in vec4 vColor;
 
+in vec2 vPos;
 in vec3 vView;
 in vec3 vNormal;
 in float linearZ;
@@ -19,10 +21,6 @@ out vec4 frag_color;
 
 void main()
 {
-    // frag_color = texture(uDecalmap, vDecalTexCoord);
-    // frag_color = vColor * texture(uDecalmap, vDecalTexCoord);
-    // frag_color = vec4(vNormal, 1.0) * texture(uDecalmap, vDecalTexCoord);
-
     // I am going to fake a light here
     // Uniform for light will be implemented later
     vec3 lightPos = vec3(0.0, 5000.0, 0.0);
@@ -58,7 +56,7 @@ void main()
     vec3 ambient = lightAmbient;
     vec3 diffuse = lightDiffuse * clamp(0.0, 1.0, max(0.0, dot(n, l)));
 
-    frag_color = vec4(decal, 1.0);
-    // frag_color = vec4((ambient + diffuse) * decal, 1.0);
+    vec3 color = (ambient + diffuse) * decal;
+    frag_color = vec4(color, 1.0);
     gl_FragDepth = linearZ;
 }

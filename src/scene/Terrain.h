@@ -102,6 +102,7 @@ private:
 
     unique_ptr<QOpenGLTexture> decalmap[3];
     unique_ptr<QOpenGLTexture> heightmap;
+    unique_ptr<QOpenGLTexture> noisemap;
 
     // List of distances ranges for LOD <range, morph>
     QVector< QPair<double, double> > ranges;

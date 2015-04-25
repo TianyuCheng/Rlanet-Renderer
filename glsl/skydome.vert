@@ -11,6 +11,7 @@ uniform mat4 uTransform;
 uniform vec3 uCenter;
 
 out vec2 vUV;
+out vec2 vPos;
 out vec3 vView;
 
 const float PI = 3.1415926;
@@ -18,6 +19,7 @@ const float PI = 3.1415926;
 vec3 hemisphere(float radius, vec2 xz, float y) {
     float theta = xz.x * 2.0 * PI;
     float phi = xz.y * 0.5 * PI;
+    vPos = vec2(phi, theta);
 
     float rho = radius + y;
     return vec3(
@@ -30,7 +32,7 @@ vec3 hemisphere(float radius, vec2 xz, float y) {
 void main()
 {
     // perform the vertex transformation
-    vec3 pos = hemisphere(9000.0, aVertex.xz, 0.0);
+    vec3 pos = hemisphere(4000.0, aVertex.xz, 0.0);
     pos.xz += uCenter.xz;
     gl_Position = uPMatrix * uMVMatrix * uTransform * vec4(pos, 1.0);
     vUV = aVertex.xz;
