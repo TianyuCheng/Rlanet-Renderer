@@ -7,6 +7,8 @@
 #include <QOpenGLFunctions>
 #include <QMap>
 #include <QTime>
+#include <QImage>
+#include <QOpenGLTexture>
 
 #include <SceneObject.h>
 #include <Camera.h>
@@ -21,6 +23,7 @@ public:
      * Add object into the scene
      * */
     void addObject(SceneObject* object);
+    void addSecondPassObject(SceneObject* object);
 
     /**
      * Render all visible objects to framebuffer.
@@ -67,9 +70,11 @@ private:
 
     // List of objects inside the scene
     QVector<SceneObject*> objects;
+    QVector<SceneObject*> secondPassObjects;
 
     // Framebuffer for texture rendering
-    QOpenGLFramebufferObject *fbo_;
+    unique_ptr<QOpenGLFramebufferObject> fbo_;
+    // QImage onePass;
 
     // Use QTime for underlying time management
     QTime time;

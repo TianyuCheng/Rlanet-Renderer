@@ -69,15 +69,17 @@ void TerrainPatch::selectPatches(Camera &camera, QVector3D &cameraPos, QVector<T
 // Terrain class
 
 Terrain::Terrain(int g, int l, Scene *parent) :
-    SceneObject(QString("CDLOD Terrain"), "../glsl/terrain.vert", "../glsl/terrain.frag", parent), 
+    SceneObject(QString("CDLOD Terrain"), parent), 
     grid(g), levels(l) {
 
     {
+        this->setShader(QOpenGLShader::Vertex, "../glsl/terrain.vert");
+        this->setShader(QOpenGLShader::Fragment, "../glsl/terrain.frag");
+
         // Load terrain texture from file
         QImage decal_dirt("../textures/decal_dirt.jpg");
         QImage decal_grass("../textures/decal_grass.jpg");
         QImage decal_snow("../textures/decal_snow.jpg");
-        QImage noise_image("../textures/Noise.png");
 
         // Generate heightmap using seed
         int r = 128;
@@ -97,7 +99,6 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         decalmap[1].reset(new QOpenGLTexture(decal_dirt));
         decalmap[2].reset(new QOpenGLTexture(decal_snow));
         heightmap.reset(new QOpenGLTexture(height));
-        noisemap.reset(new QOpenGLTexture(noise_image));
 
         decalmap[0]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         decalmap[0]->setMagnificationFilter(QOpenGLTexture::Linear);
@@ -108,8 +109,6 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         decalmap[2]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         decalmap[2]->setMagnificationFilter(QOpenGLTexture::Linear);
 
-        noisemap->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-        noisemap->setMagnificationFilter(QOpenGLTexture::Linear);
 
         heightmap->setWrapMode(QOpenGLTexture::Repeat);
         heightmap->setMinificationFilter(QOpenGLTexture::Linear);
@@ -218,22 +217,19 @@ void Terrain::allPatchesInfo() {
 }
 
 void Terrain::uniform() {
-    heightmap->bind(0);
-    decalmap[0]->bind(1);
-    decalmap[1]->bind(2);
-    decalmap[2]->bind(3);
-    noisemap->bind(4);
+    heightmap->bind(1);
+    decalmap[0]->bind(2);
+    decalmap[1]->bind(3);
+    decalmap[2]->bind(4);
 
     int heightLocation = program.uniformLocation("uHeightmap");
     int decalLocation0 = program.uniformLocation("uDecalmap0");
     int decalLocation1 = program.uniformLocation("uDecalmap1");
     int decalLocation2 = program.uniformLocation("uDecalmap2");
-    int noiseLocation = program.uniformLocation("uNoisemap");
-    program.setUniformValue(heightLocation, 0);
-    program.setUniformValue(decalLocation0, 1);
-    program.setUniformValue(decalLocation1, 2);
-    program.setUniformValue(decalLocation2, 3);
-    program.setUniformValue(noiseLocation, 4);
+    program.setUniformValue(heightLocation, 1);
+    program.setUniformValue(decalLocation0, 2);
+    program.setUniformValue(decalLocation1, 3);
+    program.setUniformValue(decalLocation2, 4);
     program.setUniformValue("uGrid", float(grid));
     CHECK_GL_ERROR("after sets uniforms");
 }

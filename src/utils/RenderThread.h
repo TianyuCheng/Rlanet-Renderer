@@ -11,6 +11,7 @@ class QOpenGLFramebufferObject;
 class QOpenGLVertexArrayObject;
 class Scene;
 class Terrain;
+class Ocean;
 class TextureSkyDome;
 
 class RenderThread : public QThread {
@@ -40,6 +41,7 @@ private:
 
 	unique_ptr<Scene> scene_;
 	unique_ptr<Terrain> terrian_;
+	unique_ptr<Ocean> ocean_;
     unique_ptr<TextureSkyDome> skydome_;
 	unique_ptr<QOpenGLVertexArrayObject> vao_;
 	bool shutdown_ = false;

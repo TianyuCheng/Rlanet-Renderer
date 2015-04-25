@@ -1,5 +1,7 @@
 #include "NoiseGenerator.h"
 
+noise::module::Perlin NoiseGenerator::perlin = noise::module::Perlin();
+
 void NoiseGenerator::ConvertNoiseMapToQImage(QImage &out, int width, int height, noise::utils::Image &noise) {
 
     // Build and write each horizontal line to the file.
@@ -16,9 +18,7 @@ void NoiseGenerator::ConvertNoiseMapToQImage(QImage &out, int width, int height,
 }
 
 void NoiseGenerator::Heightmap(QImage &out, int width, int height, int seed) {
-    // Use perlin noise
-    noise::module::Perlin perlin;
-    if (seed) perlin.SetSeed(seed);
+    if (seed) NoiseGenerator::perlin.SetSeed(seed);
 
     noise::utils::NoiseMap noiseMap;
     noise::utils::NoiseMapBuilderSphere noiseMapBuilder;
@@ -40,9 +40,7 @@ void NoiseGenerator::SphericalHeightmap(QImage &out, int radius, int seed) {
     int width = int(radius * 2 * M_PI);
     int height = int(radius * M_PI);
 
-    // Use perlin noise
-    noise::module::Perlin perlin;
-    if (seed) perlin.SetSeed(seed);
+    if (seed) NoiseGenerator::perlin.SetSeed(seed);
 
     noise::utils::NoiseMap noiseMap;
     noise::utils::NoiseMapBuilderSphere noiseMapBuilder;

@@ -14,6 +14,7 @@ uniform int  uLevel;
 uniform float uGrid;
 
 uniform sampler2D uHeightmap;
+uniform float uUnderWaterCull;
 
 // Used in the fragment shader
 out vec2 vHeightUV;
@@ -125,10 +126,10 @@ vec3 wrap(float radius, vec3 morphedPos) {
  * uv: the global position
  */
 float terrainHeight(vec2 uv) {
-    float coarse = texture(uHeightmap, uv).x * 1400 - 700;
-    if (uLevel > 3)
+    float coarse = texture(uHeightmap, uv).x * 3200.0 - 1600.0;
+    if (uLevel > 1)
         return coarse;
-    return coarse + fbm(uv) * 10.0;
+    return coarse + fbm(uv);
 }
 
 /**
@@ -164,21 +165,44 @@ vec2 morphVertex(vec2 gridPos, vec2 vertex, float morphK) {
     return vertex - fractPart * uScale * morphK;
 }
 
+float computeMorphK(vec3 pos) {
+    vec2 uv = pos.xz / 16384.0 - vec2(0.5, 0.5);
+    pos.y = terrainHeight(uv);      // approximate
+    float dist = length((uPMatrix *uMVMatrix * uTransform * vec4(pos, 1.0)).xyz);
+    float morphK = 0.0;
+    if (uLevel < 10) {
+        float scale = uScale.x;
+        float nextScale = scale * 2.0;
+        float morphArea = nextScale * 0.85;
+        if (dist > morphArea) {
+            morphK = clamp((dist - morphArea)/(nextScale), 0.0, 1.0);
+        }
+    }
+    return morphK;
+}
+
 void main()
 {
     float radius = 2048.0;
 
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
-    vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, 0.3), 0.0).xzy;
+    float morphK = computeMorphK(pos);
+
+    vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy;
     vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
     morphedPos.y = terrainHeight(uv);
+    /* if (morphedPos.y < uUnderWaterCull - 10.0) { */
+    /*     morphedPos.y = -100000.0; */
+    /* } */
+
     vec4 noproj = uMVMatrix * uTransform * vec4(morphedPos, 1.0);
     /* vec4 noproj = uMVMatrix * uTransform * vec4(wrap(radius, morphedPos), 1.0); */
-    gl_Position = uPMatrix * noproj;
+    vec4 proj = uPMatrix * noproj;
+    gl_Position = proj;
     linearZ = (-noproj.z-0.01)/(10000.0-0.01);
 
     vColor = vec4((700 + morphedPos.y) / 1400.0, 1.0 - (700 + morphedPos.y) / 1400.0, 0.0, 1.0);
-    vDecalTexCoord = morphedPos.xz / 1024.0;
+    vDecalTexCoord = morphedPos.xz / 512.0;
 
     vView = (uMVMatrix * uTransform * vec4(morphedPos, 1.0)).xyz;
     vNormal = computeNormal(aVertex.xz);

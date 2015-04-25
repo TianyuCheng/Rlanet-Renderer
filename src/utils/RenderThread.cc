@@ -9,12 +9,13 @@
 
 #include "RenderThread.h"
 #include "Terrain.h"
+#include "Ocean.h"
 #include "TextureSkyDome.h"
 #include "Scene.h"
 #include "nexus.h"
 
 RenderThread::RenderThread()
-	:size_(1280,1280)
+	:size_(1024, 768)
 {
 	nexus::register_thread(this);
 }
@@ -61,10 +62,12 @@ bool RenderThread::init_renderer()
 	vao_->bind();
 
 	scene_.reset(new Scene(nexus::get_scene_name(), size_.width(), size_.height()));
-	terrian_.reset(new Terrain(64, 10, scene_.get()));
+	terrian_.reset(new Terrain(32, 10, scene_.get()));
+	ocean_.reset(new Ocean(64, 10, scene_.get()));
     skydome_.reset(new TextureSkyDome(64, scene_.get()));
     scene_->addObject(skydome_.get());
 	scene_->addObject(terrian_.get());
+	scene_->addSecondPassObject(ocean_.get());
 	scene_->first_frame();
 	return true;
 }
@@ -83,11 +86,10 @@ void RenderThread::render_next()
 	}
 
 	// Actual rendering procedure
-	renderfbo_->bind();
-	// scene_->start(); TODO
+	// renderfbo_->bind();
 	scene_->renderScene(renderfbo_.get());
-        ctx_->functions()->glFlush();
-        renderfbo_->release();
+    ctx_->functions()->glFlush();
+    // renderfbo_->release();
 
 	// Double buffering support
 	std::swap(renderfbo_, displayfbo_);

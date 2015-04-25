@@ -16,6 +16,8 @@ public:
 private:
     static void ConvertNoiseMapToQImage(QImage &image, int width, int height, noise::utils::Image &noise);
 
+    // Use perlin noise
+    static noise::module::Perlin perlin;
 };
 
 #endif /* end of include guard: NOISEGENERATOR_H */

@@ -28,7 +28,7 @@ public:
     virtual ~TerrainPatch ();
 
     void selectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches);
-private:
+protected:
     QVector2D pos;     // the position of pos of patch
     int level;
     BoundingBox bounds;
@@ -94,7 +94,7 @@ private:
     void rangesInfo();
     void allPatchesInfo();
 
-private:
+protected:
     // Number of vertices on one side
     int grid;
     int levels;

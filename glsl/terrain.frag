@@ -1,6 +1,5 @@
 #version 330
 
-uniform sampler2D uNoisemap;
 uniform sampler2D uHeightmap;
 uniform sampler2D uDecalmap0;
 uniform sampler2D uDecalmap1;
