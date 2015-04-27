@@ -100,7 +100,14 @@ public:
 
     bool intersectSphere(QVector3D center, double radius) {
         if (dirty) updateCorners();
+
+        // check if the center is inside the bounding box
+        if (center.x() >= bmin.x() && center.y() >= bmin.y() && center.z() >= bmin.z()) 
+            if (center.x() <= bmax.x() && center.y() <= bmax.y() && center.z() <= bmax.z()) 
+                return true;
         
+        // center is outside of the bounding box, then check if 
+        // there is any possibility to intersect with corners
         int count = 0;
         for (int i = 0; i < 8; i++) {
             double distance = (center - corners[i]).length();
