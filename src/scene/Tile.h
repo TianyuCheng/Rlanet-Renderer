@@ -119,19 +119,21 @@ protected:
 }
 
 template<typename T>
-struct SquareTileShape {
+struct TileShape {
 	T x, y;
-	T d;
+	T dx, dy;
 	T res; // Resolution
 };
 
 template<typename T = double>
 struct Vec2D {
 	T x,y;
+
+	bool wrap(T maxx, T maxy); // TODO: return true if need wrap x to [0, maxx) (similar to y)
 };
 
 // We also need TileInfo concenpt for sampling purpose
-struct TerrainTileInfo : public SquareTileShape<double> {
+struct TerrainTileInfo : public TileShape<double> {
 #if 0
 	double theta_, dtheta_;
 	double phi_, dphi_;
@@ -139,8 +141,9 @@ struct TerrainTileInfo : public SquareTileShape<double> {
 	TerrainTileShape(SquareTileShape<double>& shape)
 		:SquareTileShape<double>(shape)
 	{
-		iD_ = std::round(d/res);
-		nelem_ = iD_ * iD_;
+		ix_ = std::round(dx/res);
+		iy_ = std::round(dy/res);
+		nelem_ = ix_ * iy_;
 	}
 	typedef double TileElement; // Height
 	typedef Vec2D Coordinate; // Coordinate
@@ -149,7 +152,7 @@ struct TerrainTileInfo : public SquareTileShape<double> {
 	ssize_t get_linear(const Coordinate& coord) const
 	{
 		auto icoord = get_block(coord);
-		return icoord.x * iD_ + y;
+		return icoord.x * iy_ + y;
 	}
 
 	Vec2D<int> get_block(const Coordinate& coord) const
@@ -161,9 +164,9 @@ struct TerrainTileInfo : public SquareTileShape<double> {
 	}
 
 	size_t nelement() const { return nelem_; }
-	size_t nline() const { return iD_; }
+	size_t nline() const { return ix_; }
 private:
-	ssize_t iD_;
+	ssize_t ix_, iy_;
 	size_t nelem_;
 };
 
@@ -249,9 +252,124 @@ protected:
 typedef Tile<TerrainTileInfo> TerrainTile;
 
 template<typename TileInfo, int nchild>
+class MacroTile;
+
+struct TileSetCursorPosition : public std::vector<Vec2D<int>> {
+};
+
+inline bool operator<(const TileSetCursorPosition& lhs, const TileSetCursorPosition& rhs)
+{
+	if (lhs.size() != rhs.size())
+		return false;
+	auto iter1 = lhs.begin();
+	auto iter2 = rhs.begin();
+	while (iter1 != lhs.end() && *iter1 == *iter2) {
+		iter1++;
+		iter2++;
+	}
+	return *iter1 < *iter2;
+}
+
+template<typename TileInfo, int nchild>
+struct TileHierarchyCursor {
+	typedef MacroTile<TileInfo, nchild> MTile;
+	TileHierarchyCursor(const TileSetCursorPosition& pos,
+			const std::vector<MTile*>& anc)
+		:now(pos), ancestors(anc)
+	{
+	}
+	/*
+ 	 * Invariant Condition
+	 * ancestor[i+1] == ancestors[i].child(now[i]);
+	 */
+	TileSetCursorPosition now;
+	std::vector<MTile*> ancestors;
+
+	MTile* current_tile()
+	{
+		return ancestors.back();
+	}
+	/*
+ 	 * Be careful.
+ 	 * TileHierarchyCursor does not have a bound other than 0-max
+	 *
+	 * Blitter cursors should use successor, CR and LF instead.
+	 */
+	bool up() { return tile_move(-1,0); }
+	bool down() { return tile_move(1,0); }
+	bool left() { return tile_move(0,-1); }
+	bool right() { return tile_move(0,1); }
+
+	bool tile_move(int dx, int dy)
+	{
+		Vec2D<int> dvec(dx, dy);
+		ssize_t iter = now.size() - 1;
+
+		do {
+			bool ret = false;
+			now[iter] += dvec; // Move cursor at current tile level
+			if (!now[iter].wrap(nchild, nchild))
+				ret = true; // No need to move higher level cursor
+			iter--;
+			if (iter > 0) {
+				// Maintain ancestors
+				ancestors[iter + 1] = ancestors[iter].child(now[iter+1]);
+			}
+			if (ret) // Return if done
+				return ret;
+			// Otherwise proceed to higher level
+		} while (iter > 0);
+		// OOB apparently
+		return false;
+	}
+};
+
+/*
+ * Cursor for blitting data from Tile Hierarchy to height map tile.
+ */
+template<typename TileInfo, int nchild, typename SecondTile>
+class MacroTileBlitCursor : public TileHierarchyCursor<TileInfo, nchild> {
+	typedef TileSetCursor<TileInfo, nchild> TileCursor;
+	MacroTileBlitCursor(const TileSetCursorPosition& start,
+			const std::vector<MacroTile<TileInfo>*>&,
+			const TileSetCursorPosition& _mins,
+			const TileSetCursorPosition& _maxs,
+			SecondTile &sectile,
+			)
+		:TileHierarchyCursor<TileInfo, nchild>(start, ancestors),
+		mins(_mins), maxs(_maxs)
+	{
+	}
+
+	TileSetCursorPosition mins, maxs; // Bounds, used by CR LF and successor
+	SecondTile &sectile,
+
+	/*
+ 	 * Time to learn the original meaning of these two words
+	 * CR: move the carriage to the start of CURRENT line
+	 * LF: move the carriage to the next line
+	 *
+	 * Thus, here we require CR+LF to get to the start of new line.
+ 	 */
+	void carriage_return();
+	bool line_feed();
+	// successor: move the cursor to the next tile in the same line
+	bool successor();
+
+	TileIO<TileInfo::TileElement> current_iblock();
+	TileIO<SecondTile::Element> current_oblock();
+
+	// TODO
+	bool next();
+};
+
+template<typename TileInfo, int nchild>
 class MacroTile : public Tile<TileInfo> {
 public:
-	typedef unique_ptr<MacroTile<TileInfo>> (*ChildrenArrayPointer)[nchild][nchild];
+	typedef MacroTile<TileInfo, nchild> MTile;
+	typedef TileSetCursor<TileInfo, int nchild> Cursor;
+	typedef std::vector<MTile*> Ancestors;
+	typedef unique_ptr<MTile> (*ChildrenArrayPointer)[nchild][nchild];
 
 	bool is_leaf() const { return pchildren_array_.get() == nullptr; }
 	void init_children()
@@ -270,23 +388,51 @@ public:
 	 * Note: need a working MacroTileBlitCursor class to work, which can
 	 * walk among tiles.
 	 */
-	template<typename SecondTile>
+	template<typename SecondTile, typename Splicer = TileSplicer<Element> >
 	bool blit_to(const Coord& axesmins, const Coord& axesmaxs, SecondTile& sectile)
 	{
 		const auto& secshape = sectile->get_shape();
 		typedef SecondTile::Element SecondElement;
-		MacroTileBlitCursor blit_cursor =
-			create_cursor(axesmins, axesmaxs, sectile);
+		auto blit_cursor = create_blit_cursor(axesmins, axesmaxs, sectile);
 		do {
 			auto iblock = blit_cursor.current_iblock();
 			auto oblock = blit_cursor.current_oblock();
-			TileSplicer splicer(iblock, oblock);
+			Splicer splicer(iblock, oblock);
 			splicer.splice(oblock.nelem());
 		} while (blit_cursor.next());
 		return true;
 	}
+
+	template<typename SecondTile>
+	MacroTileBlitCursor<MTile, SecondTile>
+	create_blit_cursor(SecondTile& sectile)
+	{
+		const auto& tileregion = sectile.get_shape_info();
+		std::vector<MTile> ancestors;
+		auto cursor_min = find_best_match(tileregion, &ancestors);
+		auto shapecorner = secshape;
+		shapecorner.x += secshape.d;
+		shapecorner.y += secshape.d;
+		auto cursor_max = find_best_match(secshape);
+
+		return MacroTileBlitCursor<TileInfo, nchild, SecondTile> ret(cursor_min,
+				ancestors,
+				cursor_min,
+				cursor_max,
+				sectile
+				);
+	}
+
+	// TODO
+	TileSetCursor<TileInfo> find_best_match(const TileInfo& area,
+			Ancestors* pancestors = nullptr)
+	{
+	}
+
+	// TODO
+	MTile* child(const Vec2D<int>&);
 protected:
-	MacroTile<TileInfo>* parent_;
+	MTile* parent_;
 	unique_ptr<ChildrenArrayPointer> pchildren_array_;
 	std::reference_wrapper<ChildrenArrayPointer> children_;
 };
