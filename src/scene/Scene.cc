@@ -26,11 +26,11 @@ Scene::Scene(QString n, int w, int h)
     //         QVector3D(0.0, 1.0, 0.0)
     // );
 
-    // camera.lookAt(
-    //         QVector3D(0.0, -50.0, 0.0),
-    //         QVector3D(0.0, -50.0, 20.0),
-    //         QVector3D(0.0, 1.0, 0.0)
-    // );
+    camera.lookAt(
+            QVector3D(0.0, 50.0, 0.0),
+            QVector3D(0.0, 50.0, 20.0),
+            QVector3D(0.0, 1.0, 0.0)
+    );
     // camera.moveForward(50);
     // camera.turnLeft(20);
 
@@ -159,6 +159,10 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
     //glClearColor(sin(::time(NULL)), 0.0, 0.0, 0.0);
     CHECK_GL_ERROR("After Clear\n");
 
+
+    // camera.moveForward(100 * float(msec)/1e3);
+    // camera.turnLeft(0.1);
+
     camera.lookAt(
             QVector3D(-3500, 250.0, 100.0),
             QVector3D(-3500, 250.0, 90.0),
@@ -207,7 +211,7 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
         object->program.release();
         CHECK_GL_ERROR("After release the program of some Obj");
     }
-    delete renderTarget;
+    // delete renderTarget;
 
     glFlush();
     CHECK_GL_ERROR("After flush");

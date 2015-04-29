@@ -12,7 +12,7 @@ TerrainPatch::TerrainPatch(QVector2D p, int l, QVector< QPair<double, double> > 
     // change it when we generate the heightmap by itself
     int size = ranges[level].first;
     QVector3D min = QVector3D(p.x(), 0.0, p.y());
-    QVector3D max = QVector3D(p.x() + size, 10000.0, p.y() + size);
+    QVector3D max = QVector3D(p.x() + size, 1000.0, p.y() + size);
     bounds.setMin(min);
     bounds.setMax(max);
     bounds.updateCorners();
@@ -33,9 +33,11 @@ void TerrainPatch::selectPatches(Camera &camera, QVector3D &cameraPos, QVector<T
     // Test it first with camera for frustum culling
     if (camera.isCullable(bounds) == Camera::Cullable::TOTALLY_CULLABLE) return;
 
+    // if (!bounds.intersectSphere(cameraPos, qSqrt(2) * ranges[level].first)) return;
+
     int size = ranges[level].first;
 
-    if (level == 0 || !bounds.intersectSphere(cameraPos, ranges[level - 1].first)) {
+    if (level == 0 || !bounds.intersectSphere(cameraPos, qSqrt(2) * ranges[level - 1].first)) {
         // Add this node to scene
         selectedPatches << this;
     }
@@ -231,6 +233,11 @@ void Terrain::uniform() {
     program.setUniformValue(decalLocation1, 3);
     program.setUniformValue(decalLocation2, 4);
     program.setUniformValue("uGrid", float(grid));
+
+    Camera* camera = dynamic_cast<Scene*>(parent)->getCamera();
+    QVector3D cameraPos = camera->getPosition();
+    program.setUniformValue("uCamera", cameraPos);
+
     CHECK_GL_ERROR("after sets uniforms");
 }
 
@@ -245,7 +252,7 @@ void Terrain::render()
 	//qDebug("uOffset location: %d", loc);
 	// Drawing only using line mode for LOD visualization
 	// drawMode = GL_LINE;
-	glPolygonMode( GL_FRONT_AND_BACK, drawMode );
+    glPolygonMode( GL_FRONT_AND_BACK, drawMode );
 	CHECK_GL_ERROR("set polygon mode");
 
 	vbo_.bind();
@@ -269,12 +276,14 @@ void Terrain::render()
 		double scaleFactor = ranges[patch->level].first;
 		QVector2D scale(scaleFactor, scaleFactor);
 		program.setUniformValue("uOffset", patch->pos);
-		//glUniform2f(loc, 1.0f, 1.0f);
 		CHECK_GL_ERROR("After Terrian bind uOffset");
 		program.setUniformValue("uScale", scale);
 		CHECK_GL_ERROR("After Terrian bind uScale");
 		program.setUniformValue("uLevel", patch->level);
 		CHECK_GL_ERROR("After Terrian bind uLevel");
+        QPair<double, double> range = ranges[patch->level];
+        QVector2D ranges = QVector2D(range.first, range.second);
+		program.setUniformValue("uRange", ranges);
 
 		// draw all the triangles
 		glDrawElements(GL_TRIANGLES, 

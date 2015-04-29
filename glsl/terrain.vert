@@ -10,11 +10,14 @@ uniform mat4 uTransform;
 
 uniform vec2 uOffset;
 uniform vec2 uScale;
-uniform int  uLevel;
 uniform float uGrid;
+uniform int  uLevel;                // for debugging purpose, consider deprecated
+
+uniform vec3 uCamera;
+uniform vec2 uRange;                // (range, morphArea)
+uniform vec4 uUnderWaterClip;       // plane for under water clipping, xyz is the normal, w is the distance from origin
 
 uniform sampler2D uHeightmap;
-uniform float uUnderWaterCull;
 
 // Used in the fragment shader
 out vec2 vHeightUV;
@@ -29,6 +32,7 @@ out float vHeight;
 out float linearZ;
 
 const float PI = 3.1415926;
+const float SQRT2 = 1.4142;
 
 // Noise functions with fBm
 // Source: https://www.shadertoy.com/view/4lB3zz
@@ -127,7 +131,7 @@ vec3 wrap(float radius, vec3 morphedPos) {
  */
 float terrainHeight(vec2 uv) {
     float coarse = texture(uHeightmap, uv).x * 3200.0 - 1600.0;
-    if (uLevel > 1)
+    if (uRange.x > 64.0)
         return coarse;
     return coarse + fbm(uv);
 }
@@ -168,21 +172,15 @@ vec2 morphVertex(vec2 gridPos, vec2 vertex, float morphK) {
 float computeMorphK(vec3 pos) {
     vec2 uv = pos.xz / 16384.0 - vec2(0.5, 0.5);
     pos.y = terrainHeight(uv);      // approximate
-    float dist = length((uPMatrix *uMVMatrix * uTransform * vec4(pos, 1.0)).xyz);
+    float dist = distance(uCamera, pos);
     float morphK = 0.0;
-    if (uLevel < 10) {
-        float scale = uScale.x;
-        float nextScale = scale * 2.0;
-        float morphArea = nextScale * 0.85;
-        if (dist > morphArea) {
-            morphK = clamp((dist - morphArea)/(nextScale), 0.0, 1.0);
-        }
-    }
+    /* I do not know how to compute morphK */
     return morphK;
 }
 
 void main()
 {
+    vColor = vec4(1.0, 1.0, 1.0, 1.0);
     float radius = 2048.0;
 
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
@@ -191,9 +189,6 @@ void main()
     vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy;
     vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
     morphedPos.y = terrainHeight(uv);
-    /* if (morphedPos.y < uUnderWaterCull - 10.0) { */
-    /*     morphedPos.y = -100000.0; */
-    /* } */
 
     vec4 noproj = uMVMatrix * uTransform * vec4(morphedPos, 1.0);
     /* vec4 noproj = uMVMatrix * uTransform * vec4(wrap(radius, morphedPos), 1.0); */
@@ -201,7 +196,13 @@ void main()
     gl_Position = proj;
     linearZ = (-noproj.z-0.01)/(10000.0-0.01);
 
-    vColor = vec4((700 + morphedPos.y) / 1400.0, 1.0 - (700 + morphedPos.y) / 1400.0, 0.0, 1.0);
+    /* if (uLevel <= 5) vColor = vec4(1.0, 1.0, 1.0, 1.0); */
+    /* else if (uLevel == 6) vColor = vec4(1.0, 0.0, 0.0, 1.0); */
+    /* else if (uLevel == 7) vColor = vec4(1.0, 1.0, 0.0, 1.0); */
+    /* else if (uLevel == 8) vColor = vec4(0.0, 1.0, 1.0, 1.0); */
+    /* else if (uLevel == 9) vColor = vec4(0.0, 0.0, 1.0, 1.0); */
+    /* else if (uLevel == 10) vColor = vec4(1.0, 0.0, 1.0, 1.0); */
+
     vDecalTexCoord = morphedPos.xz / 512.0;
 
     vView = (uMVMatrix * uTransform * vec4(morphedPos, 1.0)).xyz;
