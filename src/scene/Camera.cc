@@ -71,6 +71,21 @@ void Camera::turnRight(double angle, QVector3D axis) {
     turnLeft(-angle, axis);
 }
 
+void Camera::lookUp(double angle) {
+    QVector3D axis = QVector3D::crossProduct(look, up).normalized();
+    QQuaternion q = QQuaternion::fromAxisAndAngle(axis, angle);
+
+    look = q.rotatedVector(look);
+    center = eye + look;
+    // We have not moved our eye, only updated our view
+
+    dirty = true;
+}
+
+void Camera::lookDown(double angle) {
+    lookUp(-angle);
+}
+
 void Camera::setLeft(double left) { 
     this->left = left; 
     uPMatrix.setToIdentity();

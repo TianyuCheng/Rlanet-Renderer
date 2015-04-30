@@ -31,6 +31,8 @@ public:
     void moveBackward(double distance);     // move away from center
     void turnLeft(double angle, QVector3D axis = QVector3D(0, 1, 0));            // angle is in degree
     void turnRight(double angle, QVector3D axis = QVector3D(0, 1, 0));           // angle is in degree
+    void lookUp(double angle);
+    void lookDown(double angle);
 
     /**
      * Projection matrix manipulation
