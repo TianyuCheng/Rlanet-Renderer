@@ -7,6 +7,7 @@
  * code.
  * */
 
+#include <QtMath>
 #include <QVector3D>
 
 class BoundingBox {
@@ -99,21 +100,35 @@ public:
 	// }
 
     bool intersectSphere(QVector3D center, double radius) {
-        if (dirty) updateCorners();
+
+        // Q_ASSERT(bmin.x() <= bmax.x() && bmin.y() <= bmax.y() && bmin.z() <= bmax.z());
 
         // check if the center is inside the bounding box
         if (center.x() >= bmin.x() && center.y() >= bmin.y() && center.z() >= bmin.z()) 
             if (center.x() <= bmax.x() && center.y() <= bmax.y() && center.z() <= bmax.z()) 
                 return true;
-        
-        // center is outside of the bounding box, then check if 
-        // there is any possibility to intersect with corners
-        int count = 0;
-        for (int i = 0; i < 8; i++) {
-            double distance = (center - corners[i]).length();
-            if (distance < radius) return true;
+
+        float dmin = 0;
+
+        if (center.x() < bmin.x()) {
+            dmin += qPow(center.x() - bmin.x(), 2);
+        } else if (center.x() > bmax.x()) {
+            dmin += qPow(center.x() - bmax.x(), 2);
         }
-        return false;
+
+        if (center.y() < bmin.y()) {
+            dmin += qPow(center.y() - bmin.y(), 2);
+        } else if (center.y() > bmax.y()) {
+            dmin += qPow(center.y() - bmax.y(), 2);
+        }
+
+        if (center.z() < bmin.z()) {
+            dmin += qPow(center.z() - bmin.z(), 2);
+        } else if (center.z() > bmax.z()) {
+            dmin += qPow(center.z() - bmax.z(), 2);
+        }
+
+        return qSqrt(dmin) <= radius;
     }
 
 	void operator=(const BoundingBox& target) {

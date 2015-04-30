@@ -28,6 +28,11 @@ public:
     virtual ~TerrainPatch ();
 
     void selectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches);
+
+protected:
+    void partiallSelectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches);
+    void initializeChildren();
+
 protected:
     QVector2D pos;     // the position of pos of patch
     int level;
