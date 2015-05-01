@@ -41,9 +41,9 @@ TextureSkyDome::~TextureSkyDome() {
 }
 
 void TextureSkyDome::uniform() {
-    // decalmap->bind(0);
-    // int decalLocation = program.uniformLocation("uDecalmap");
-    // program.setUniformValue(decalLocation, 0);
+    decalmap->bind(1);
+    int decalLocation = program.uniformLocation("uDecalmap");
+    program.setUniformValue(decalLocation, 1);
     
 
     Camera* camera = dynamic_cast<Scene*>(parent)->getCamera();

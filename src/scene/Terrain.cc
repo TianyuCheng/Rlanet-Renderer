@@ -30,6 +30,12 @@ TerrainPatch::~TerrainPatch() {
 
 void TerrainPatch::selectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches) {
     
+    // Test using distance
+    if (level == ranges.size()) {
+        float far = camera.getFar();
+        if ((bounds.getMin() - cameraPos).length() > far || (bounds.getMax() - cameraPos).length()) return;
+    }
+
     // Test it first with camera for frustum culling
     if (camera.isCullable(bounds) == Camera::Cullable::TOTALLY_CULLABLE) return;
 

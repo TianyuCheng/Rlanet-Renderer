@@ -77,13 +77,13 @@ float fbm(vec2 pos)
 
 void main()
 {
-    /* // No computation, fast */
-    /* vec3 pic = texture(uDecalmap, vUV).rgb; */
-    /* frag_color = vec4(pic, 1.0); */
+    // No computation, fast
+    vec3 pic = texture(uDecalmap, vUV).rgb;
+    frag_color = vec4(pic, 1.0);
 
-    // fBm-based sky, slow
-    float cloud = fbm(vUV);
-    vec4 color = vec4(cloud, cloud, cloud, 1.0);
-    vec4 skyColor = vec4(0.49, 0.75, 0.93, 1.0);
-    frag_color = mix(skyColor, 0.6 * smoothstep(0.5, 0.8, color), 0.4);
+    /* // fBm-based sky, slow */
+    /* float cloud = fbm(vUV); */
+    /* vec4 color = vec4(cloud, cloud, cloud, 1.0); */
+    /* vec4 skyColor = vec4(0.49, 0.75, 0.93, 1.0); */
+    /* frag_color = mix(skyColor, 0.6 * smoothstep(0.5, 0.8, color), 0.4); */
 }
