@@ -190,17 +190,6 @@ Camera::Cullable Camera::isCullable(BoundingBox box) {
     QVector3D* corners = box.getCorners();
 
     int total = 0;
-    /**
-     * The idea is simple, you go through all corners,
-     * and check whether that corner is behind all six planes
-     * of the frustum.
-     * If yes, then the corner is in the frustum.
-     * If no, then the corner is not in the frustum.
-     *
-     * NOT CULLABLE = number of corners in frustum == 8
-     * PARTIALLY_CULLABLE = 0 < number of corners in frustum < 8
-     * TOTALLY_CULLABLE = number of corners in frustum == 0
-     * */
 
     // Iterate through every plane
     for (int i = 0; i < 6; i++) {

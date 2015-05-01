@@ -1,39 +1,54 @@
 #ifndef GRASS_H
 #define GRASS_H
 
-#include <QVector>
-#include <QImage>
-#include <QOpenGLTexture>
+
+#include <cmath>
+#include <ctime>
+#include <cstdlib>
 #include <memory>
 
-#include <Scene.h>
+#include <QVector>
+#include <QImage>
+#include <QVector3D>
+#include <QQuaternion>
+#include <QOpenGLTexture>
+#include <QOpenGLShader>
 
-class GrassBlade
-{
-public:
-    GrassBlade();
-    virtual ~GrassBlade();
-
-private:
-    /* data */
-};
+#include <SceneObject.h>
 
 class Grass : public SceneObject
 {
 public:
-    Grass();
+    Grass(int seed);
     virtual ~Grass();
+
+    void uniform();
+    void update();
+    // void render();
+
+private:
+    void generateBillboard();
+};
+
+class GrassFactory
+{
+    friend class Grass;
+public:
+    GrassFactory(int numVariations);
+    virtual ~GrassFactory();
+
+    Grass* getGrass(int index);
+
+private:
 
     // prepare the structure of grass blades
     void prepareGrassBlades();
 
-private:
-    int numGrassVariations;
+    int numVariations;
 
     std::unique_ptr<QOpenGLTexture> grassBlade;
-    // std::unique_ptr<QOpenGLTexture> grassAlpha;
 
-    QVector<GrassBlade*> blades;
+    QVector<Grass*> blades;
 };
 
 #endif /* end of include guard: GRASS_H */

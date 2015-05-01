@@ -13,6 +13,7 @@ class Scene;
 class Terrain;
 class Ocean;
 class TextureSkyDome;
+class Grass;
 
 class RenderThread : public QThread {
 	Q_OBJECT;
@@ -43,6 +44,7 @@ private:
 	unique_ptr<Terrain> terrian_;
 	unique_ptr<Ocean> ocean_;
     unique_ptr<TextureSkyDome> skydome_;
+    unique_ptr<Grass> grass_;
 	unique_ptr<QOpenGLVertexArrayObject> vao_;
 	bool shutdown_ = false;
 };

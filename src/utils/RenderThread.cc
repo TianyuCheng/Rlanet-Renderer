@@ -11,6 +11,7 @@
 #include "Terrain.h"
 #include "Ocean.h"
 #include "TextureSkyDome.h"
+#include "Grass.h"
 #include "Scene.h"
 #include "nexus.h"
 
@@ -62,12 +63,14 @@ bool RenderThread::init_renderer()
 	vao_->bind();
 
 	scene_.reset(new Scene(nexus::get_scene_name(), size_.width(), size_.height()));
-	terrian_.reset(new Terrain(32, 10, scene_.get()));
-	ocean_.reset(new Ocean(64, 10, scene_.get()));
+	terrian_.reset(new Terrain(64, 15, scene_.get()));
+	// ocean_.reset(new Ocean(64, 10, scene_.get()));
     skydome_.reset(new TextureSkyDome(64, scene_.get()));
+    grass_.reset(new Grass(0x12345678));
     scene_->addObject(skydome_.get());
+    scene_->addObject(grass_.get());
 	scene_->addObject(terrian_.get());
-	scene_->addSecondPassObject(ocean_.get());
+	// scene_->addSecondPassObject(ocean_.get());
 	scene_->first_frame();
 	return true;
 }

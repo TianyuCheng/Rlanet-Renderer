@@ -1,4 +1,3 @@
-
 #include "Terrain.h"
 
 // TerrainPatch class
@@ -37,46 +36,32 @@ void TerrainPatch::selectPatches(Camera &camera, QVector3D &cameraPos, QVector<T
     int size = ranges[level].first;
 
     if (level == 0 || !bounds.intersectSphere(cameraPos, ranges[level - 1].first)) {
-        // qDebug() << "Cut here" << pos << size;
         // Add this node to scene
         selectedPatches << this;
     }
     else {
-        // this->initializeChildren();
-        // for (int i = 0; i < 4; i++) {
-        //     children[i]->selectPatches(camera, cameraPos, selectedPatches);
-        // }
-        // Partially add this patch
-        this->partiallSelectPatches(camera, cameraPos, selectedPatches);
+        if (!bounds.intersectSphere(cameraPos, ranges[level].first)) {
+            // this patch is not even in the current range
+            selectedPatches << this;
+        }
+        else {
+            // this patch has some patches that lying in the high detailed range
+            // Partially add this patch
+            this->partiallySelectPatches(camera, cameraPos, selectedPatches);
+        }
     }
 }
 
 void TerrainPatch::initializeChildren() {
     // initialize all children if not initialized
     int nextSize = ranges[level - 1].first;
-    for (int i = 0; i < 4; i++) {
-        // If the child is never instantiated, create it
-        if (!children[i]) {
-            QVector2D childPos;
-            switch (i) {
-                case 0:
-                    childPos = QVector2D(pos.x() + nextSize, pos.y() + nextSize);
-                    break;
-                case 1:
-                    childPos = QVector2D(pos.x(), pos.y() + nextSize);
-                    break;
-                case 2:
-                    childPos = QVector2D(pos.x(), pos.y());
-                    break;
-                default:
-                    childPos = QVector2D(pos.x() + nextSize, pos.y());
-            }
-            children[i] = new TerrainPatch(childPos, level - 1, &ranges);
-        }
-    }
+    children[0] = new TerrainPatch(QVector2D(pos.x() + nextSize, pos.y() + nextSize), level - 1, &ranges);
+    children[1] = new TerrainPatch(QVector2D(pos.x(), pos.y() + nextSize), level - 1, &ranges);
+    children[2] = new TerrainPatch(QVector2D(pos.x(), pos.y()), level - 1, &ranges);
+    children[3] = new TerrainPatch(QVector2D(pos.x() + nextSize, pos.y()), level - 1, &ranges);
 }
 
-void TerrainPatch::partiallSelectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches) {
+void TerrainPatch::partiallySelectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches) {
     
     initializeChildren();
 
@@ -84,26 +69,24 @@ void TerrainPatch::partiallSelectPatches(Camera &camera, QVector3D &cameraPos, Q
     for (int i = 0; i < 4; i++) {
         TerrainPatch *child = children[i];
         // first test with current level
-        if (child->level == 0 || !child->bounds.intersectSphere(cameraPos, ranges[level - 1].first)) {
-            // qDebug() << child->pos << "Whole" << ranges[level - 1];
+        if (child->level == 0) {
+            selectedPatches << child;
+        }
+        else if (!child->bounds.intersectSphere(cameraPos, ranges[level - 1].first)) {
             selectedPatches << child;
         }
         else {
             child->initializeChildren();
-            for (int j = 0; j < 4; j++)
-                child->children[j]->selectPatches(camera, cameraPos, selectedPatches);
-
-            // qDebug() << child->pos << "Partial"  << ranges[level - 1];
-            // if (!child->bounds.intersectSphere(cameraPos, ranges[child->level - 1].first)) {
-            //     child->initializeChildren();
-            //     if (camera.isCullable(child->children[0]->bounds) != Camera::Cullable::TOTALLY_CULLABLE) selectedPatches << child->children[0];
-            //     if (camera.isCullable(child->children[1]->bounds) != Camera::Cullable::TOTALLY_CULLABLE) selectedPatches << child->children[1];
-            //     if (camera.isCullable(child->children[2]->bounds) != Camera::Cullable::TOTALLY_CULLABLE) selectedPatches << child->children[2];
-            //     if (camera.isCullable(child->children[3]->bounds) != Camera::Cullable::TOTALLY_CULLABLE) selectedPatches << child->children[3];
-            // }
-            // else {
-            //     child->selectPatches(camera, cameraPos, selectedPatches);
-            // }
+            if (!child->bounds.intersectSphere(cameraPos, ranges[child->level - 1].first)) {
+                child->initializeChildren();
+                selectedPatches << child->children[0];
+                selectedPatches << child->children[1];
+                selectedPatches << child->children[2];
+                selectedPatches << child->children[3];
+            }
+            else {
+                child->selectPatches(camera, cameraPos, selectedPatches);
+            }
             
         }
     }
@@ -161,11 +144,10 @@ Terrain::Terrain(int g, int l, Scene *parent) :
     }
 
     // Initialize ranges
-    double range = 1.0, morph = range;
+    double range = 1.0;
     for (int i = 0; i <= levels; i++) {
-        ranges << qMakePair(range, morph);
-        range *= 2;
-        morph = 0.85 * range;       // let morph area takes 15% less
+        ranges << qMakePair(range, range * 0.85);
+        range *= 2.0;
     }
     
     // rangesInfo();

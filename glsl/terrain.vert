@@ -131,9 +131,10 @@ vec3 wrap(float radius, vec3 morphedPos) {
  */
 float terrainHeight(vec2 uv) {
     float coarse = texture(uHeightmap, uv).x * 3200.0 - 1600.0;
-    if (uRange.x > 64.0)
-        return coarse;
-    return coarse + fbm(uv);
+    /* if (uRange.x > 64.0) */
+    /*     return coarse; */
+    /* return coarse + fbm(uv); */
+    return coarse;
 }
 
 /**
@@ -169,13 +170,27 @@ vec2 morphVertex(vec2 gridPos, vec2 vertex, float morphK) {
     return vertex - fractPart * uScale * morphK;
 }
 
-float computeMorphK(vec3 pos) {
-    vec2 uv = pos.xz / 16384.0 - vec2(0.5, 0.5);
-    pos.y = terrainHeight(uv);      // approximate
-    float dist = distance(uCamera, pos);
-    float morphK = 0.0;
-    /* I do not know how to compute morphK */
-    return morphK;
+float computeMorphK(vec2 gridPos, vec3 vertex) {
+    vec2 uv = vertex.xz / 16384.0 - vec2(0.5, 0.5);
+    // vertex.y = terrainHeight(uv);      // approximate
+    vec3 camera = uCamera;
+    camera.y = 0.0;
+    float dist = distance(camera, vertex);
+    float morphStart = uRange.y * 2.0;
+    float morphEnd = uRange.x * 2.0 * sqrt(2.0);
+    // if (dist > morphStart) vColor = vec4(1.0, 0.0, 0.0, 1.0);
+    float morphLerpK = clamp((dist - morphStart) / (morphEnd-morphStart), 0.0, 1.0);
+
+    // Hack for detecting edge
+    vec2 scaledGridPos = gridPos * uGrid;
+    float x = scaledGridPos.x;
+    float y = scaledGridPos.y;
+    if (x == uGrid || y == uGrid || x == 0 || y == 0) {
+        if (morphLerpK >= 0.5) morphLerpK = 1.0;
+        else morphLerpK = 0.0;
+    }
+
+    return morphLerpK;
 }
 
 void main()
@@ -184,7 +199,8 @@ void main()
     float radius = 2048.0;
 
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
-    float morphK = computeMorphK(pos);
+    float morphK = computeMorphK(aVertex.xz, pos);
+    // float morphK = 0.0;
 
     vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy;
     vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
@@ -196,12 +212,15 @@ void main()
     gl_Position = proj;
     linearZ = (-noproj.z-0.01)/(10000.0-0.01);
 
-    /* if (uLevel <= 5) vColor = vec4(1.0, 1.0, 1.0, 1.0); */
-    /* else if (uLevel == 6) vColor = vec4(1.0, 0.0, 0.0, 1.0); */
-    /* else if (uLevel == 7) vColor = vec4(1.0, 1.0, 0.0, 1.0); */
-    /* else if (uLevel == 8) vColor = vec4(0.0, 1.0, 1.0, 1.0); */
-    /* else if (uLevel == 9) vColor = vec4(0.0, 0.0, 1.0, 1.0); */
-    /* else if (uLevel == 10) vColor = vec4(1.0, 0.0, 1.0, 1.0); */
+    // if (uLevel == 0) vColor = vec4(1.0, 0.0, 0.0, 1.0);
+    // else if (uLevel == 1) vColor = vec4(1.0, 1.0, 0.0, 1.0);
+    // else if (uLevel == 2) vColor = vec4(0.0, 1.0, 1.0, 1.0);
+    // else if (uLevel == 3) vColor = vec4(0.0, 0.0, 1.0, 1.0);
+    // else if (uLevel == 4) vColor = vec4(1.0, 0.0, 1.0, 1.0);
+    // else if (uLevel == 5) vColor = vec4(1.0, 1.0, 0.0, 1.0);
+    // else if (uLevel == 6) vColor = vec4(0.0, 1.0, 0.0, 1.0);
+    // else if (uLevel == 7) vColor = vec4(0.0, 1.0, 1.0, 1.0);
+    // else if (uLevel >= 8) vColor = vec4(1.0, 1.0, 1.0, 1.0);
 
     vDecalTexCoord = morphedPos.xz / 512.0;
 
