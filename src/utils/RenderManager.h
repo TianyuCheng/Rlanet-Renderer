@@ -9,7 +9,7 @@
 class RenderManager
 {
 public:
-    RenderManager() { lastTime = 0; }
+    RenderManager() { lastTime = 0; _fpsVal = 0; }
     virtual ~RenderManager() {}
 
     void beforeRender();

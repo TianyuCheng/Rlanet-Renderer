@@ -190,6 +190,23 @@ void Camera::setPerspective(double fovy, double aspect, double zNear, double zFa
     // projectionInfo();
 }
 
+void Camera::reflectCamera(QVector4D n, Camera *cam) {
+    QMatrix4x4 reflectionMatrix(
+        1 - 2 * n.x() * n.x(), -2 * n.x() * n.y(), -2 * n.x() * n.z(), -2 * n.x() * n.w(), 
+        -2 * n.x() * n.y(), 1 - 2 * n.y() * n.y(),-2 * n.y() * n.z(), -2 * n.y() * n.w(), 
+        -2 * n.x() * n.z(), -2 * n.y() * n.y(), 1 - 2 * n.z() * n.z(), -2 * n.z() * n.w(), 
+        0, 0, 0, 1
+    );
+    QMatrix4x4 flipMatrix(
+        -1.0, 0.0, 0.0, 0.0,
+         1.0, 1.0, 0.0, 0.0,
+         1.0, 0.0,-1.0, 0.0,
+         1.0, 0.0, 0.0, 1.0
+    );
+    // Unimplemented yet
+    // QMatrix4x4 cameraMatrix = 
+}
+
 void Camera::uniformMatrices(QOpenGLShaderProgram &program) {
     // uniform matrices
     program.setUniformValue("uMVMatrix", uMVMatrix);

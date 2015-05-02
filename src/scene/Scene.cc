@@ -2,13 +2,37 @@
 
 Scene::Scene(QString n, QSize r) 
     : SceneObject(n), 
-      name(n), resolution(r), camera(nullptr)
+      name(n), resolution(r), camera(nullptr), 
+      fbo_ready(false), lastPass(-1)
 {
 }
 
 
 Scene::~Scene() {
 
+}
+
+void Scene::init_fbo() {
+    int w = resolution.width();
+    int h = resolution.height();
+
+    // Create my own framebuffer for two pass rendering
+    QOpenGLFramebufferObjectFormat fmt;
+    fmt.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+    fbo_.reset(new QOpenGLFramebufferObject(QSize(w, h),fmt));
+
+    // Mark the flag
+    fbo_ready = true;
+}
+
+GLuint Scene::texture() const {
+    Q_ASSERT_X(fbo_ready, __func__, "Error: no fbo to take from");
+    return fbo_->texture();
+}
+
+GLuint Scene::takeTexture() const {
+    Q_ASSERT_X(fbo_ready, __func__, "Error: no fbo to take from");
+    return fbo_->takeTexture();
 }
 
 void Scene::addObject(SceneObject* object) {
@@ -18,7 +42,19 @@ void Scene::addObject(SceneObject* object) {
 
 void Scene::renderScene(QOpenGLFramebufferObject* fbo)
 {
-    fbo->bind();
+    /**
+     * If the input fbo is not null, then we render the 
+     * scene into the input fbo, else we prepare its own
+     * fbo and render.
+     * */
+    if (fbo) {
+        fbo->bind();
+    }
+    else {
+        if (!fbo_ready) init_fbo();
+        fbo_->bind();
+    }
+
     CHECK_GL_ERROR("Before Clear\n");
 
     // Change the viewport to the whole screen
@@ -50,6 +86,16 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
         // Uniform the object variables
         object->program.setUniformValue("uTransform", object->transform);
 
+        /* lastPass is initialized to -1,
+         * it gets reseted to nonnegative when
+         * assigned a texture unit
+         */
+        if (lastPass >= 0) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, lastPass);
+            object->program.setUniformValue("uRenderTexture", 0);
+        }
+
         // User defined uniform variables
         object->uniform();
         CHECK_GL_ERROR("Before render some Obj");
@@ -61,7 +107,9 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
 
     glFlush();
     CHECK_GL_ERROR("After flush");
-    fbo->release();
+
+    if (fbo) fbo->release();
+    else fbo_->release();
 }
 
 void Scene::resize(QSize res) {

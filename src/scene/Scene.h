@@ -32,8 +32,11 @@ public:
      *
      * Note: Currently it just draws all the objects in the 
      * scene, but possible to optimize. 
+     *
+     * if fbo == nullptr, then we render it into scene's own
+     * fbo.
      * */
-    void renderScene(QOpenGLFramebufferObject*);
+    void renderScene(QOpenGLFramebufferObject *fbo = nullptr);
 
     /**
      * Scene Update
@@ -49,6 +52,15 @@ public:
 
     void resize(QSize res);
 
+    void discardTexture() { lastPass = -1; }
+    void useTexture(GLuint texture) { lastPass = texture; }
+
+    GLuint texture() const;
+    GLuint takeTexture() const;
+
+private:
+    void init_fbo();
+
 private:
     // Name for debugging and displaying
     QString name;
@@ -57,8 +69,14 @@ private:
     // Camera object encapsulation
     Camera *camera;
 
+    // Framebuffer object
+    unique_ptr<QOpenGLFramebufferObject> fbo_;
+
     // List of objects inside the scene
     QVector<SceneObject*> objects;
+
+    bool fbo_ready;
+    int lastPass;
 };
 
 #endif /* end of include guard: SCENE_H */

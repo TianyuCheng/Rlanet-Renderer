@@ -52,6 +52,9 @@ public:
     void setAspect(double aspect);  // this aspect is for horizontal
     void setPerspective(double fovy, double aspect, double zNear, double zFar);
 
+    // reflect about plane
+    void reflectCamera(QVector4D plane, Camera *cam);
+
     // GLSL related functions
     void uniformMatrices(QOpenGLShaderProgram &program);
 
