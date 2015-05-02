@@ -131,6 +131,6 @@ void RenderThread::setup_ui_signals(QObject* ui)
 void RenderThread::camera_move(qreal dx, qreal dy, qreal dz)
 {
 	// Simple handler.
-	fprintf(stderr, "%s %f %f %f\n", __func__, dx, dy, dz);
+	// fprintf(stderr, "%s %f %f %f\n", __func__, dx, dy, dz);
 	scene_->getCamera()->move(QVector3D(dx, dy, dz));
 }

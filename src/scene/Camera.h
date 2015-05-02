@@ -29,6 +29,7 @@ public:
     void lookAt(QVector3D eye, QVector3D center, QVector3D up);
     void moveForward(double distance);      // move towards the center
     void moveBackward(double distance);     // move away from center
+    void move(QVector3D deye);
     void turnLeft(double angle, QVector3D axis = QVector3D(0, 1, 0));            // angle is in degree
     void turnRight(double angle, QVector3D axis = QVector3D(0, 1, 0));           // angle is in degree
 

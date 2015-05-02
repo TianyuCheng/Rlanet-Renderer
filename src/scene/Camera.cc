@@ -52,6 +52,21 @@ void Camera::moveForward(double distance) {
     // modelviewInfo();
 }
 
+void Camera::move(QVector3D daxes)
+{
+	QVector3D X(QVector3D::crossProduct(look, up).normalized());
+	QVector3D Y(up.normalized());
+	QVector3D Z(-look.normalized());
+
+	QVector3D deye;
+	// Should be matrix but I'm too laze to reason the formula.
+	deye += daxes.x() * X;
+	deye += daxes.y() * Y;
+	deye += daxes.z() * Z;
+
+	setEye(getPosition() + deye);
+}
+
 void Camera::moveBackward(double distance) {
     moveForward(-distance);
 }
