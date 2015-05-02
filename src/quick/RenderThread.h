@@ -18,6 +18,10 @@ class RenderThread : public QThread {
 public slots:
 	void render_next();
 	void shutdown();
+	/*
+ 	 * Step 3: a slot to handle cameramove singal from the UI
+	 */
+	void camera_move(qreal dx, qreal dy, qreal dz);
 signals:
 	void textureReady(int id, const QSize &size);
 
@@ -32,6 +36,8 @@ public:
 	bool init_fbos();
 	bool init_renderer();
 	QOpenGLContext* context() const { return ctx_.get(); }
+
+	void setup_ui_signals(QObject*);
 private:
 	unique_ptr<QOpenGLContext> ctx_;
 	QOffscreenSurface *surface_; // QOffscreenSurface needs deleteLater
@@ -40,7 +46,7 @@ private:
 
 	unique_ptr<Scene> scene_;
 	unique_ptr<Terrain> terrian_;
-    unique_ptr<TextureSkyDome> skydome_;
+	unique_ptr<TextureSkyDome> skydome_;
 	unique_ptr<QOpenGLVertexArrayObject> vao_;
 	bool shutdown_ = false;
 };
