@@ -5,7 +5,7 @@
 #include <QtCore/QThread>
 #include <RenderManager.h>
 
-using std::unique_ptr;
+// using std::unique_ptr;
 class QOpenGLContext;
 class QOffscreenSurface;
 class QOpenGLFramebufferObject;
@@ -21,6 +21,10 @@ class RenderThread : public QThread {
 public slots:
 	void render_next();
 	void shutdown();
+	/*
+ 	 * Step 3: a slot to handle cameramove singal from the UI
+	 */
+	void camera_move(qreal dx, qreal dy, qreal dz);
 signals:
 	void textureReady(int id, const QSize &size);
 
@@ -38,21 +42,23 @@ public:
 
 public:
     static RenderManager *renderMgr;
+	void setup_ui_signals(QObject*);
 
 private:
-	unique_ptr<QOpenGLContext> ctx_;
+	std::unique_ptr<QOpenGLContext> ctx_;
 	QOffscreenSurface *surface_; // QOffscreenSurface needs deleteLater
-	unique_ptr<QOpenGLFramebufferObject> renderfbo_, displayfbo_;
+	std::unique_ptr<QOpenGLFramebufferObject> renderfbo_, displayfbo_;
 	QSize size_;
 
 #if 0
-	unique_ptr<Scene> scene_;
-	unique_ptr<Terrain> terrian_;
-	unique_ptr<Ocean> ocean_;
-    unique_ptr<TextureSkyDome> skydome_;
-    unique_ptr<Grass> grass_;
+	std::unique_ptr<Scene> scene_;
+	std::unique_ptr<Terrain> terrian_;
+	std::unique_ptr<Ocean> ocean_;
+    std::unique_ptr<TextureSkyDome> skydome_;
+    std::unique_ptr<Grass> grass_;
 #endif
-	unique_ptr<QOpenGLVertexArrayObject> vao_;
+
+	std::unique_ptr<QOpenGLVertexArrayObject> vao_;
 	bool shutdown_ = false;
 };
 

@@ -51,6 +51,8 @@ public:
     virtual ~PlanetRenderManager() {
     }
 
+    Camera* getCamera() { return camera_.get(); }
+
     void prepare() {
         int width = resolution.width();
         int height = resolution.height();

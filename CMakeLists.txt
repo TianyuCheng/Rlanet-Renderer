@@ -38,9 +38,9 @@ SET(LIBNOISE_LIBRARY ${install_dir}/lib/libnoise.a)
 # Package OpenGL
 find_package (OpenGL REQUIRED)
 include_directories(src/)
-include_directories(src/ui/)
-include_directories(src/utils/)
+include_directories(src/quick/)
 include_directories(src/scene/)
+include_directories(src/utils/)
 
 # C++11 Debug
 set(CMAKE_CXX_FLAGS "--std=c++11 -ggdb3 ${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
@@ -55,12 +55,12 @@ set(QT_LIBRARIES ${Qt5OpenGL_LIBRARIES})
 qt5_add_resources(RESOURCES src/quick/quick.qrc)
 
 file(GLOB PLANET_HDRS
-    src/utils/*.h,
     src/scene/*.h
 )
-AUX_SOURCE_DIRECTORY(src/utils/ PLANET_UTIL_SRCS)
 AUX_SOURCE_DIRECTORY(src/scene/ PLANET_SCENE_SRCS)
-add_library(PlanetEssential ${PLANET_HDRS} ${PLANET_UTIL_SRCS} ${PLANET_SCENE_SRCS})
+AUX_SOURCE_DIRECTORY(src/quick/ PLANET_QUICK_SRCS)
+AUX_SOURCE_DIRECTORY(src/utils/ PLANET_QUICK_SRCS)
+add_library(PlanetEssential ${PLANET_HDRS} ${PLANET_QUICK_SRCS} ${PLANET_SCENE_SRCS})
 set_target_properties(PlanetEssential PROPERTIES LINKER_LANGUAGE CXX)
 
 add_dependencies(PlanetEssential project_libnoise)

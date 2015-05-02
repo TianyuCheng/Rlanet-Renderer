@@ -100,8 +100,7 @@ public:
 	// }
 
     bool intersectSphere(QVector3D center, double radius) {
-
-        // Q_ASSERT(bmin.x() <= bmax.x() && bmin.y() <= bmax.y() && bmin.z() <= bmax.z());
+        if (dirty) updateCorners();
 
         // check if the center is inside the bounding box
         if (center.x() >= bmin.x() && center.y() >= bmin.y() && center.z() >= bmin.z()) 
@@ -115,7 +114,6 @@ public:
         } else if (center.x() > bmax.x()) {
             dmin += qPow(center.x() - bmax.x(), 2);
         }
-
         if (center.y() < bmin.y()) {
             dmin += qPow(center.y() - bmin.y(), 2);
         } else if (center.y() > bmax.y()) {

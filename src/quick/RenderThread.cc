@@ -8,12 +8,15 @@
 #include <QtGlobal>
 
 #include "RenderThread.h"
+#include "nexus.h"
+
+#if 0
 #include "Terrain.h"
 #include "Ocean.h"
 #include "TextureSkyDome.h"
 #include "Grass.h"
 #include "Scene.h"
-#include "nexus.h"
+#endif
 
 RenderManager *RenderThread::renderMgr = nullptr;
 
@@ -139,4 +142,29 @@ void RenderThread::shutdown()
 	surface_->deleteLater();
 	exit();
 	moveToThread(QGuiApplication::instance()->thread());
+}
+
+/*
+ * Step 4: connect signal to slot
+ */
+void RenderThread::setup_ui_signals(QObject* ui)
+{
+	connect(ui,
+		SIGNAL(cameramove(qreal, qreal, qreal)), // Identical name as in main.qml. Note: real->qreal
+		this,
+		SLOT(camera_move(qreal, qreal, qreal)),
+		Qt::QueuedConnection); // Must be QueuedConnection
+	// Note: In theory we don't need to specify Qt::QueuedConnection because
+	// Qt::connect will use QueuedConnection for object in different threads,
+	// which is just our case. However I don't want to take the risk.
+}
+
+void RenderThread::camera_move(qreal dx, qreal dy, qreal dz)
+{
+	// Simple handler.
+	// fprintf(stderr, "%s %f %f %f\n", __func__, dx, dy, dz);
+#if 0
+	scene_->getCamera()->move(QVector3D(dx, dy, dz));
+#endif
+    if (renderMgr) renderMgr->getCamera()->move(QVector3D(dx, dy, dz));
 }

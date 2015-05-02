@@ -22,14 +22,14 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
     CHECK_GL_ERROR("Before Clear\n");
 
     // Change the viewport to the whole screen
-    glViewport(0, 50, resolution.width(), resolution.height());
+    glViewport(0, 0, resolution.width(), resolution.height());
     // Clear out buffer before drawing anything
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
     //glClearColor(drand48(), drand48(), drand48(), 1.0);
     //glClearColor(sin(::time(NULL)), 0.0, 0.0, 0.0);
     CHECK_GL_ERROR("After Clear\n");
-
+    
     // Render all objects in the scene.
     // This could be done in a smarter way
     for (auto iter = objects.constBegin(); iter != objects.constEnd(); ++iter) {

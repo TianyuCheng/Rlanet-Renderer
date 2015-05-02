@@ -4,6 +4,8 @@
 #include <QTime>
 #include <QOpenGLFramebufferObject>
 
+#include <Camera.h>
+
 class RenderManager
 {
 public:
@@ -15,6 +17,8 @@ public:
     virtual void prepare() = 0;
     virtual void render(QOpenGLFramebufferObject *) = 0;
     virtual void shutdown()  = 0;
+
+    virtual Camera* getCamera() = 0;
 
     int fps() { return _fpsVal; }
 
