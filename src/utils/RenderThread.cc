@@ -15,6 +15,8 @@
 #include "Scene.h"
 #include "nexus.h"
 
+RenderManager *RenderThread::renderMgr = nullptr;
+
 RenderThread::RenderThread()
 	:size_(1024, 768)
 {
@@ -62,6 +64,7 @@ bool RenderThread::init_renderer()
 	vao_->create();
 	vao_->bind();
 
+#if 0
 	scene_.reset(new Scene(nexus::get_scene_name(), size_.width(), size_.height()));
 	terrian_.reset(new Terrain(64, 15, scene_.get()));
 	// ocean_.reset(new Ocean(64, 10, scene_.get()));
@@ -72,6 +75,8 @@ bool RenderThread::init_renderer()
 	scene_->addObject(terrian_.get());
 	// scene_->addSecondPassObject(ocean_.get());
 	scene_->first_frame();
+#endif
+    if (renderMgr) { renderMgr->prepare(); }
 	return true;
 }
 
@@ -88,15 +93,25 @@ void RenderThread::render_next()
 		init_renderer();
 	}
 
+    /* This is older version code that hard coded
+     * the scene inside the render thread. We consider
+     * a more flexible framework by render manager
+     * */
+#if 0
 	// Actual rendering procedure
 	// renderfbo_->bind();
 	scene_->renderScene(renderfbo_.get());
     ctx_->functions()->glFlush();
     // renderfbo_->release();
+#endif
+    
+    if (renderMgr) {
+        renderMgr->render(renderfbo_.get());
+    }
 
-	// Double buffering support
-	std::swap(renderfbo_, displayfbo_);
-	emit textureReady(displayfbo_->texture(), size_);
+    // Double buffering support
+    std::swap(renderfbo_, displayfbo_);
+    emit textureReady(displayfbo_->texture(), size_);
 }
 
 void RenderThread::shutdown()
@@ -108,9 +123,13 @@ void RenderThread::shutdown()
 	displayfbo_.reset();
 	renderfbo_.reset();
 	vao_.reset();
+#if 0
 	scene_.reset();
 	terrian_.reset();
-        ctx_->doneCurrent();
+#endif
+    if (renderMgr) { renderMgr->shutdown(); }
+
+    ctx_->doneCurrent();
 	ctx_.reset();
 
 	surface_->deleteLater();

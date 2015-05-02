@@ -2,6 +2,7 @@
 #define SCENE_H
 
 #include <memory>
+#include <QSize>
 #include <QVector>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLFunctions>
@@ -16,14 +17,13 @@
 class Scene : public SceneObject
 {
 public:
-    Scene(QString name, int width, int height);
+    Scene(QString name, QSize resolution);
     virtual ~Scene();
 
     /**
      * Add object into the scene
      * */
     void addObject(SceneObject* object);
-    void addSecondPassObject(SceneObject* object);
 
     /**
      * Render all visible objects to framebuffer.
@@ -44,45 +44,21 @@ public:
     /**
      * Camera
      * */
-    Camera* getCamera() { return &camera; }
+    void setCamera(Camera *cam) { camera = cam; }
+    Camera* getCamera() { return camera; }
 
-    /**
-     * Time Utils
-     * Scene time control with start, pause, resume, and restart.
-     * As there is no pause and stop in the Qt, we fake it through
-     * subtracting the elapsed time right before paused.
-     * */
-    void start();
-    void pause();
-    void resume();
-    void restart();
-    double timeElapsed() const;
+    void resize(QSize res);
 
-    void resize(GLuint width, GLuint height);
-    void first_frame();
 private:
     // Name for debugging and displaying
     QString name;
-    int width, height;
+    QSize resolution;
 
     // Camera object encapsulation
-    Camera camera;
+    Camera *camera;
 
     // List of objects inside the scene
     QVector<SceneObject*> objects;
-    QVector<SceneObject*> secondPassObjects;
-
-    // Framebuffer for texture rendering
-    unique_ptr<QOpenGLFramebufferObject> fbo_;
-    // QImage onePass;
-
-    // Use QTime for underlying time management
-    QTime time;
-    QTime frametimer_;
-    int elapsedTime;
-
-    int fps;        // fps counter
-    int fpsCounter;
 };
 
 #endif /* end of include guard: SCENE_H */

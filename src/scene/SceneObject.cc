@@ -45,7 +45,9 @@ void SceneObject::setShader(QOpenGLShader *shader) {
     QString where = "SceneObject.cpp: setShader()";
     QString what  = "%1 Shader of %2 is null";
     Q_ASSERT_X(
-            type == QOpenGLShader::ShaderType::Vertex || type == QOpenGLShader::ShaderType::Fragment,
+            type == QOpenGLShader::ShaderType::Vertex || 
+            type == QOpenGLShader::ShaderType::Fragment || 
+            type == QOpenGLShader::ShaderType::Geometry ,
             "SceneObject.cpp: setShader()", 
             QString("The type of shader for ") + name + QString(" is neither Vertex nor Fragment"));
     Q_ASSERT_X(shader->isCompiled(), "SceneObject.cpp: setShader()", 
