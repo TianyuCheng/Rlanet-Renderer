@@ -29,6 +29,7 @@ void Mangekyou::get_thread_ready()
 	thread_->moveToThread(thread_);
 	connect(window(), SIGNAL(sceneGraphInvalidated()),
 			thread_, SLOT(shutdown()), Qt::QueuedConnection);
+	thread_->setup_ui_signals(this);
 	thread_->start();
 	update();
 }
