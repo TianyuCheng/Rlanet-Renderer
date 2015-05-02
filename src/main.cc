@@ -89,7 +89,9 @@ public:
     }
 
     void render(QOpenGLFramebufferObject *fbo) {
-        camera_->moveForward(10);
+        // qDebug() << "FPS:" << fps();
+
+        camera_->moveForward(500 * getInterval());
         camera_->turnLeft(0.1);
 
         finalPass_->setCamera(camera_.get());

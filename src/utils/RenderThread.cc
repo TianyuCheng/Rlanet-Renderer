@@ -76,7 +76,10 @@ bool RenderThread::init_renderer()
 	// scene_->addSecondPassObject(ocean_.get());
 	scene_->first_frame();
 #endif
-    if (renderMgr) { renderMgr->prepare(); }
+    if (renderMgr) { 
+        renderMgr->start();
+        renderMgr->prepare(); 
+    }
 	return true;
 }
 
@@ -106,6 +109,7 @@ void RenderThread::render_next()
 #endif
     
     if (renderMgr) {
+        renderMgr->beforeRender();
         renderMgr->render(renderfbo_.get());
     }
 
