@@ -18,7 +18,8 @@ Item {
 		 * These should have clear semantics about how to modify
 		 * attributes provided by the backend, like camera positions.
 		 */
-		signal cameramove(real dx, real dy, real dz)
+        signal keypressed(int count, int key, int modifiers, string text)
+        signal keyreleased(int count, int key, int modifiers, string text)
 
 		/*
 		 * Step 2: accept keyboard signals, and translate them to UI
@@ -28,27 +29,14 @@ Item {
 		 * signals, say we can support WSAD and 5213 simultaneously in
 		 * Qt Quick part, without even touching C++ part.
 		 */
-		property real camera_speed : 10.0
 		focus : true;
-		Keys.onPressed : {
-			if (event.key == Qt.Key_W) {
-				renderer.cameramove(0.0, 0.0, -camera_speed);
-				event.accepted = true;
-			} else if (event.key == Qt.Key_S) {
-				renderer.cameramove(0.0, 0.0, camera_speed);
-				event.accepted = true;
-			} else if (event.key == Qt.Key_A) {
-				renderer.cameramove(0.0, -camera_speed, 0.0);
-				event.accepted = true;
-			} else if (event.key == Qt.Key_D) {
-				renderer.cameramove(0.0, camera_speed, 0.0);
-				event.accepted = true;
-			}
-			/*
-			if (event.accepted) {
-				console.log("Accepted Keyboard event");
-			}
-			*/
-		}
+        Keys.onPressed : {
+            renderer.keypressed(event.count, event.key, event.modifiers, event.text);
+            event.accepted = true;
+        }
+        Keys.onReleased : {
+            renderer.keyreleased(event.count, event.key, event.modifiers, event.text);
+            event.accepted = true;
+        }
 	}
 }

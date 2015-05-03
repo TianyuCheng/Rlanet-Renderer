@@ -12,13 +12,21 @@ public:
     RenderManager() { lastTime = 0; _fpsVal = 0; }
     virtual ~RenderManager() {}
 
+    /**
+     * Do not override this function because the method
+     * is doing book-keeping for fps.
+     * */
     void beforeRender();
 
     virtual void prepare() = 0;
     virtual void render(QOpenGLFramebufferObject *) = 0;
     virtual void shutdown()  = 0;
 
-    virtual Camera* getCamera() = 0;
+    /**
+     * Please implement these methods to enable key controls
+     * */
+    virtual void keyPressed(int count, int key, int modifiers, QString text) {}
+    virtual void keyReleased(int count, int key, int modifiers, QString text) {}
 
     int fps() { return _fpsVal; }
 

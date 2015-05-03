@@ -149,22 +149,50 @@ void RenderThread::shutdown()
  */
 void RenderThread::setup_ui_signals(QObject* ui)
 {
+#if 0
 	connect(ui,
 		SIGNAL(cameramove(qreal, qreal, qreal)), // Identical name as in main.qml. Note: real->qreal
 		this,
 		SLOT(camera_move(qreal, qreal, qreal)),
 		Qt::QueuedConnection); // Must be QueuedConnection
+#endif
+    // Connect for key press events
+	connect(ui,
+		SIGNAL(keypressed(int, int, int, QString)), // Identical name as in main.qml. Note: real->qreal
+		this,
+		SLOT(keyPressed(int, int, int, QString)),
+		Qt::QueuedConnection); // Must be QueuedConnection
+
+    // Connect for key release events
+	connect(ui,
+		SIGNAL(keyreleased(int, int, int, QString)), // Identical name as in main.qml. Note: real->qreal
+		this,
+		SLOT(keyReleased(int, int, int, QString)),
+		Qt::QueuedConnection); // Must be QueuedConnection
+
 	// Note: In theory we don't need to specify Qt::QueuedConnection because
 	// Qt::connect will use QueuedConnection for object in different threads,
 	// which is just our case. However I don't want to take the risk.
 }
 
+/*
+ * Replaced with more general key event process functions
+ * */
+#if 0
 void RenderThread::camera_move(qreal dx, qreal dy, qreal dz)
 {
 	// Simple handler.
 	// fprintf(stderr, "%s %f %f %f\n", __func__, dx, dy, dz);
-#if 0
 	scene_->getCamera()->move(QVector3D(dx, dy, dz));
+}
 #endif
-    if (renderMgr) renderMgr->getCamera()->move(QVector3D(dx, dy, dz));
+
+void RenderThread::keyPressed(int count, int key, int modifiers, QString text) {
+    // qDebug() << "Key Pressed" << text;
+    if (renderMgr) renderMgr->keyPressed(count, key, modifiers, text);
+}
+
+void RenderThread::keyReleased(int count, int key, int modifiers, QString text) {
+    // qDebug() << "Key Released" << text;
+    if (renderMgr) renderMgr->keyReleased(count, key, modifiers, text);
 }

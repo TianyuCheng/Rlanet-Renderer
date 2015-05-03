@@ -45,13 +45,39 @@ class PlanetRenderManager : public RenderManager
 {
 public:
 
+    /**
+     * Notice: do not put your object instantiation code
+     * in the construction. This is due to the fact that
+     * when the constructor is called, the OpenGL context
+     * has not been created, therefore the instantiation
+     * will fail. Instead, please move those codes into 
+     * prepare method.
+     * */
     PlanetRenderManager() : resolution(1024, 768) {
     }
 
     virtual ~PlanetRenderManager() {
+
     }
 
-    Camera* getCamera() { return camera_.get(); }
+    void keyPressed(int count, int key, int modifiers, QString text) {
+        switch (key) {
+            case Qt::Key_Left:
+                camera_->turnLeft(5);
+                break;
+            case Qt::Key_Right:
+                camera_->turnRight(5);
+                break;
+            case Qt::Key_Up:
+                camera_->moveForward(50);
+                break;
+            case Qt::Key_Down:
+                camera_->moveBackward(50);
+                break;
+            default:
+                qDebug() << "Not arrow keys";
+        }
+    }
 
     void prepare() {
         int width = resolution.width();
@@ -101,8 +127,8 @@ public:
          * */
         qDebug() << "FPS:" << fps();
 
-        camera_->moveForward(500 * getInterval());
-        camera_->turnLeft(0.1);
+        // camera_->moveForward(500 * getInterval());
+        // camera_->turnLeft(0.1);
 
         // reflection_->setCamera(camera_.get());
         // reflection_->renderScene();

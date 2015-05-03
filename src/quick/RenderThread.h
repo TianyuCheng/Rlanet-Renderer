@@ -3,6 +3,8 @@
 
 #include <memory>
 #include <QtCore/QThread>
+#include <QKeyEvent>
+
 #include <RenderManager.h>
 
 // using std::unique_ptr;
@@ -24,7 +26,11 @@ public slots:
 	/*
  	 * Step 3: a slot to handle cameramove singal from the UI
 	 */
+#if 0
 	void camera_move(qreal dx, qreal dy, qreal dz);
+#endif
+    void keyPressed(int, int, int, QString);
+    void keyReleased(int, int, int, QString);
 signals:
 	void textureReady(int id, const QSize &size);
 
