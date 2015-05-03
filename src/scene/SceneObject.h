@@ -131,6 +131,7 @@ protected:
     // shader-based rendering
 	unique_ptr<QOpenGLShader> vShader;
 	unique_ptr<QOpenGLShader> fShader;
+	unique_ptr<QOpenGLShader> gShader;
 	QOpenGLBuffer vbo_ = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
 	QOpenGLBuffer ibo_ = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
 	QOpenGLBuffer tbo_ = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);

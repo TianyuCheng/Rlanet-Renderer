@@ -61,6 +61,9 @@ void SceneObject::setShader(QOpenGLShader *shader) {
         case QOpenGLShader::Fragment:
             fShader.reset(shader);
             break;
+        case QOpenGLShader::Geometry:
+            gShader.reset(shader);
+            break;
     }
 
     // make sure the shader is attached and linked

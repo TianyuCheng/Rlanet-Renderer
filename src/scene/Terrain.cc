@@ -107,6 +107,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
 
     {
         this->setShader(QOpenGLShader::Vertex, "../glsl/terrain.vert");
+        // this->setShader(QOpenGLShader::Geometry, "../glsl/terrain.geom");
         this->setShader(QOpenGLShader::Fragment, "../glsl/terrain.frag");
 
         // Load terrain texture from file
