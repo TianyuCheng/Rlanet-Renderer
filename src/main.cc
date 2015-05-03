@@ -117,7 +117,7 @@ public:
 
         // Instantiate scene objects
         skydome_.reset(new TextureSkyDome(64, finalPass_.get()));
-        terrain_.reset(new Terrain(64, 15, finalPass_.get()));
+        terrain_.reset(new Terrain(64, 5, finalPass_.get()));
         // ocean_.reset(new Ocean(64, 15, finalPass_.get()));
         grassFactory_.reset(new GrassFactory(10));
 
@@ -142,7 +142,7 @@ public:
          * disable ocean at this point. I may refine
          * on the ocean later.
          * */
-        // qDebug() << "FPS:" << fps();
+        qDebug() << "FPS:" << fps();
 
         // camera_->moveForward(500 * getInterval());
         // camera_->turnLeft(0.1);

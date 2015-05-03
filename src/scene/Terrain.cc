@@ -107,7 +107,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
 
     {
         this->setShader(QOpenGLShader::Vertex, "../glsl/terrain.vert");
-        // this->setShader(QOpenGLShader::Geometry, "../glsl/terrain.geom");
+        this->setShader(QOpenGLShader::Geometry, "../glsl/terrain.geom");
         this->setShader(QOpenGLShader::Fragment, "../glsl/terrain.frag");
 
         // Load terrain texture from file
@@ -151,7 +151,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
     }
 
     // Initialize ranges
-    double range = 1.0;
+    double range = 256.0;
     for (int i = 0; i <= levels; i++) {
         ranges << qMakePair(range, range * 0.85);
         range *= 2.0;
