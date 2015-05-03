@@ -16,21 +16,35 @@
 
 #include <SceneObject.h>
 
+class GrassFactory;
+
 class Grass : public SceneObject
 {
+    friend class GrassFactory;
 public:
-    Grass(int seed);
+    Grass(GrassFactory *factory, int seed);
     virtual ~Grass();
 
     void uniform();
     void update();
-    // void render();
+    void render();
 
 private:
     void generateBillboard();
+
+private:
+    GrassFactory *factory;
+
+    QVector3D offset;
+    QVector3D scale;
 };
 
-class GrassFactory
+/**
+ * GrassFactory dummily inherits from SceneObject,
+ * yet it does so only because it needs to reuse the 
+ * shader methods in SceneObject
+ * */
+class GrassFactory : private SceneObject
 {
     friend class Grass;
 public:
@@ -38,6 +52,10 @@ public:
     virtual ~GrassFactory();
 
     Grass* getGrass(int index);
+
+    void uniform() {}
+    void update() {}
+    void render() {} 
 
 private:
 
@@ -47,6 +65,7 @@ private:
     int numVariations;
 
     std::unique_ptr<QOpenGLTexture> grassBlade;
+    std::unique_ptr<QOpenGLTexture> grassBladeAlpha;
 
     QVector<Grass*> blades;
 };

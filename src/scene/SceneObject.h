@@ -84,7 +84,15 @@ public:
      * translate, scale, rotate
      * */
     void loadIdentity();
+    /**
+     * scale/translate/rotate are not correctly implemented,
+     * as scale, rotate are origin-sensitive, we need to multiply
+     * inverted transformation first. As we are not really using
+     * these functions in current project, we can kind of get away
+     * with that. Remember to implement them when needed.
+     * */
     void scale(double s);
+    void scale(double sx, double sy, double sz);
     void translate(QVector3D offset);
     void rotate(double angle, QVector3D axis);
 
@@ -104,6 +112,7 @@ protected:
     QMap<QString, GLuint> attributes;
     QMap<QString, GLuint> uniforms;
     QVector<QVector3D> vertices;
+    QVector<QVector2D> texcoords;
     QVector<unsigned int> indices;
 
     // used for user customization
@@ -124,7 +133,9 @@ protected:
 	unique_ptr<QOpenGLShader> fShader;
 	QOpenGLBuffer vbo_ = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
 	QOpenGLBuffer ibo_ = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
+	QOpenGLBuffer tbo_ = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
 	GLuint vertexLocation_;
+    GLuint texcoordLocation_;
 };
 
 #endif /* end of include guard: SCENEOBJECT_H */

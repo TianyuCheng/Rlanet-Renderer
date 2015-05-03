@@ -101,6 +101,7 @@ public:
         // Create camera
         camera_.reset(new Camera("Viewer Camera"));
         camera_->setPerspective(45.0, (float)width/(float)height, 1.0, 5000.0);
+        // For terrain navigation
         camera_->lookAt(
                 QVector3D(0.0, 150.0, 0.0),
                 QVector3D(0.0, 150.0, 20.0),
@@ -117,19 +118,20 @@ public:
         // Instantiate scene objects
         skydome_.reset(new TextureSkyDome(64, finalPass_.get()));
         terrain_.reset(new Terrain(64, 15, finalPass_.get()));
-        ocean_.reset(new Ocean(64, 15, finalPass_.get()));
-        // grass_.reset(new Grass(0x12345678));
+        // ocean_.reset(new Ocean(64, 15, finalPass_.get()));
+        grassFactory_.reset(new GrassFactory(10));
 
-        // Adding objects into reflection pass
-        reflection_->addObject(skydome_.get());
-        reflection_->addObject(terrain_.get());
+        // // Adding objects into reflection pass
+        // reflection_->addObject(skydome_.get());
+        // reflection_->addObject(terrain_.get());
 
         // Adding objects into final pass
         finalPass_->addObject(skydome_.get());
         finalPass_->addObject(terrain_.get());
         // finalPass_->addObject(ocean_.get());
+        finalPass_->addObject(grassFactory_->getGrass(0));
 
-        // OperGL settings
+        // gOperGL settings
         glEnable(GL_DEPTH_TEST);
     }
 
@@ -161,6 +163,7 @@ public:
         // Reset scene objects
         skydome_.reset();
         terrain_.reset();
+        grassFactory_.reset();
         
         camera_.reset();
         reflectCamera_.reset();
@@ -179,7 +182,7 @@ private:
     std::unique_ptr<Terrain> terrain_;
     std::unique_ptr<Ocean> ocean_;
     std::unique_ptr<TextureSkyDome> skydome_;
-    std::unique_ptr<Grass> grass_;
+    std::unique_ptr<GrassFactory> grassFactory_;
 
     // Camera
     std::unique_ptr<Camera> camera_;

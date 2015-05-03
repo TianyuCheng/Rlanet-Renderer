@@ -114,11 +114,23 @@ void SceneObject::initialize() {
 	ibo_.allocate(size);
 	ibo_.write(0, indices.constData(), size);
 	ibo_.setUsagePattern(QOpenGLBuffer::StaticDraw);
+
+    tbo_.create();
+    tbo_.bind();
+    size = texcoords.size() * sizeof(QVector2D);
+    tbo_.allocate(size);
+    tbo_.write(0, texcoords.constData(), size);
+
 	REPORT_GL_STATUS("Create GL Buffers");
 
 	glBindFragDataLocation(program.programId(), 0, "frag_color");
+
 	vertexLocation_ = program.attributeLocation("aVertex");
 	attributes["vertex"] = vertexLocation_;
+    
+    texcoordLocation_ = program.attributeLocation("aTexCoord");
+    attributes["texcoord"] = texcoordLocation_;
+
 	//qDebug("Vertex attribute location %d\n", attributes["vertex"]);
 
 #if 0 // These should be done in render, not here.
@@ -135,9 +147,10 @@ void SceneObject::initialize() {
 	program.release();
 #endif
 	ibo_.release();
+    tbo_.release();
 	vbo_.release();
 
-	qDebug("VBO: %d, IBO %d", vbo_.bufferId(), ibo_.bufferId());
+	qDebug("VBO: %d, IBO %d, TBO %d", vbo_.bufferId(), ibo_.bufferId(), tbo_.bufferId());
 }
 
 void SceneObject::doubleCheck() const { 
@@ -168,6 +181,11 @@ void SceneObject::render() {
 	vbo_.bind();
 	program.setAttributeBuffer(vertexLocation_, GL_FLOAT, 0, 3);
 	program.enableAttributeArray(vertexLocation_);
+
+    tbo_.bind();
+    program.setAttributeBuffer(texcoordLocation_, GL_FLOAT, 0, 2);
+    program.enableAttributeArray(texcoordLocation_);
+
 	ibo_.bind();
 	CHECK_GL_ERROR("After buffer");
 	glDrawElements(
@@ -176,6 +194,8 @@ void SceneObject::render() {
 			GL_UNSIGNED_INT,	// type
 			NULL);			// Does not matter with ibo
 	CHECK_GL_ERROR("After render");
+    ibo_.release();
+    tbo_.release();
 	vbo_.release();
 }
 
@@ -185,6 +205,10 @@ void SceneObject::loadIdentity() {
 
 void SceneObject::scale(double s) {
     transform.scale(s);
+}
+
+void SceneObject::scale(double sx, double sy, double sz) {
+    transform.scale(sx, sy, sz);
 }
 
 void SceneObject::translate(QVector3D offset) {

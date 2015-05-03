@@ -8,8 +8,11 @@ TextureSkyDome::TextureSkyDome(int grid, Scene *parent)
     // QImage decal("../textures/decal_sky.jpg");
     QImage decal("../textures/sky_texture.jpg");
     decalmap.reset(new QOpenGLTexture(decal));
-    decalmap->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    decalmap->setMinificationFilter(QOpenGLTexture::Linear);
     decalmap->setMagnificationFilter(QOpenGLTexture::Linear);
+    decalmap->setWrapMode(QOpenGLTexture::DirectionS, QOpenGLTexture::Repeat);
+    decalmap->setWrapMode(QOpenGLTexture::DirectionT, QOpenGLTexture::Repeat);
+    decalmap->setWrapMode(QOpenGLTexture::DirectionT, QOpenGLTexture::Repeat);
 
     // Generate vertex and index data
     {
