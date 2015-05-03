@@ -1,0 +1,59 @@
+			CONCEPTS OF TILE SERIES TEMPLATE
+
+``Concept'' is a technology originally planned for C++11 (but was cancelled).
+The main purpose of this technique is to describe what a C++ template
+provides, and requires.
+
+Although we do not have concept support in current C++ compilers, descriptions
+about what templates provide and require are still helpful in understanding
+the code.
+
+			Element
+Type for storage. Should meet concepts of basic type "double".
+
+			TileInfo
+typedef
+	+ TileElement
+		- What will be stored in corresponding Tile objects
+	+ Coordinate
+		- The coordinate system class to access the sampled data.
+		- Example: PolarCoordinate class
+	+ TitleSeed
+		- type of essential data to generate the data on the fly.
+		- In theory we can use string of a file path as TitleSeed, and
+		  implement a generator to read file from disk to "generate"
+		  the data.
+	+ (TODO) Generator
+		- Class to generate the TileElement
+
+function
+	+ Vec2D<int> get_block(const Coordinate&)
+		- Get the rasterized coordinate from the coordinate system we
+		  sampled from.
+	+ size_t nelement()
+		- Number of elements should be stored in the tile.
+	+ size_t nline()
+		- Tile is a 2D structure, thus we have number of lines
+	+ Coordinate init_pos()
+		- Get the initial coordinates
+		
+
+			TileIO<Element>
+Class to access array of Elements in tile-shape.
+
+			TileSplicer<Element1, Element2>
+Class to splice elements from one Tile to another Tile.
+
+			Tile<TileInfo>
+typedef
+	+ Element = TileInfo::TileElement
+	+ Seed = TileInfo::TileSeed
+	+ Coord = TileInfo::Coordinate
+		* All for easy access
+function
+	TileIO<Element> get_ioblock(Coord axesmins, Coord axesmaxs, int LODLevel)
+		- Get TileIO object from given coordinates.
+
+
+		  	BlitterFromMTile<SourceTile, TargetTile>
+Class to splice elements managed by Macro Tile (SourceTile) to a simple Tile.
