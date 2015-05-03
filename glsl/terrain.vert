@@ -210,7 +210,7 @@ void main()
     /* vec4 noproj = uMVMatrix * uTransform * vec4(wrap(radius, morphedPos), 1.0); */
     vec4 proj = uPMatrix * noproj;
     gl_Position = proj;
-    linearZ = (-noproj.z-0.01)/(10000.0-0.01);
+    linearZ = (-noproj.z-1.0)/(5000.0-1.0);
 
     // if (uLevel == 0) vColor = vec4(1.0, 0.0, 0.0, 1.0);
     // else if (uLevel == 1) vColor = vec4(1.0, 1.0, 0.0, 1.0);

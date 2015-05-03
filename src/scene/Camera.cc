@@ -90,10 +90,13 @@ void Camera::lookUp(double angle) {
     QVector3D axis = QVector3D::crossProduct(look, up).normalized();
     QQuaternion q = QQuaternion::fromAxisAndAngle(axis, angle);
 
+    // We have not moved our eye, only updated our view
+    up = q.rotatedVector(up);
     look = q.rotatedVector(look);
     center = eye + look;
-    // We have not moved our eye, only updated our view
 
+    uMVMatrix.setToIdentity();
+    uMVMatrix.lookAt(eye, center, up);
     dirty = true;
 }
 

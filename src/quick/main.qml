@@ -18,8 +18,13 @@ Item {
 		 * These should have clear semantics about how to modify
 		 * attributes provided by the backend, like camera positions.
 		 */
+
+        /* key events */
         signal keypressed(int count, int key, int modifiers, string text)
         signal keyreleased(int count, int key, int modifiers, string text)
+
+        /* mouse events */
+        // signal
 
 		/*
 		 * Step 2: accept keyboard signals, and translate them to UI

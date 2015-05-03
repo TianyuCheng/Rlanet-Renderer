@@ -54,6 +54,7 @@ public:
      * prepare method.
      * */
     PlanetRenderManager() : resolution(1024, 768) {
+        drawMode = GL_FILL;
     }
 
     virtual ~PlanetRenderManager() {
@@ -63,19 +64,33 @@ public:
     void keyPressed(int count, int key, int modifiers, QString text) {
         switch (key) {
             case Qt::Key_Left:
-                camera_->turnLeft(5);
+            case Qt::Key_A:
+                camera_->turnLeft(1);
                 break;
             case Qt::Key_Right:
-                camera_->turnRight(5);
+            case Qt::Key_D:
+                camera_->turnRight(1);
                 break;
             case Qt::Key_Up:
+            case Qt::Key_W:
                 camera_->moveForward(50);
                 break;
             case Qt::Key_Down:
+            case Qt::Key_S:
                 camera_->moveBackward(50);
                 break;
-            default:
-                qDebug() << "Not arrow keys";
+            case Qt::Key_PageUp:
+                camera_->lookUp(5);
+                break;
+            case Qt::Key_PageDown:
+                camera_->lookDown(5);
+                break;
+            case Qt::Key_Space:
+                if (drawMode == GL_FILL) { drawMode = GL_LINE; }
+                else { drawMode = GL_FILL; }
+                reflection_->setDrawMode(drawMode);
+                finalPass_->setDrawMode(drawMode);
+                break;
         }
     }
 
@@ -85,7 +100,7 @@ public:
 
         // Create camera
         camera_.reset(new Camera("Viewer Camera"));
-        camera_->setPerspective(45.0, (float)width/(float)height, 0.01, 5000.0);
+        camera_->setPerspective(45.0, (float)width/(float)height, 1.0, 5000.0);
         camera_->lookAt(
                 QVector3D(0.0, 150.0, 0.0),
                 QVector3D(0.0, 150.0, 20.0),
@@ -125,7 +140,7 @@ public:
          * disable ocean at this point. I may refine
          * on the ocean later.
          * */
-        qDebug() << "FPS:" << fps();
+        // qDebug() << "FPS:" << fps();
 
         // camera_->moveForward(500 * getInterval());
         // camera_->turnLeft(0.1);
@@ -153,6 +168,7 @@ public:
 
 private:
     QSize resolution;
+    GLuint drawMode;
 
     // Render Targets
     std::unique_ptr<Scene> reflection_;
