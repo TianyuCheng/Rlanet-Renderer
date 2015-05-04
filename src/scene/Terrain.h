@@ -78,6 +78,12 @@ public:
 
     void initialize();
 
+    void bindHeightmap(QOpenGLShaderProgram &program, QString name, GLuint textureUnit = 1) {
+        heightmap->bind(textureUnit);
+        int heightLocation = program.uniformLocation(name);
+        program.setUniformValue(heightLocation, textureUnit);
+    }
+
 private:
     
     /**

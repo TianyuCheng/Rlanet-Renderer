@@ -7,9 +7,11 @@ layout (triangle_strip, max_vertices = 12) out;
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 
+uniform sampler2D uHeightmap;
 uniform float uSize;
 
 out vec2 vTexCoords;
+out float linearZ;
 
 const float PI = 3.14159265257;
 
@@ -30,7 +32,9 @@ vec4 quarternionFromAxisAndAngle(vec3 axis, float angle) {
 }
 
 vec4 transform(vec3 pos) {
-    return uPMatrix * uMVMatrix * vec4(pos, 1.0);
+    vec4 noproj = uMVMatrix * vec4(pos, 1.0);
+    linearZ = (-noproj.z - 1.0) / (5000.0 - 1.0);
+    return uPMatrix * noproj;
 }
 
 void createFace(float angle, float displacement, float height, vec3 pos) {
@@ -64,11 +68,18 @@ void createFace(float angle, float displacement, float height, vec3 pos) {
     EndPrimitive();
 }
 
+float terrainHeight(vec2 uv) {
+    float coarse = texture(uHeightmap, uv).x * 3200.0 - 1600.0;
+    return coarse;
+}
+
 void main(void) {
 
     vec3 pos = gl_in[0].gl_Position.xyz;
     float height = pos.y;
-    pos = vec3(pos.x, 500.0, pos.z);
+    vec2 uv = pos.xz / 16384.0 - vec2(0.5, 0.5);
+    float posy = terrainHeight(uv);
+    pos = vec3(pos.x, posy, pos.z);
 
     float angle = rand(pos.zx);
     float displacement = rand(pos.xz);

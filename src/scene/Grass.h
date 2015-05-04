@@ -16,6 +16,7 @@
 #include <QOpenGLShader>
 
 #include <SceneObject.h>
+#include <Terrain.h>
 
 class GrassFactory;
 
@@ -47,7 +48,7 @@ class GrassFactory : private SceneObject
 {
     friend class Grass;
 public:
-    GrassFactory();
+    GrassFactory(Terrain *terrain);
     virtual ~GrassFactory();
 
     /* dummy functions that we do not use */
@@ -60,6 +61,7 @@ public:
 private:
     std::unique_ptr<QOpenGLTexture> grassBlade;
     std::unique_ptr<QOpenGLTexture> grassBladeAlpha;
+    Terrain *terrain;
 };
 
 #endif /* end of include guard: GRASS_H */

@@ -60,14 +60,12 @@ void TextureSkyDome::update() {
 }
 
 void TextureSkyDome::render() {
+    drawMode = GL_FILL;
 	glPolygonMode( GL_FRONT_AND_BACK, drawMode );
 	CHECK_GL_ERROR("set polygon mode");
 
     glDisable(GL_DEPTH_TEST);
     glDepthMask(false);
-
-    glCullFace(GL_FRONT);
-    glDepthFunc(GL_LEQUAL);
 
     SceneObject::render();
 

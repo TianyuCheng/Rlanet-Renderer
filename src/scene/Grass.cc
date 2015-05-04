@@ -18,12 +18,16 @@ void Grass::plantGrass(QVector2D coordinate, double height) {
 }
 
 void Grass::uniform() {
-    factory->grassBlade->bind(1);
-    factory->grassBladeAlpha->bind(2);
+    // uniform height map
+    factory->terrain->bindHeightmap(program, "uHeightmap", 1);
 
-    program.setUniformValue("uDecalmap", 1);
-    program.setUniformValue("uAlphamap", 2);
+    // uniform the grass texture and alpha map
+    factory->grassBlade->bind(2);
+    factory->grassBladeAlpha->bind(3);
+    program.setUniformValue("uDecalmap", 2);
+    program.setUniformValue("uAlphamap", 3);
 
+    // uniform the size of grass
     program.setUniformValue("uSize", float(size));
 }
 
@@ -48,7 +52,8 @@ void Grass::render() {
     glDisable(GL_BLEND);
 }
 
-GrassFactory::GrassFactory() : SceneObject("Grass Factory") {
+GrassFactory::GrassFactory(Terrain *t) 
+    : SceneObject("Grass Factory"), terrain(t) {
 
     QImage grass("../textures/grass.jpg");
     QImage grassAlpha("../textures/grass_alpha.jpg");

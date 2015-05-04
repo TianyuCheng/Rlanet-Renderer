@@ -1,37 +1,3 @@
-#if 0
-/**utilities 
- * main.cpp
- * */
-#include <QGuiApplication>  
-#include <QQuickView>
-
-#include "Scene.h"
-#include "Planet.h"
-#include "Terrain.h"
-#include "Mangekyou.h"
-#include "nexus.h"
-
-int main(int argc, char *argv[])  
-{  
-	QGuiApplication app(argc, argv);
-	qmlRegisterType<Mangekyou>("Mangekyou", 1, 0, "Renderer");
-
-	int ret;
-	{
-		QQuickView view;
-		view.setFormat(nexus::select_gl(view.format()));
-		view.setPersistentOpenGLContext(true);
-		view.setPersistentSceneGraph(true);
-		view.setResizeMode(QQuickView::SizeRootObjectToView);
-		view.setSource(QUrl("qrc:///main.qml"));
-		view.show();
-		ret = app.exec();
-	} // After this view will be destructed
-	nexus::terminate();
-	return ret;
-}
-#endif
-
 #include <Application.h>
 #include <RenderManager.h>
 
@@ -127,8 +93,8 @@ public:
         skydome_.reset(new TextureSkyDome(64, finalPass_.get()));
         terrain_.reset(new Terrain(64, 5, finalPass_.get()));
         ocean_.reset(new Ocean(64, 15, finalPass_.get()));
-        grassFactory_.reset(new GrassFactory());
-        grass_.reset(grassFactory_->createGrass(QVector2D(0, 0), 1000.0, 30.0, 50.0, 60.0));
+        grassFactory_.reset(new GrassFactory(terrain_.get()));
+        grass_.reset(grassFactory_->createGrass(QVector2D(1500, 1500), 200.0, 10.0, 20.0, 20.0));
 
         // Adding objects into reflection pass
         reflection_->addObject(skydome_.get());
@@ -138,7 +104,7 @@ public:
         // Adding objects into final pass
         finalPass_->addObject(skydome_.get());
         finalPass_->addObject(terrain_.get());
-        finalPass_->addObject(ocean_.get());
+        // finalPass_->addObject(ocean_.get());
         finalPass_->addObject(grass_.get());
 
         // gOperGL settings
@@ -157,11 +123,11 @@ public:
         // camera_->moveForward(500 * getInterval());
         // camera_->turnLeft(0.1);
 
-        camera_->reflectCamera(QVector4D(0.0, 1.0, 0.0, 0.0), reflectCamera_.get());
-        reflection_->setCamera(reflectCamera_.get());
-        reflection_->renderScene();
-
-        finalPass_->useTexture(reflection_->texture());
+        // camera_->reflectCamera(QVector4D(0.0, 1.0, 0.0, 0.0), reflectCamera_.get());
+        // reflection_->setCamera(reflectCamera_.get());
+        // reflection_->renderScene();
+        //
+        // finalPass_->useTexture(reflection_->texture());
         finalPass_->setCamera(camera_.get());
         finalPass_->renderScene(fbo);
     }
