@@ -36,6 +36,10 @@ void Ocean::uniform() {
 
     program.setUniformValue("uGrid", float(grid));
 
+    Camera* camera = dynamic_cast<Scene*>(parent)->getCamera();
+    QVector3D cameraPos = camera->getPosition();
+    program.setUniformValue("uCamera", cameraPos);
+
     CHECK_GL_ERROR("after sets uniforms");
     // this->setDrawMode(GL_LINE);
 }

@@ -76,12 +76,6 @@ public:
                 QVector3D(0.0, 150.0, 20.0),
                 QVector3D(0.0, 1.0, 0.0)
         );
-        // // For grass
-        // camera_->lookAt(
-        //         QVector3D(0.0, 10.0, 30.0),
-        //         QVector3D(0.0, 10.0, 0.0),
-        //         QVector3D(0.0, 1.0, 1.0)
-        // );
 
         // Create two passes
         reflection_.reset(new Scene("reflection", resolution));
@@ -92,7 +86,7 @@ public:
         // Instantiate scene objects
         skydome_.reset(new TextureSkyDome(64, finalPass_.get()));
         terrain_.reset(new Terrain(64, 5, finalPass_.get()));
-        ocean_.reset(new Ocean(64, 15, finalPass_.get()));
+        ocean_.reset(new Ocean(64, 5, finalPass_.get()));
         grassFactory_.reset(new GrassFactory(terrain_.get()));
         grass_.reset(grassFactory_->createGrass(QVector2D(1500, 1500), 200.0, 10.0, 20.0, 20.0));
 
@@ -104,7 +98,7 @@ public:
         // Adding objects into final pass
         finalPass_->addObject(skydome_.get());
         finalPass_->addObject(terrain_.get());
-        // finalPass_->addObject(ocean_.get());
+        finalPass_->addObject(ocean_.get());
         finalPass_->addObject(grass_.get());
 
         // gOperGL settings
@@ -123,11 +117,18 @@ public:
         // camera_->moveForward(500 * getInterval());
         // camera_->turnLeft(0.1);
 
-        // camera_->reflectCamera(QVector4D(0.0, 1.0, 0.0, 0.0), reflectCamera_.get());
-        // reflection_->setCamera(reflectCamera_.get());
-        // reflection_->renderScene();
-        //
-        // finalPass_->useTexture(reflection_->texture());
+        if (camera_->getPosition().y() >= 0) {
+            // reflection
+            camera_->reflectCamera(QVector4D(0.0, 1.0, 0.0, 0.0), reflectCamera_.get());
+            reflection_->setCamera(reflectCamera_.get());
+        }
+        else {
+            // refraction
+            reflection_->setCamera(camera_.get());
+        }
+        reflection_->renderScene();
+
+        finalPass_->useTexture(reflection_->texture());
         finalPass_->setCamera(camera_.get());
         finalPass_->renderScene(fbo);
     }

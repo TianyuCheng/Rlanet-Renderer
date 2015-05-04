@@ -9,6 +9,7 @@ uniform mat4 uTransform;
 uniform sampler2D uRenderTexture;
 
 uniform float uGrid;
+uniform vec3 uCamera;
 
 in vec2 vHeightUV;
 in vec2 vDecalTexCoord;
@@ -34,6 +35,7 @@ void main()
     vec3 l = normalize(lightPos - vView);
 
     vec4 clipReflection = uPMatrix * uMVMatrix * vec4(vPos.x, 0.0, vPos.z, 1.0);
+    if (uCamera.y >= 0) clipReflection.t *= -1.0;
     vec2 deviceReflection = clipReflection.st / clipReflection.q;
     vec2 decalReflection = vec2(0.5, 0.5) + 0.5 * deviceReflection;
     vec3 decal = texture(uRenderTexture, decalReflection).rgb;
@@ -41,7 +43,7 @@ void main()
     vec3 ambient = lightAmbient;
     vec3 diffuse = lightDiffuse * clamp(0.0, 1.0, max(0.0, dot(n, l)));
 
-    vec3 color = (ambient + diffuse) * decal * 0.6;
+    vec3 color = (ambient + diffuse) * decal;
     frag_color = vec4(color, 1.0);
     gl_FragDepth = linearZ;
 }

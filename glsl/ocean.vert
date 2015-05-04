@@ -8,6 +8,7 @@ uniform mat4 uPMatrix;
 uniform mat4 uNMatrix;
 uniform mat4 uTransform;
 
+uniform vec3 uCamera;
 uniform vec2 uOffset;
 uniform vec2 uScale;
 uniform int  uLevel;
@@ -56,11 +57,15 @@ float waves(vec2 pos) {
     float amplitude, speed, waveLength;
     vec2 direction;
 
-    amplitude = 20.2; speed = 5.0; waveLength = 100.0; direction = vec2(1.0, 1.0);
+    /* amplitude = 20.2; speed = 5.0; waveLength = 100.0; direction = vec2(1.0, 1.0); */
+    /* sum += wave(pos, amplitude, speed, waveLength, direction); */
+    /* normal += computeNormal(pos, amplitude, speed, waveLength, direction); */
+
+    amplitude = 0.5; speed = 0.005; waveLength = 0.003; direction = vec2(0.5, 0.3);
     sum += wave(pos, amplitude, speed, waveLength, direction);
     normal += computeNormal(pos, amplitude, speed, waveLength, direction);
 
-    amplitude = 1.5; speed = 0.002; waveLength = 0.005; direction = vec2(0.5, 0.3);
+    amplitude = 0.2; speed = 0.001; waveLength = 0.008; direction = vec2(0.2, -0.3);
     sum += wave(pos, amplitude, speed, waveLength, direction);
     normal += computeNormal(pos, amplitude, speed, waveLength, direction);
 

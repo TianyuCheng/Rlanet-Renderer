@@ -217,22 +217,17 @@ void Camera::reflectCamera(QVector4D n, Camera *cam) {
     dist = qAbs(dist);
     QVector3D newEye = eye + normal * 2 * dist;
 
-    // // reflect camera center
-    // dist = QVector3D::dotProduct((center - p), planeNormal);
-    // if (dist >= 0) normal = -planeNormal;
-    // else normal = planeNormal;
-    // dist = qAbs(dist);
-    // QVector3D newCenter = center + normal * 2 * dist;
-    QVector3D newCenter = center;
+    // reflect camera center
+    dist = QVector3D::dotProduct((center - p), planeNormal);
+    if (dist >= 0) normal = -planeNormal;
+    else normal = planeNormal;
+    dist = qAbs(dist);
+    QVector3D newCenter = center + normal * 2 * dist;
 
     // find out the new up vector
     QVector3D newLook = newCenter - newEye;
     QVector3D newUp = QVector3D::crossProduct(baseX, newLook).normalized();
     cam->lookAt(newEye, newCenter, newUp);
-
-    // qDebug() << eye << cam->eye;
-    // qDebug() << center << cam->center;
-    // qDebug() << up << cam->up;
 }
 
 void Camera::uniformMatrices(QOpenGLShaderProgram &program) {
