@@ -1,7 +1,7 @@
 #ifndef NOISE_H
 #define NOISE_H
 
-#include <math.h>
+#include <stdlib.h>
 
 // BlankNoise: A noise generator which doesn't do anything
 class BlankNoise {

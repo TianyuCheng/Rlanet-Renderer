@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtMultimedia 5.0
 
 import Mangekyou 1.0
 
@@ -19,12 +20,12 @@ Item {
 		 * attributes provided by the backend, like camera positions.
 		 */
 
-        /* key events */
-        signal keypressed(int count, int key, int modifiers, string text)
-        signal keyreleased(int count, int key, int modifiers, string text)
+		/* key events */
+		signal keypressed(int count, int key, int modifiers, string text)
+		signal keyreleased(int count, int key, int modifiers, string text)
 
-        /* mouse events */
-        // signal
+		/* mouse events */
+		// signal
 
 		/*
 		 * Step 2: accept keyboard signals, and translate them to UI
@@ -35,13 +36,19 @@ Item {
 		 * Qt Quick part, without even touching C++ part.
 		 */
 		focus : true;
-        Keys.onPressed : {
-            renderer.keypressed(event.count, event.key, event.modifiers, event.text);
-            event.accepted = true;
-        }
-        Keys.onReleased : {
-            renderer.keyreleased(event.count, event.key, event.modifiers, event.text);
-            event.accepted = true;
-        }
+		Keys.onPressed : {
+			renderer.keypressed(event.count, event.key, event.modifiers, event.text);
+			event.accepted = true;
+		}
+		Keys.onReleased : {
+			renderer.keyreleased(event.count, event.key, event.modifiers, event.text);
+			event.accepted = true;
+		}
+	}
+
+	Audio {
+		id: playMusic
+		source: appPath+"/e922d4ffdee2345071e146039b970aea1d4c3d5c.aac"
+		autoPlay: true
 	}
 }
