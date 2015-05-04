@@ -106,10 +106,6 @@ Terrain::Terrain(int g, int l, Scene *parent) :
     grid(g), levels(l) {
 
     {
-        this->setShader(QOpenGLShader::Vertex, "../glsl/terrain.vert");
-        this->setShader(QOpenGLShader::Geometry, "../glsl/terrain.geom");
-        this->setShader(QOpenGLShader::Fragment, "../glsl/terrain.frag");
-
         // Load terrain texture from file
         QImage decal_dirt("../textures/decal_dirt.jpg");
         QImage decal_grass("../textures/decal_grass.jpg");
@@ -273,6 +269,14 @@ void Terrain::uniform() {
 
 void Terrain::update() {
     updatePatches();
+}
+
+void Terrain::initialize() {
+    qDebug() << "Terain Initialize";
+    this->setShader(QOpenGLShader::Vertex, "../glsl/terrain.vert");
+    this->setShader(QOpenGLShader::Geometry, "../glsl/terrain.geom");
+    this->setShader(QOpenGLShader::Fragment, "../glsl/terrain.frag");
+    SceneObject::initialize();
 }
 
 void Terrain::render()

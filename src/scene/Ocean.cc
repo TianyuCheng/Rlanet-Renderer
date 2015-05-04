@@ -1,10 +1,6 @@
 #include "Ocean.h"
 
 Ocean::Ocean(int grid, int levels, Scene *parent) : Terrain(grid, levels, parent) {
-    // this->setName("CDLOD Ocean");
-    program.removeAllShaders();
-    this->setShader(QOpenGLShader::Vertex, "../glsl/ocean.vert");
-    this->setShader(QOpenGLShader::Fragment, "../glsl/ocean.frag");
 
     QImage decal_ocean("../textures/decal_ocean.jpg");
     // Check whether texture are loaded
@@ -23,6 +19,11 @@ Ocean::~Ocean() {
 
 void Ocean::initialize() {
     time.start();
+
+    this->setShader(QOpenGLShader::Vertex, "../glsl/ocean.vert");
+    this->setShader(QOpenGLShader::Fragment, "../glsl/ocean.frag");
+
+    SceneObject::initialize();
 }
 
 void Ocean::uniform() {

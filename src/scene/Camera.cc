@@ -194,20 +194,45 @@ void Camera::setPerspective(double fovy, double aspect, double zNear, double zFa
 }
 
 void Camera::reflectCamera(QVector4D n, Camera *cam) {
-    QMatrix4x4 reflectionMatrix(
-        1 - 2 * n.x() * n.x(), -2 * n.x() * n.y(), -2 * n.x() * n.z(), -2 * n.x() * n.w(), 
-        -2 * n.x() * n.y(), 1 - 2 * n.y() * n.y(),-2 * n.y() * n.z(), -2 * n.y() * n.w(), 
-        -2 * n.x() * n.z(), -2 * n.y() * n.y(), 1 - 2 * n.z() * n.z(), -2 * n.z() * n.w(), 
-        0, 0, 0, 1
-    );
-    QMatrix4x4 flipMatrix(
-        -1.0, 0.0, 0.0, 0.0,
-         1.0, 1.0, 0.0, 0.0,
-         1.0, 0.0,-1.0, 0.0,
-         1.0, 0.0, 0.0, 1.0
-    );
-    // Unimplemented yet
-    // QMatrix4x4 cameraMatrix = 
+    // Find a point on the plane
+    QVector3D p;
+    double a = n.x();
+    double b = n.y();
+    double c = n.z();
+    double d = n.w();
+    if (n.x() != 0) { p = QVector3D(-d / a, 0.0, 0.0); }
+    else if (n.y() != 0) { p = QVector3D(0.0, -d / b, 0.0); }
+    else if (n.z() != 0) { p = QVector3D(0.0, 0.0, -d / c); }
+
+    QVector3D normalizedDir = look.normalized();
+    QVector3D baseX = QVector3D::crossProduct(normalizedDir, up).normalized();
+
+    QVector3D planeNormal = QVector3D(a, b, c).normalized();
+    QVector3D normal;
+
+    // reflect camera eye
+    double dist = QVector3D::dotProduct((eye - p), planeNormal);
+    if (dist >= 0) normal = -planeNormal;
+    else normal = planeNormal;
+    dist = qAbs(dist);
+    QVector3D newEye = eye + normal * 2 * dist;
+
+    // // reflect camera center
+    // dist = QVector3D::dotProduct((center - p), planeNormal);
+    // if (dist >= 0) normal = -planeNormal;
+    // else normal = planeNormal;
+    // dist = qAbs(dist);
+    // QVector3D newCenter = center + normal * 2 * dist;
+    QVector3D newCenter = center;
+
+    // find out the new up vector
+    QVector3D newLook = newCenter - newEye;
+    QVector3D newUp = QVector3D::crossProduct(baseX, newLook).normalized();
+    cam->lookAt(newEye, newCenter, newUp);
+
+    // qDebug() << eye << cam->eye;
+    // qDebug() << center << cam->center;
+    // qDebug() << up << cam->up;
 }
 
 void Camera::uniformMatrices(QOpenGLShaderProgram &program) {

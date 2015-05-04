@@ -106,6 +106,7 @@ public:
     // Render with GL_TRIANGLES, GL_LINES, GL_QUADS, GL_TRIANGLE_STRIPS, etc
     void setDrawMode(GLenum mode) { drawMode = mode; }
 
+    bool isInitialized() const { return initialized; }
 protected:
     // rendering related variables
     // vertex array, index array, locations, etc.
@@ -137,6 +138,8 @@ protected:
 	QOpenGLBuffer tbo_ = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
 	GLuint vertexLocation_;
     GLuint texcoordLocation_;
+
+    bool initialized = false;
 };
 
 #endif /* end of include guard: SCENEOBJECT_H */

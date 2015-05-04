@@ -154,6 +154,7 @@ void SceneObject::initialize() {
 	vbo_.release();
 
 	qDebug("VBO: %d, IBO %d, TBO %d", vbo_.bufferId(), ibo_.bufferId(), tbo_.bufferId());
+    initialized = true;
 }
 
 void SceneObject::doubleCheck() const { 

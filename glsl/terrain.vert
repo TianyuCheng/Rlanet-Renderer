@@ -27,18 +27,6 @@ out vData
     float linearZ;
 } vertex;
 
-/* // Used in the fragment shader */
-/* out vec2 vHeightUV; */
-/* out vec2 vDecalTexCoord; */
-/* out vec4 vColor; */
-
-/* out vec3 vView; */
-/* out vec3 vNormal; */
-/*  */
-/* out vec2  vPos; */
-/* out float vHeight; */
-/* out float linearZ; */
-
 const float PI = 3.1415926;
 const float SQRT2 = 1.4142;
 

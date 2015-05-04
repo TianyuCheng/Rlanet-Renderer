@@ -76,6 +76,8 @@ public:
 
     void render();
 
+    void initialize();
+
 private:
     
     /**

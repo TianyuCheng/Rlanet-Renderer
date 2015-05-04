@@ -101,19 +101,21 @@ public:
         // Create camera
         camera_.reset(new Camera("Viewer Camera"));
         camera_->setPerspective(45.0, (float)width/(float)height, 1.0, 5000.0);
+        reflectCamera_.reset(new Camera("Reflection Camera"));
+        reflectCamera_->setPerspective(45.0, (float)width/(float)height, 1.0, 5000.0);
+
         // For terrain navigation
         camera_->lookAt(
                 QVector3D(0.0, 150.0, 0.0),
                 QVector3D(0.0, 150.0, 20.0),
                 QVector3D(0.0, 1.0, 0.0)
         );
-        // // For terrain navigation
+        // // For grass
         // camera_->lookAt(
         //         QVector3D(0.0, 10.0, 30.0),
         //         QVector3D(0.0, 10.0, 0.0),
         //         QVector3D(0.0, 1.0, 1.0)
         // );
-        reflectCamera_.reset(new Camera("Reflection Camera"));
 
         // Create two passes
         reflection_.reset(new Scene("reflection", resolution));
@@ -124,18 +126,19 @@ public:
         // Instantiate scene objects
         skydome_.reset(new TextureSkyDome(64, finalPass_.get()));
         terrain_.reset(new Terrain(64, 5, finalPass_.get()));
-        // ocean_.reset(new Ocean(64, 15, finalPass_.get()));
+        ocean_.reset(new Ocean(64, 15, finalPass_.get()));
         grassFactory_.reset(new GrassFactory());
         grass_.reset(grassFactory_->createGrass(QVector2D(0, 0), 1000.0, 30.0, 50.0, 60.0));
 
-        // // Adding objects into reflection pass
-        // reflection_->addObject(skydome_.get());
-        // reflection_->addObject(terrain_.get());
+        // Adding objects into reflection pass
+        reflection_->addObject(skydome_.get());
+        reflection_->addObject(terrain_.get());
+        reflection_->addObject(grass_.get());
 
         // Adding objects into final pass
         finalPass_->addObject(skydome_.get());
         finalPass_->addObject(terrain_.get());
-        // finalPass_->addObject(ocean_.get());
+        finalPass_->addObject(ocean_.get());
         finalPass_->addObject(grass_.get());
 
         // gOperGL settings
@@ -154,10 +157,11 @@ public:
         // camera_->moveForward(500 * getInterval());
         // camera_->turnLeft(0.1);
 
-        // reflection_->setCamera(camera_.get());
-        // reflection_->renderScene();
+        camera_->reflectCamera(QVector4D(0.0, 1.0, 0.0, 0.0), reflectCamera_.get());
+        reflection_->setCamera(reflectCamera_.get());
+        reflection_->renderScene();
 
-        // finalPass_->useTexture(reflection_->texture());
+        finalPass_->useTexture(reflection_->texture());
         finalPass_->setCamera(camera_.get());
         finalPass_->renderScene(fbo);
     }

@@ -37,7 +37,7 @@ GLuint Scene::takeTexture() const {
 
 void Scene::addObject(SceneObject* object) {
     objects.append(object);
-    object->initialize();
+    if (!object->isInitialized()) object->initialize();
 }
 
 void Scene::renderScene(QOpenGLFramebufferObject* fbo)
