@@ -1,8 +1,11 @@
 #ifndef MACRO_TILE_H
 #define MACRO_TILE_H
 
-#include "TileInfo.h"
+#include "Tile.h"
+#include "TileBlitter.h"
+#include <boost/integer/static_log2.hpp> 
 
+#if 0
 constexpr int constlog2(int n)
 {
 	int ret = 0;
@@ -10,35 +13,45 @@ constexpr int constlog2(int n)
 		ret++;
 	return ret;
 }
+#endif
 
 template<typename TileInfo, int _nchild>
 class MacroTile : public Tile<TileInfo> {
 public:
 	static constexpr int nchild = _nchild;
-	static constexpr int childlod = constlog2(nchild);
+	static constexpr int childlod = boost::static_log2<nchild>::value;
 
 	typedef MacroTile<TileInfo, nchild> MTile;
-	typedef TileSetCursor<TileInfo, int nchild> Cursor;
+	typedef MTile *MTilePointer;
+	typedef TileHierarchyCursor<MTile> Cursor;
 	typedef std::vector<MTile*> Ancestors;
-	typedef MTile* (*ChildrenArrayPointer)[nchild][nchild];
+	typedef MTilePointer ChildrenPointerArray[nchild][nchild];
+	typedef typename TileInfo::TileSeed Seed;
 	typedef Seed (*SeedArray)[nchild][nchild];
+	typedef typename TileInfo::TileElement Element;
+	typedef typename TileInfo::Coordinate Coord;
 
 	MacroTile(const TileInfo& tileinfo, const Seed& seed)
-		:Tile(tileinfo, seed) 
+		:Tile<TileInfo>(tileinfo, seed), pchildren_array_(nullptr)
 	{
 	}
+
+	~MacroTile()
+	{
+		free(pchildren_array_);
+	}
+
 
 	bool is_leaf() const { return pchildren_array_.get() == nullptr; }
 	void init_children()
 	{
-		ChildrenArrayPointer childrenlist = new ChildrenArrayPointer;
-		pchildren_array_.reset(childrenlist);
-		children_ = std::ref(*childrenlist);
-
+		// Sometimes C++ makes things more complicated
+		// Here you CAN'T allocate the expensive (2K bytes for nchild=16) ChildrenPointerArray direclty with new
+		pchildren_array_ = (ChildrenPointerArray*)malloc(sizeof(ChildrenPointerArray));
 		// Seeds for children
-		seeds_.reset(new SeedArray);
-		TileInfo::Generator generator(seed_);
-		generator.gen(seeds_, nchild*nchild);
+		seeds_.resize(nchild*nchild);
+		typename TileInfo::Generator generator(this->seed_);
+		generator.gen(seeds_);
 	}
 	/*
 	 * Transfer a part of the whole terrain hierarchy to a second tile
@@ -51,11 +64,9 @@ public:
 	 * walk among tiles.
 	 */
 	template<typename SecondTile, typename Splicer = TileSplicer<Element> >
-	bool blit_to(const Coord& axesmins, const Coord& axesmaxs, SecondTile& sectile)
+	bool blit_to(SecondTile& sectile)
 	{
-		const auto& secshape = sectile->get_shape();
-		typedef SecondTile::Element SecondElement;
-		auto blit_cursor = create_blit_cursor(axesmins, axesmaxs, sectile);
+		auto blit_cursor = create_blitter(sectile, *this);
 		do {
 			auto iblock = blit_cursor.current_iblock();
 			auto oblock = blit_cursor.current_oblock();
@@ -65,40 +76,41 @@ public:
 		return true;
 	}
 
-	TileSetCursorPosition find_best_match(const TileInfo& area,
+	Cursor find_best_match(const TileInfo& area,
 			Ancestors* pancestors = nullptr)
 	{
+		Ancestors ancestors;
 		TileSetCursorPosition pos;
-		if (pancestors) {
-			pancestors->clear();
-			pancestors->emplace_back(this);
-		}
+		ancestors.emplace_back(this);
 		MTile* cursor = this;
-		Coord objres = area.get_resolution(0);
+		double objres = area.get_resolution(0);
 		while (cursor->get_resolution(childlod) > objres) {
-			if (pancestors)
-				pancestors->emplace_back(cursor);
+			ancestors.emplace_back(cursor);
 			auto childpos = which(area.init_pos());
 			pos.emplace_back(childpos);
 			cursor = child(childpos);
 		}
-		return pos;
+		// TODO: LOD
+		if (pancestors) {
+			*pancestors = ancestors;
+		}
+		return Cursor(pos, ancestors);
 	}
 
 	Vec2D<int> which(const Coord& coord)
 	{
-		Coord childsize = shape/nchild;
-		Coord offset = coord - shape_.init_pos();
+		Coord childsize = this->shape_.shape/nchild;
+		Coord offset = coord - this->shape_.init_pos();
 		return Vec2D<int>(offset.x/childsize.x, offset.y/childsize.y);
 	}
 
-	MTile* child(const Vec2D<int>& id)
+	MTile* child(Vec2D<int> id) // We need clamp, so NO const&
 	{
 		if (!pchildren_array_)
 			init_children();
 		id.clamp_min(Vec2D<int>(0, 0));
 		id.clamp_max(Vec2D<int>(nchild-1, nchild-1));
-		MTile** ptr = &children_[id.x][id.y];
+		MTile** ptr = &((*pchildren_array_)[id.x][id.y]);
 		if (!*ptr) {
 			*ptr = create_chile_at(id);
 		}
@@ -106,16 +118,18 @@ public:
 	}
 
 	MTile* create_chile_at(const Vec2D<int>& id) {
-		TileInfo ti = shape_;
-		ti.d /= nchild;
+		TileInfo ti = this->shape_;
+		ti.shape /= nchild;
 		ti.res /= nchild;
-		ti.coord = id.x * ti.d.x + id.y * ti.d.y;
+		ti.init_coord.x = id.x * ti.shape.x;
+		ti.init_coord.y = id.y * ti.shape.y;
 		return new MTile(ti, TileInfo::Generator::GenSeed()); // TODO GenSeed
 	}
 protected:
-	unique_ptr<ChildrenArrayPointer> pchildren_array_;
-	unique_ptr<SeedArray> seeds_;
-	std::reference_wrapper<ChildrenArrayPointer> children_;
+	ChildrenPointerArray* pchildren_array_;
+	std::vector<Seed> seeds_;
 };
+
+typedef MacroTile<TerrainTileInfo, 16> Zearth; // The Earth
 
 #endif
