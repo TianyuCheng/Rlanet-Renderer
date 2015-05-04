@@ -42,7 +42,7 @@ public:
 	}
 
 
-	bool is_leaf() const { return pchildren_array_.get() == nullptr; }
+	bool is_leaf() const { return pchildren_array_ == nullptr; }
 	void init_children()
 	{
 		// Sometimes C++ makes things more complicated
