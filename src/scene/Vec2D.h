@@ -5,6 +5,11 @@ template<typename T = double>
 struct Vec2D {
 	T x,y;
 
+	Vec2D()
+		:x(T()), y(T())
+	{
+	}
+
 	Vec2D(T _x, T _y)
 		:x(_x), y(_y)
 	{
@@ -43,6 +48,13 @@ struct Vec2D {
 		y = std::min(y, another.y);
 	}
 
+	Vec2D operator += (Vec2D v)
+	{
+		x += v.x;
+		y += v.y;
+		return *this;
+	}
+
 	template<typename Scalar>
 	Vec2D operator /= (Scalar d)
 	{
@@ -64,10 +76,27 @@ inline bool operator > (const Vec2D<T>& lhs, const Vec2D<T>& rhs)
 	return lhs.x > rhs.x || lhs.y > rhs.y;
 }
 
+template<typename T>
+inline bool operator != (const Vec2D<T>& lhs, const Vec2D<T>& rhs)
+{
+	return lhs.x != rhs.x || lhs.y != rhs.y;
+}
+
 template<typename T, typename Scalar>
 Vec2D<T> operator / (const Vec2D<T>& lhs, Scalar d)
 {
 	return Vec2D<T>(lhs.x/d, lhs.y/d);
 }
 
+template<typename T>
+Vec2D<T> operator - (const Vec2D<T>& lhs, const Vec2D<T>& rhs)
+{
+	return Vec2D<T>(lhs.x - rhs.x, lhs.y - rhs.y);
+}
+
+template<typename T>
+Vec2D<T> operator + (const Vec2D<T>& lhs, const Vec2D<T>& rhs)
+{
+	return Vec2D<T>(lhs.x + rhs.x, lhs.y + rhs.y);
+}
 #endif

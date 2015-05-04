@@ -74,6 +74,9 @@ qt5_use_modules(PlanetRenderer Quick Core OpenGL)
 add_dependencies(PlanetRenderer project_libnoise)
 target_link_libraries(PlanetRenderer PlanetEssential ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})
 
+# Test cases
+add_executable(test_tile src/test/test_tile.cc)
+
 # Generate cscope.files
 set(ALL_SRC ${SRC} ${PLANET_HDRS} ${PLANET_UTIL_SRCS} ${PLANET_SCENE_SRCS})
 string(REPLACE ";" "\n" ALL_SRC "${ALL_SRC}")

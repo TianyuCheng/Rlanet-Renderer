@@ -14,13 +14,13 @@ using std::vector;
 
 template<typename TileInfo>
 class Tile {
-pubic:
+public:
 	typedef typename TileInfo::Coordinate Coord;
 	typedef typename TileInfo::TileSeed Seed;
 	typedef typename TileInfo::TileElement Element;
 
 	Tile() = delete;
-	Tile(const TileShape& shape, const Seed& seed)
+	Tile(const TileInfo& shape, const Seed& seed)
 		:shape_(shape), seed_(seed)
 	{
 	}
@@ -57,23 +57,22 @@ pubic:
 		auto imins = shape_.get_block(axesmins);
 		auto imaxs = shape_.get_block(axesmaxs);
 		if (imins.x < 0 || imaxs.x < 0)
-			return TileIO<Element>(nullptr, 0, 0);
+			return TileIO<Element>(nullptr, 0, 0, 0);
 		ssize_t lineelem = imaxs.y - imins.y;
-		intptr_t stride = sizeof(Elem) * lineelem;
-		Elem* buf = &elems[start];
+		intptr_t stride = sizeof(Element) * lineelem;
+		Element* buf = &elems_[start];
 		return TileIO<Element>(buf, lineelem, stride, imaxs.x - imins.x);
 	}
 
-	const TileShape& get_shape_info() const { return shape_; }
+	const TileInfo& get_shape_info() const { return shape_; }
 	Coord init_pos() const { return shape_.init_pos(); }
 	Coord tail_pos() const { return shape_.tail_pos(); }
 	double get_resolution(int LODLevel) const { return shape_.get_resolution(LODLevel); }
 
-	void adjust_resolution(const Coord& newres)
+	void adjust_resolution(double newres)
 	{
 		elems_.clear();
-		shape_.dx = newres.x;
-		shape_.dy = newres.x;
+		shape_.res = newres;
 		alloc_memory();
 	}
 protected:
@@ -85,7 +84,7 @@ protected:
 	void alloc_memory()
 	{
 		if (elems_.empty()) {
-			size_t nelem = shape_->nelement();
+			size_t nelem = shape_.nelement();
 			elems_.resize(nelem);
 		}
 	}
@@ -94,7 +93,7 @@ protected:
 	{
 		if (elems_.empty()) {
 			alloc_memory();
-			TileInfo::Generator generator(seed_);
+			typename TileInfo::Generator generator(seed_);
 			generator.gen(elems_);
 		}
 	}

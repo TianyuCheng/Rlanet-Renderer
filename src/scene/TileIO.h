@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <algorithm>
 #include <functional>
 
 using std::unique_ptr;
@@ -31,12 +32,12 @@ struct TileIO {
 
 	Elem* now() const
 	{
-		void* newloc = gpos_ + static_cast<void*>(buf_);
-		return static_cast<Elem*>(newloc);
+		char* newloc = gpos_ + reinterpret_cast<char*>(buf_);
+		return reinterpret_cast<Elem*>(newloc);
 	}
 
-	size_t nline() const { return nline_; }
-	size_t nelem() const { return nline_ * linenelem_; }
+	ssize_t nline() const { return nline_; }
+	ssize_t nelem() const { return nline_ * linenelem_; }
 
 	ssize_t lineremain() const
 	{
@@ -72,7 +73,7 @@ private:
 	intptr_t gpos_;
 	ssize_t linenelem_;
 	intptr_t stride_in_bytes_;
-	size_t nline_;
+	ssize_t nline_;
 };
 
 template<typename InElem,
@@ -87,16 +88,16 @@ public:
 
 	ssize_t splice(ssize_t nelem)
 	{
-		if (!in.is_valid() || !out.is_valid())
+		if (!in_.is_valid() || !out_.is_valid())
 			return -1;
-		nelem = std::min(nelem, in.nelem());
-		nelem = std::min(nelem, out.nelem());
+		nelem = std::min(nelem, in_.nelem());
+		nelem = std::min(nelem, out_.nelem());
 		ssize_t ret = 0;
 		while (nelem > 0) {
 			InElem* ipos = in_.now();
 			OutElem* opos = out_.now();
 
-			ssize_t lineelem = std::min(in.lineremain(), out.lineremain());
+			ssize_t lineelem = std::min(in_.lineremain(), out_.lineremain());
 			lineelem = std::min(nelem, lineelem);
 			splicer_.ncopy(ipos, lineelem, opos);
 
@@ -113,6 +114,6 @@ protected:
 	TileIO<InElem>& in_;
 	TileIO<OutElem>& out_;
 	Splicer splicer_;
-}
+};
 
 #endif

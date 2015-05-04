@@ -12,7 +12,7 @@ inline bool operator<(const TileSetCursorPosition& lhs, const TileSetCursorPosit
 		return false;
 	auto iter1 = lhs.begin();
 	auto iter2 = rhs.begin();
-	while (iter1 != lhs.end() && *iter1 == *iter2) {
+	while (iter1 != lhs.end() && *iter1 != *iter2) {
 		iter1++;
 		iter2++;
 	}
@@ -20,13 +20,19 @@ inline bool operator<(const TileSetCursorPosition& lhs, const TileSetCursorPosit
 }
 
 template<typename TileInfo, int nchild>
+class MacroTile;
+
+template<typename MTile>
 struct TileHierarchyCursor {
-	typedef MacroTile<TileInfo, nchild> MTile;
+	static constexpr int nchild = MTile::nchild;
+	typedef typename MTile::Coord Coord;
+
 	TileHierarchyCursor(const TileSetCursorPosition& pos,
 			const std::vector<MTile*>& anc)
 		:now(pos), ancestors(anc)
 	{
 	}
+
 	/*
  	 * Invariant Condition
 	 * ancestor[i+1] == ancestors[i].child(now[i]);
@@ -50,7 +56,7 @@ struct TileHierarchyCursor {
 	bool left() { return tile_move(0,-1); }
 	bool right() { return tile_move(0,1); }
 
-	Coordinate get_resolution()
+	double get_resolution()
 	{
 		return current_tile()->get_resolution(LODLevel);
 	}
@@ -68,7 +74,7 @@ struct TileHierarchyCursor {
 			iter--;
 			if (iter > 0) {
 				// Maintain ancestors
-				ancestors[iter + 1] = ancestors[iter].child(now[iter+1]);
+				ancestors[iter + 1] = ancestors[iter]->child(now[iter+1]);
 			}
 			if (ret) // Return if done
 				return ret;
@@ -83,30 +89,25 @@ struct TileHierarchyCursor {
  * Cursor for blitting data from Tile Hierarchy to height map tile.
  */
 template<typename SourceTile, typename TargetTile>
-class BlitterFromMTile : public TileHierarchyCursor<typename SourceTile::TileInfo,
-	SourceTile::nchild> {
+class BlitterFromMTile : public TileHierarchyCursor<SourceTile>
+{
+public:
 	static const int nchild = SourceTile::nchild;
-	typedef MacroTile<TileInfo, nchild> MTile;
-	typedef TileSetCursor<TileInfo, nchild> TileCursor;
+	typedef TileHierarchyCursor<SourceTile> TileCursor;
 	typedef typename SourceTile::Element SourceElement;
 	typedef typename TargetTile::Element TargetElement;
-	typedef typename SourceTile::Coordinate Coord;
+	typedef typename SourceTile::Coord Coord;
 
 	BlitterFromMTile(const TileSetCursorPosition& start,
-			const std::vector<MacroTile<TileInfo>*>& anc,
+			const std::vector<SourceTile*>& anc,
 			const TileSetCursorPosition& _mins,
 			const TileSetCursorPosition& _maxs,
-			TargetTile &_sect,
+			TargetTile &_sect
 			)
-		:TileHierarchyCursor<TileInfo, nchild>(start, anc),
+		:TileHierarchyCursor<SourceTile>(start, anc),
 		mins(_mins), maxs(_maxs),
 		write_pos_(0,0), sectile(_sect)
 	{
-		MTile* init_tile = current_tile();
-		const TileShape& firstshape(init_tile->get_shape_info());
-		const TileShape& secshape(sectile->get_shape_info());
-		init_offset_ = firstshape.get_block(secshape.init_pos());
-		tail_offset_ = firstshape.get_block(secshape.tail_pos());
 	}
 
 	TileSetCursorPosition mins, maxs; // Bounds, used by CR LF and successor
@@ -114,7 +115,7 @@ class BlitterFromMTile : public TileHierarchyCursor<typename SourceTile::TileInf
 
 	bool oob() const
 	{
-		if (maxs < now || now < mins)
+		if (maxs < this->now || this->now < mins)
 			return true;
 		return false;
 	}
@@ -128,45 +129,45 @@ class BlitterFromMTile : public TileHierarchyCursor<typename SourceTile::TileInf
 	void carriage_return()
 	{
 		for(size_t i = 0; i < mins.size(); i++) {
-			now[i].y = mins.[i].y;
+			this->now[i].y = mins[i].y;
 		}
 		write_pos_.y = 0;
 	}
 
 	bool line_feed()
 	{
-		bool ret = down();
+		bool ret = this->down();
 		write_pos_.x++;
 		return oob() && ret;
 	}
 
 	void get_blitting_region(Coord& min, Coord& max)
 	{
-		SourceTile *now = current_tile();
+		SourceTile *now = this->current_tile();
 		min = now->init_pos();
 		max = now->tail_pos();
 		min.clamp_min(sectile.init_pos());
 		max.clamp_max(sectile.tail_pos());
 	}
 
-	TileIO<SourceElement> current_ioblock()
+	TileIO<SourceElement> current_iblock()
 	{
-		SourceTile *now = current_tile();
+		SourceTile *now = this->current_tile();
 		Coord min, max;
-		get_blitting_region(&min, &max);
+		get_blitting_region(min, max);
 		return now->get_ioblock(min, max, 0);
 	}
 
 	TileIO<TargetElement> current_oblock()
 	{
 		Coord min, max;
-		get_blitting_region(&min, &max);
+		get_blitting_region(min, max);
 		return sectile.get_ioblock(min, max, 0);
 	}
 
 	bool next()
 	{
-		right(); // Move one step right
+		this->right(); // Move one step right
 		if (!oob())
 			return true;
 		carriage_return();
@@ -174,29 +175,26 @@ class BlitterFromMTile : public TileHierarchyCursor<typename SourceTile::TileInf
 	}
 private:
 	Vec2D<int> write_pos_;
-	Vec2D<int> init_offset_;
-	Vec2D<int> tail_offset_;
 };
 
 template<typename SourceTile, typename TargetTile>
 BlitterFromMTile<SourceTile, TargetTile>
-create_blitter(SecondTile& sectile)
+create_blitter(TargetTile& target, SourceTile& source)
 {
-	const auto& tileregion = sectile.get_shape_info();
-	std::vector<MTile> ancestors;
-	auto cursor_min = find_best_match(tileregion, &ancestors);
-	sectile.adjust_resolution(cursor_min.get_resolution());
+	const auto& tileregion = target.get_shape_info();
+	std::vector<SourceTile*> ancestors;
+	auto cursor_min = source.find_best_match(tileregion, &ancestors);
+	target.adjust_resolution(cursor_min.get_resolution());
+	// Query the tail pos
 	auto shapecorner = tileregion;
-	shapecorner.x += secshape.d;
-	shapecorner.y += secshape.d;
-	auto cursor_max = find_best_match(shapecorner);
+	shapecorner.init_coord += target.tail_pos();
+	auto cursor_max = source.find_best_match(shapecorner);
 
-	return MacroTileBlitCursor<TileInfo, nchild, SecondTile> ret(cursor_min,
+	return BlitterFromMTile<SourceTile, TargetTile>(cursor_min.now,
 			ancestors,
-			cursor_min,
-			cursor_max,
-			sectile
-			);
+			cursor_min.now,
+			cursor_max.now,
+			target);
 }
 
 #endif
