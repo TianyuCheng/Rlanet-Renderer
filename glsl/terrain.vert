@@ -15,21 +15,29 @@ uniform int  uLevel;                // for debugging purpose, consider deprecate
 
 uniform vec3 uCamera;
 uniform vec2 uRange;                // (range, morphArea)
-uniform vec4 uUnderWaterClip;       // plane for under water clipping, xyz is the normal, w is the distance from origin
 
 uniform sampler2D uHeightmap;
 
-// Used in the fragment shader
-out vec2 vHeightUV;
-out vec2 vDecalTexCoord;
-out vec4 vColor;
+out vData
+{
+    vec3 view;
+    vec3 normal;
+    vec2 heightUV;
+    vec2 texCoords;
+    float linearZ;
+} vertex;
 
-out vec3 vView;
-out vec3 vNormal;
+/* // Used in the fragment shader */
+/* out vec2 vHeightUV; */
+/* out vec2 vDecalTexCoord; */
+/* out vec4 vColor; */
 
-out vec2  vPos;
-out float vHeight;
-out float linearZ;
+/* out vec3 vView; */
+/* out vec3 vNormal; */
+/*  */
+/* out vec2  vPos; */
+/* out float vHeight; */
+/* out float linearZ; */
 
 const float PI = 3.1415926;
 const float SQRT2 = 1.4142;
@@ -195,7 +203,7 @@ float computeMorphK(vec2 gridPos, vec3 vertex) {
 
 void main()
 {
-    vColor = vec4(1.0, 1.0, 1.0, 1.0);
+    /* vColor = vec4(1.0, 1.0, 1.0, 1.0); */
     float radius = 2048.0;
 
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
@@ -210,22 +218,27 @@ void main()
     /* vec4 noproj = uMVMatrix * uTransform * vec4(wrap(radius, morphedPos), 1.0); */
     vec4 proj = uPMatrix * noproj;
     gl_Position = proj;
-    linearZ = (-noproj.z-1.0)/(5000.0-1.0);
+    /*  */
+    /* // if (uLevel == 0) vColor = vec4(1.0, 0.0, 0.0, 1.0); */
+    /* // else if (uLevel == 1) vColor = vec4(1.0, 1.0, 0.0, 1.0); */
+    /* // else if (uLevel == 2) vColor = vec4(0.0, 1.0, 1.0, 1.0); */
+    /* // else if (uLevel == 3) vColor = vec4(0.0, 0.0, 1.0, 1.0); */
+    /* // else if (uLevel == 4) vColor = vec4(1.0, 0.0, 1.0, 1.0); */
+    /* // else if (uLevel == 5) vColor = vec4(1.0, 1.0, 0.0, 1.0); */
+    /* // else if (uLevel == 6) vColor = vec4(0.0, 1.0, 0.0, 1.0); */
+    /* // else if (uLevel == 7) vColor = vec4(0.0, 1.0, 1.0, 1.0); */
+    /* // else if (uLevel >= 8) vColor = vec4(1.0, 1.0, 1.0, 1.0); */
+    /*  */
+    /* vDecalTexCoord = morphedPos.xz / 512.0; */
+    /*  */
+    /* vView = (uMVMatrix * uTransform * vec4(morphedPos, 1.0)).xyz; */
+    /* vNormal = computeNormal(aVertex.xz); */
+    /* vHeightUV = uv; */
+    /* vPos = morphedPos.xz; */
 
-    // if (uLevel == 0) vColor = vec4(1.0, 0.0, 0.0, 1.0);
-    // else if (uLevel == 1) vColor = vec4(1.0, 1.0, 0.0, 1.0);
-    // else if (uLevel == 2) vColor = vec4(0.0, 1.0, 1.0, 1.0);
-    // else if (uLevel == 3) vColor = vec4(0.0, 0.0, 1.0, 1.0);
-    // else if (uLevel == 4) vColor = vec4(1.0, 0.0, 1.0, 1.0);
-    // else if (uLevel == 5) vColor = vec4(1.0, 1.0, 0.0, 1.0);
-    // else if (uLevel == 6) vColor = vec4(0.0, 1.0, 0.0, 1.0);
-    // else if (uLevel == 7) vColor = vec4(0.0, 1.0, 1.0, 1.0);
-    // else if (uLevel >= 8) vColor = vec4(1.0, 1.0, 1.0, 1.0);
-
-    vDecalTexCoord = morphedPos.xz / 512.0;
-
-    vView = (uMVMatrix * uTransform * vec4(morphedPos, 1.0)).xyz;
-    vNormal = computeNormal(aVertex.xz);
-    vHeightUV = uv;
-    vPos = morphedPos.xz;
+    vertex.normal = computeNormal(aVertex.xz);
+    vertex.view = (uMVMatrix * vec4(morphedPos, 1.0)).xyz;
+    vertex.heightUV = uv;
+    vertex.texCoords = morphedPos.xz / 512.0;
+    vertex.linearZ = (-noproj.z-1.0)/(5000.0-1.0);
 }

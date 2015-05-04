@@ -81,11 +81,6 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
         object->setDrawMode(drawMode);
         object->update();
 
-        // Uniform the camera matrix
-        camera->uniformMatrices(object->program);
-        // Uniform the object variables
-        object->program.setUniformValue("uTransform", object->transform);
-
         /* lastPass is initialized to -1,
          * it gets reseted to nonnegative when
          * assigned a texture unit
@@ -95,6 +90,11 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
             glBindTexture(GL_TEXTURE_2D, lastPass);
             object->program.setUniformValue("uRenderTexture", 0);
         }
+
+        // Uniform the camera matrix
+        camera->uniformMatrices(object->program);
+        // Uniform the object variables
+        object->program.setUniformValue("uTransform", object->transform);
 
         // User defined uniform variables
         object->uniform();

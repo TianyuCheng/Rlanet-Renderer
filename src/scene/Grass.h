@@ -9,6 +9,7 @@
 
 #include <QVector>
 #include <QImage>
+#include <QVector2D>
 #include <QVector3D>
 #include <QQuaternion>
 #include <QOpenGLTexture>
@@ -22,21 +23,19 @@ class Grass : public SceneObject
 {
     friend class GrassFactory;
 public:
-    Grass(GrassFactory *factory, int seed);
+    Grass(GrassFactory *factory);
     virtual ~Grass();
+
+    void setSize(double s) { size = s; }
+    void plantGrass(QVector2D coordinate, double height);
 
     void uniform();
     void update();
     void render();
 
 private:
-    void generateBillboard();
-
-private:
     GrassFactory *factory;
-
-    QVector3D offset;
-    QVector3D scale;
+    double size;
 };
 
 /**
@@ -48,26 +47,19 @@ class GrassFactory : private SceneObject
 {
     friend class Grass;
 public:
-    GrassFactory(int numVariations);
+    GrassFactory();
     virtual ~GrassFactory();
 
-    Grass* getGrass(int index);
-
+    /* dummy functions that we do not use */
     void uniform() {}
     void update() {}
     void render() {} 
 
+    Grass* createGrass(QVector2D center, double radius, double spacing, double size, double height, int seed = 0);
+
 private:
-
-    // prepare the structure of grass blades
-    void prepareGrassBlades();
-
-    int numVariations;
-
     std::unique_ptr<QOpenGLTexture> grassBlade;
     std::unique_ptr<QOpenGLTexture> grassBladeAlpha;
-
-    QVector<Grass*> blades;
 };
 
 #endif /* end of include guard: GRASS_H */

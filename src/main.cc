@@ -107,6 +107,12 @@ public:
                 QVector3D(0.0, 150.0, 20.0),
                 QVector3D(0.0, 1.0, 0.0)
         );
+        // // For terrain navigation
+        // camera_->lookAt(
+        //         QVector3D(0.0, 10.0, 30.0),
+        //         QVector3D(0.0, 10.0, 0.0),
+        //         QVector3D(0.0, 1.0, 1.0)
+        // );
         reflectCamera_.reset(new Camera("Reflection Camera"));
 
         // Create two passes
@@ -119,7 +125,8 @@ public:
         skydome_.reset(new TextureSkyDome(64, finalPass_.get()));
         terrain_.reset(new Terrain(64, 5, finalPass_.get()));
         // ocean_.reset(new Ocean(64, 15, finalPass_.get()));
-        grassFactory_.reset(new GrassFactory(10));
+        grassFactory_.reset(new GrassFactory());
+        grass_.reset(grassFactory_->createGrass(QVector2D(0, 0), 1000.0, 30.0, 50.0, 60.0));
 
         // // Adding objects into reflection pass
         // reflection_->addObject(skydome_.get());
@@ -129,7 +136,7 @@ public:
         finalPass_->addObject(skydome_.get());
         finalPass_->addObject(terrain_.get());
         // finalPass_->addObject(ocean_.get());
-        finalPass_->addObject(grassFactory_->getGrass(0));
+        finalPass_->addObject(grass_.get());
 
         // gOperGL settings
         glEnable(GL_DEPTH_TEST);
@@ -142,7 +149,7 @@ public:
          * disable ocean at this point. I may refine
          * on the ocean later.
          * */
-        qDebug() << "FPS:" << fps();
+        // qDebug() << "FPS:" << fps();
 
         // camera_->moveForward(500 * getInterval());
         // camera_->turnLeft(0.1);
@@ -183,6 +190,7 @@ private:
     std::unique_ptr<Ocean> ocean_;
     std::unique_ptr<TextureSkyDome> skydome_;
     std::unique_ptr<GrassFactory> grassFactory_;
+    std::unique_ptr<Grass> grass_;
 
     // Camera
     std::unique_ptr<Camera> camera_;
