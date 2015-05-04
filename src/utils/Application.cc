@@ -24,9 +24,9 @@ int Application::exec() {
         view.setPersistentOpenGLContext(true);
         view.setPersistentSceneGraph(true);
         view.setResizeMode(QQuickView::SizeRootObjectToView);
+        view.engine()->rootContext()->setContextProperty("appPath", QUrl(QString("file://%1").arg(app.applicationDirPath())));
         view.setSource(QUrl("qrc:///main.qml"));
         view.show();
-	view.engine()->rootContext()->setContextProperty("appPath", QUrl(QString("file:///%1").arg(app.applicationDirPath())));
 
         ret = app.exec();
     } // After this view will be destructed

@@ -272,7 +272,6 @@ void Terrain::update() {
 }
 
 void Terrain::initialize() {
-    qDebug() << "Terain Initialize";
     this->setShader(QOpenGLShader::Vertex, "../glsl/terrain.vert");
     this->setShader(QOpenGLShader::Geometry, "../glsl/terrain.geom");
     this->setShader(QOpenGLShader::Fragment, "../glsl/terrain.frag");
