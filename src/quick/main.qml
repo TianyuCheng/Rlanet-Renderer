@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import QtMultimedia 5.4
+import QtMultimedia 5.0
 
 import Mangekyou 1.0
 
@@ -47,8 +47,8 @@ Item {
 	}
 
 	Audio {
-		id: bgm 
-		source: "e922d4ffdee2345071e146039b970aea1d4c3d5c.aac"
+		id: playMusic
+		source: appPath+"/e922d4ffdee2345071e146039b970aea1d4c3d5c.aac"
 		autoPlay: true
 	}
 }

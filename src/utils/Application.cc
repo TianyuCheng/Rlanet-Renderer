@@ -1,3 +1,5 @@
+#include <QQmlEngine> 
+#include <QQmlContext> 
 #include <Application.h>
 
 Application::Application(QString n, int argc, char *argv[]) 
@@ -24,6 +26,8 @@ int Application::exec() {
         view.setResizeMode(QQuickView::SizeRootObjectToView);
         view.setSource(QUrl("qrc:///main.qml"));
         view.show();
+	view.engine()->rootContext()->setContextProperty("appPath", QUrl(QString("file:///%1").arg(app.applicationDirPath())));
+
         ret = app.exec();
     } // After this view will be destructed
     nexus::terminate();
