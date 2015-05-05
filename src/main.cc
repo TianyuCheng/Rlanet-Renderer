@@ -7,6 +7,7 @@
 #include <Ocean.h>
 #include <TextureSkyDome.h>
 #include <Grass.h>
+#include <Tree.h>
 
 class PlanetRenderManager : public RenderManager
 {
@@ -136,21 +137,27 @@ public:
         skydome_.reset(new TextureSkyDome(64, finalPass_.get()));
         terrain_.reset(new Terrain(64, 10, finalPass_.get()));
         ocean_.reset(new Ocean(64, 10, finalPass_.get()));
+
         grassFactory_.reset(new GrassFactory(terrain_.get()));
-        // grass_.reset(grassFactory_->createGrass(QVector2D(0, 0), 200.0, 10.0, 20.0, 20.0));
+        grass_.reset(grassFactory_->createGrass(QVector2D(1000, 1000), 1000.0, 30.0, 40.0, 20.0));
+
+        treeFactory_.reset(new TreeFactory(terrain_.get()));
+        tree_.reset(treeFactory_->createTree(QVector2D(2000, 2000), 1000.0, 200.0, 140.0, 200.0));
 
         // Adding objects into reflection pass
         reflection_->addObject(skydome_.get());
         reflection_->addObject(terrain_.get());
         // reflection_->addObject(grass_.get());
+        reflection_->addObject(tree_.get());
 
         // Adding objects into final pass
         finalPass_->addObject(skydome_.get());
         finalPass_->addObject(terrain_.get());
         finalPass_->addObject(ocean_.get());
         // finalPass_->addObject(grass_.get());
+        finalPass_->addObject(tree_.get());
 
-        // gOperGL settings
+        // OpenGL settings
         glEnable(GL_DEPTH_TEST);
     }
 
@@ -210,6 +217,10 @@ public:
         skydome_.reset();
         terrain_.reset();
         grassFactory_.reset();
+        treeFactory_.reset();
+
+        grass_.reset();
+        tree_.reset();
         
         camera_.reset();
         reflectCamera_.reset();
@@ -230,6 +241,8 @@ private:
     std::unique_ptr<TextureSkyDome> skydome_;
     std::unique_ptr<GrassFactory> grassFactory_;
     std::unique_ptr<Grass> grass_;
+    std::unique_ptr<TreeFactory> treeFactory_;
+    std::unique_ptr<Tree> tree_;
 
     // Camera
     std::unique_ptr<Camera> camera_;

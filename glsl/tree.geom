@@ -1,7 +1,7 @@
 #version 330 core
 
 layout (points) in;
-layout (triangle_strip, max_vertices = 12) out;
+layout (triangle_strip, max_vertices = 16) out;
 
 // Used in the vertex transformation
 uniform mat4 uMVMatrix;
@@ -78,13 +78,13 @@ void main(void) {
     vec3 pos = gl_in[0].gl_Position.xyz;
     float height = pos.y;
     vec2 uv = pos.xz / 16384.0 - vec2(0.5, 0.5);
-    float posy = terrainHeight(uv) + 50.0;
+    float posy = terrainHeight(uv);
     pos = vec3(pos.x, posy, pos.z);
 
     float angle = rand(pos.zx);
-    float displacement = rand(pos.xz) * 0.5;
 
-    createFace(angle, displacement, height, pos); 
-    createFace(angle + 2.0 * PI / 3.0, displacement, height, pos); 
-    createFace(angle - 2.0 * PI / 3.0, displacement, height, pos);
+    createFace(angle, 0.0, height, pos); angle += PI / 4.0;
+    createFace(angle, 0.0, height, pos); angle += PI / 4.0;
+    createFace(angle, 0.0, height, pos); angle += PI / 4.0;
+    createFace(angle, 0.0, height, pos); 
 }

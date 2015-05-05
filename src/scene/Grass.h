@@ -17,26 +17,22 @@
 
 #include <SceneObject.h>
 #include <Terrain.h>
+#include <Billboard.h>
 
 class GrassFactory;
 
-class Grass : public SceneObject
+class Grass : public Billboard
 {
     friend class GrassFactory;
 public:
     Grass(GrassFactory *factory);
     virtual ~Grass();
 
-    void setSize(double s) { size = s; }
-    void plantGrass(QVector2D coordinate, double height);
-
     void uniform();
     void update();
-    void render();
 
 private:
     GrassFactory *factory;
-    double size;
 };
 
 /**
@@ -44,7 +40,7 @@ private:
  * yet it does so only because it needs to reuse the 
  * shader methods in SceneObject
  * */
-class GrassFactory : private SceneObject
+class GrassFactory : public BillboardFactory
 {
     friend class Grass;
 public:

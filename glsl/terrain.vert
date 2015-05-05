@@ -148,6 +148,6 @@ void main()
     vertex.normal = computeNormal(aVertex.xz);
     vertex.view = (uMVMatrix * vec4(morphedPos, 1.0)).xyz;
     vertex.heightUV = uv;
-    vertex.texCoords = morphedPos.xz / 128.0;
+    vertex.texCoords = morphedPos.xz / 512.0;
     vertex.linearZ = (-noproj.z-1.0)/(10000.0-1.0);
 }
