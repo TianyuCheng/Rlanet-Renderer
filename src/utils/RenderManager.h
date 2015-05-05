@@ -25,8 +25,8 @@ public:
     /**
      * Please implement these methods to enable key controls
      * */
-    virtual void keyPressed(int count, int key, int modifiers, QString text) {}
-    virtual void keyReleased(int count, int key, int modifiers, QString text) {}
+    virtual void keyPressed(int count, int key, int modifiers, QString text) = 0;
+    virtual void keyReleased(int count, int key, int modifiers, QString text) = 0;
 
     int fps() { return _fpsVal; }
 
