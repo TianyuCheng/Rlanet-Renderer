@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <Application.h>
 #include <RenderManager.h>
 
@@ -9,6 +10,25 @@
 
 class PlanetRenderManager : public RenderManager
 {
+	enum ACTION_BIT {
+		_CAMERA_LEFT_BIT = 0,
+		_CAMERA_RIGHT_BIT,
+		_CAMERA_FORWARD_BIT,
+		_CAMERA_BACKWARD_BIT,
+		_CAMERA_PITCH_UP_BIT,
+		_CAMERA_PITCH_DOWN_BIT,
+	};
+#define DEFINE_ACTION(A)	A = (1 << _##A##_BIT),
+
+	enum  : uint64_t {
+		DEFINE_ACTION(CAMERA_LEFT)
+		DEFINE_ACTION(CAMERA_RIGHT)
+		DEFINE_ACTION(CAMERA_FORWARD)
+		DEFINE_ACTION(CAMERA_BACKWARD)
+		DEFINE_ACTION(CAMERA_PITCH_UP)
+		DEFINE_ACTION(CAMERA_PITCH_DOWN)
+	};
+#undef DEFINE_ACTION
 public:
 
     /**
@@ -31,31 +51,59 @@ public:
         switch (key) {
             case Qt::Key_Left:
             case Qt::Key_A:
-                camera_->turnLeft(1);
+		    action_flag_|= CAMERA_LEFT;
                 break;
             case Qt::Key_Right:
             case Qt::Key_D:
-                camera_->turnRight(1);
+		    action_flag_|= CAMERA_RIGHT;
                 break;
             case Qt::Key_Up:
             case Qt::Key_W:
-                camera_->moveForward(50);
+		    action_flag_|= CAMERA_FORWARD;
                 break;
             case Qt::Key_Down:
             case Qt::Key_S:
-                camera_->moveBackward(50);
+		    action_flag_|= CAMERA_BACKWARD;
                 break;
             case Qt::Key_PageUp:
-                camera_->lookUp(5);
+		    action_flag_|= CAMERA_PITCH_UP;
                 break;
             case Qt::Key_PageDown:
-                camera_->lookDown(5);
+		    action_flag_|= CAMERA_PITCH_DOWN;
                 break;
             case Qt::Key_Space:
                 if (drawMode == GL_FILL) { drawMode = GL_LINE; }
                 else { drawMode = GL_FILL; }
                 reflection_->setDrawMode(drawMode);
                 finalPass_->setDrawMode(drawMode);
+                break;
+        }
+    }
+
+    void keyReleased(int count, int key, int modifiers, QString text)
+    {
+        switch (key) {
+            case Qt::Key_Left:
+            case Qt::Key_A:
+		    action_flag_ &= ~CAMERA_LEFT;
+                break;
+            case Qt::Key_Right:
+            case Qt::Key_D:
+		    action_flag_ &= ~CAMERA_RIGHT;
+                break;
+            case Qt::Key_Up:
+            case Qt::Key_W:
+		    action_flag_ &= ~CAMERA_FORWARD;
+                break;
+            case Qt::Key_Down:
+            case Qt::Key_S:
+		    action_flag_ &= ~CAMERA_BACKWARD;
+                break;
+            case Qt::Key_PageUp:
+		    action_flag_ &= ~CAMERA_PITCH_UP;
+                break;
+            case Qt::Key_PageDown:
+		    action_flag_ &= ~CAMERA_PITCH_DOWN;
                 break;
         }
     }
@@ -105,6 +153,29 @@ public:
         glEnable(GL_DEPTH_TEST);
     }
 
+    void do_camera_move()
+    {
+	    if (action_flag_ & CAMERA_LEFT) {
+		    camera_->turnLeft(1);
+	    }
+	    if (action_flag_ & CAMERA_RIGHT) {
+		    camera_->turnRight(1);
+	    }
+	    if (action_flag_ & CAMERA_FORWARD) {
+		    camera_->moveForward(50);
+	    }
+	    if (action_flag_ & CAMERA_BACKWARD) {
+		    camera_->moveBackward(50);
+	    }
+	    if (action_flag_ & CAMERA_PITCH_UP) {
+		    camera_->lookUp(5);
+	    }
+	    if (action_flag_ & CAMERA_PITCH_DOWN) {
+		    camera_->lookDown(5);
+	    }
+
+    }
+
     void render(QOpenGLFramebufferObject *fbo) {
         /**
          * Currently there seems to be an efficiency
@@ -114,8 +185,7 @@ public:
          * */
         // qDebug() << "FPS:" << fps();
 
-        // camera_->moveForward(500 * getInterval());
-        // camera_->turnLeft(0.1);
+	    do_camera_move();
 
         if (camera_->getPosition().y() >= 0) {
             // reflection
@@ -166,6 +236,7 @@ private:
     // Camera
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<Camera> reflectCamera_;
+    uint64_t action_flag_;
 };
 
 
