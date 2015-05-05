@@ -74,6 +74,7 @@ void Camera::moveBackward(double distance) {
 void Camera::turnLeft(double angle, QVector3D axis) {
     QQuaternion q = QQuaternion::fromAxisAndAngle(axis, angle);
     look = q.rotatedVector(look);
+    up = q.rotatedVector(up);
     center = eye + look;
     uMVMatrix.setToIdentity();
     uMVMatrix.lookAt(eye, center, up);
