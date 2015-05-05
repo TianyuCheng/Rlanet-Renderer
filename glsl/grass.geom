@@ -84,7 +84,7 @@ void main(void) {
     float angle = rand(pos.zx);
     float displacement = rand(pos.xz);
 
-    createFace(angle, displacement, height, pos); angle -= PI / 3.0;
-    createFace(angle, displacement, height, pos); angle -= PI / 3.0;
+    createFace(angle, displacement, height, pos); angle -= 2.0 * PI / 3.0;
+    createFace(angle, displacement, height, pos); angle -= 2.0 * PI / 3.0;
     createFace(angle, displacement, height, pos);
 }

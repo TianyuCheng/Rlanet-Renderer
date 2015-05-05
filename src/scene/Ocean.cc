@@ -21,6 +21,7 @@ void Ocean::initialize() {
     time.start();
 
     this->setShader(QOpenGLShader::Vertex, "../glsl/ocean.vert");
+    this->setShader(QOpenGLShader::Geometry, "../glsl/ocean.geom");
     this->setShader(QOpenGLShader::Fragment, "../glsl/ocean.frag");
 
     SceneObject::initialize();

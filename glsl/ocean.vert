@@ -9,23 +9,23 @@ uniform mat4 uNMatrix;
 uniform mat4 uTransform;
 
 uniform vec3 uCamera;
+uniform vec2 uRange;                // (range, morphArea)
+
 uniform vec2 uOffset;
 uniform vec2 uScale;
-uniform int  uLevel;
 uniform float uGrid;
 uniform float uTime;
 
 // Used in the fragment shader
-out vec2 vHeightUV;
-out vec2 vDecalTexCoord;
-out vec4 vColor;
-
-out vec3 vView;
-out vec3 vNormal;
-
-out vec3  vPos;
-out float vHeight;
-out float linearZ;
+out vData
+{
+    vec3 pos;
+    vec3 view;
+    vec3 normal;
+    vec2 heightUV;
+    vec2 texCoords;
+    float linearZ;
+} vertex;
 
 const float PI = 3.1415926;
 
@@ -73,7 +73,7 @@ float waves(vec2 pos) {
     sum += wave(pos, amplitude, speed, waveLength, direction);
     normal += computeNormal(pos, amplitude, speed, waveLength, direction);
 
-    vNormal = normal;
+    vertex.normal = normal;
     return sum;
 }
 
@@ -87,18 +87,24 @@ vec2 morphVertex(vec2 gridPos, vec2 vertex, float morphK) {
     return vertex - fractPart * uScale * morphK;
 }
 
-float computeMorphK(vec3 pos) {
-    float dist = length((uPMatrix *uMVMatrix * uTransform * vec4(pos, 1.0)).xyz);
-    float morphK = 0.0;
-    if (uLevel < 10) {
-        float scale = uScale.x;
-        float nextScale = scale * 2.0;
-        float morphArea = nextScale * 0.85;
-        if (dist > morphArea) {
-            morphK = clamp((dist - morphArea) / (nextScale * 0.15), 0.0, 1.0);
-        }
+float computeMorphK(vec2 gridPos, vec3 vertex) {
+    vec2 uv = vertex.xz / 16384.0 - vec2(0.5, 0.5);
+    vec3 camera = uCamera;
+    float dist = distance(camera, vertex);
+    float morphStart = uRange.y * 2.0;
+    float morphEnd = uRange.x * 2.0 * sqrt(2.0);
+    float morphLerpK = clamp((dist - morphStart) / (morphEnd-morphStart), 0.0, 1.0);
+
+    // Hack for detecting edge
+    vec2 scaledGridPos = gridPos * uGrid;
+    float x = scaledGridPos.x;
+    float y = scaledGridPos.y;
+    if (x == uGrid || y == uGrid || x == 0 || y == 0) {
+        if (morphLerpK >= 0.5) morphLerpK = 1.0;
+        else morphLerpK = 0.0;
     }
-    return morphK;
+
+    return morphLerpK;
 }
 
 void main()
@@ -106,19 +112,17 @@ void main()
     float radius = 2048.0;
 
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
-    float morphK = computeMorphK(pos);
+    float morphK = computeMorphK(aVertex.xz, pos);
     vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy;
     vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
     morphedPos.y = waves(uv);
     vec4 noproj = uMVMatrix * uTransform * vec4(morphedPos, 1.0);
     /* vec4 noproj = uMVMatrix * uTransform * vec4(wrap(radius, pos), 1.0); */
     gl_Position = uPMatrix * noproj;
-    linearZ = (-noproj.z-1.0)/(10000.0-1.0);
 
-    /* vColor = vec4((700 + pos.y) / 1400.0, 1.0 - (700 + pos.y) / 1400.0, 0.0, 1.0); */
-    vDecalTexCoord = pos.xz / 512.0;
-
-    vView = (uMVMatrix * uTransform * vec4(morphedPos, 1.0)).xyz;
-    vHeightUV = uv;
-    vPos = pos;
+    vertex.pos = pos;
+    vertex.linearZ = (-noproj.z-1.0)/(10000.0-1.0);
+    vertex.texCoords = pos.xz / 512.0;
+    vertex.view = (uMVMatrix * vec4(morphedPos, 1.0)).xyz;
+    vertex.heightUV = uv;
 }

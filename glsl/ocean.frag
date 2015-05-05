@@ -11,14 +11,15 @@ uniform sampler2D uRenderTexture;
 uniform float uGrid;
 uniform vec3 uCamera;
 
-in vec2 vHeightUV;
-in vec2 vDecalTexCoord;
-in vec4 vColor;
-
-in vec3 vPos;
-in vec3 vView;
-in vec3 vNormal;
-in float linearZ;
+in fData
+{
+    vec3 pos;
+    vec3 view;
+    vec3 normal;
+    vec2 heightUV;
+    vec2 texCoords;
+    float linearZ;
+} frag;
 
 out vec4 frag_color;
 
@@ -30,11 +31,11 @@ void main()
     vec3 lightAmbient = vec3(0.1, 0.1, 0.1);
     vec3 lightDiffuse = vec3(0.8, 0.8, 0.8);
 
-    vec3 n = normalize(vNormal);
-    vec3 v = normalize(-vView);
-    vec3 l = normalize(lightPos - vView);
+    vec3 n = normalize(frag.normal);
+    vec3 v = normalize(-frag.view);
+    vec3 l = normalize(lightPos - frag.view);
 
-    vec4 clipReflection = uPMatrix * uMVMatrix * vec4(vPos.x, 0.0, vPos.z, 1.0);
+    vec4 clipReflection = uPMatrix * uMVMatrix * vec4(frag.pos.x, 0.0, frag.pos.z, 1.0);
     if (uCamera.y >= 0) clipReflection.t *= -1.0;
     vec2 deviceReflection = clipReflection.st / clipReflection.q;
     vec2 decalReflection = vec2(0.5, 0.5) + 0.5 * deviceReflection;
@@ -45,5 +46,5 @@ void main()
 
     vec3 color = (ambient + diffuse) * decal;
     frag_color = vec4(color, 1.0);
-    gl_FragDepth = linearZ;
+    gl_FragDepth = frag.linearZ;
 }

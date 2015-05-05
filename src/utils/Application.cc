@@ -26,6 +26,10 @@ int Application::exec() {
         view.setResizeMode(QQuickView::SizeRootObjectToView);
         view.engine()->rootContext()->setContextProperty("appPath", QUrl(QString("file://%1").arg(app.applicationDirPath())));
         view.setSource(QUrl("qrc:///main.qml"));
+
+        if (RenderThread::renderMgr) 
+            RenderThread::renderMgr->setContext(view.engine()->rootContext());
+
         view.show();
 
         ret = app.exec();

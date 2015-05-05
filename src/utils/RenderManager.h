@@ -2,6 +2,7 @@
 #define RENDERMANAGER_H
 
 #include <QTime>
+#include <QQmlContext>
 #include <QOpenGLFramebufferObject>
 
 #include <Camera.h>
@@ -30,6 +31,12 @@ public:
 
     int fps() { return _fpsVal; }
 
+    void setContext(QQmlContext *c) { context = c; }
+    void setContextProperty(QString key, QString val) {
+        Q_ASSERT(context != nullptr);
+        context->setContextProperty(key, val);
+    }
+
     /**
      * Time Utils
      * Scene time control with start, pause, resume, and restart.
@@ -47,6 +54,7 @@ private:
     int _fps;
     int _fpsCounter;
 
+    QQmlContext *context;
     QTime time;
     int elapsedTime;
     int lastTime;

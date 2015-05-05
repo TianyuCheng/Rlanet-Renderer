@@ -157,10 +157,10 @@ public:
     void do_camera_move()
     {
 	    if (action_flag_ & CAMERA_LEFT) {
-		    camera_->turnLeft(1);
+		    camera_->turnLeft(3);
 	    }
 	    if (action_flag_ & CAMERA_RIGHT) {
-		    camera_->turnRight(1);
+		    camera_->turnRight(3);
 	    }
 	    if (action_flag_ & CAMERA_FORWARD) {
 		    camera_->moveForward(50);
@@ -178,13 +178,8 @@ public:
     }
 
     void render(QOpenGLFramebufferObject *fbo) {
-        /**
-         * Currently there seems to be an efficiency
-         * issue with ocean rendering. That is why I
-         * disable ocean at this point. I may refine
-         * on the ocean later.
-         * */
-        // qDebug() << "FPS:" << fps();
+
+        setContextProperty("fps", QString::number(fps()));
 
 	    do_camera_move();
 
