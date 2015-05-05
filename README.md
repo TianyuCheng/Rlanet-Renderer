@@ -9,6 +9,8 @@ Motivation
 I know a lot of people have already done a lot of work in similar projects, but I just want to give it a try and make my own planet.
 With a planet, one can do a wide range of simulation, such as evolution, or even more ambitiously, a solar system, etc. It will be a lot of fun.
 
+![Sample Image](./universalsim.jpg)
+
 Basic features
 ----------------
 
