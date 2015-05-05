@@ -50,5 +50,6 @@ Item {
 		id: playMusic
 		source: appPath+"/e922d4ffdee2345071e146039b970aea1d4c3d5c.aac"
 		autoPlay: true
+		loops: Audio.Infinite
 	}
 }
