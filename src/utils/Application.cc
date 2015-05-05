@@ -27,6 +27,8 @@ int Application::exec() {
         view.engine()->rootContext()->setContextProperty("appPath", QUrl(QString("file://%1").arg(app.applicationDirPath())));
         view.setSource(QUrl("qrc:///main.qml"));
 
+        QObject::connect(view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
+
         if (RenderThread::renderMgr) 
             RenderThread::renderMgr->setContext(view.engine()->rootContext());
 

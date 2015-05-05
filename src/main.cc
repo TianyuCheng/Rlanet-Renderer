@@ -137,18 +137,18 @@ public:
         terrain_.reset(new Terrain(64, 10, finalPass_.get()));
         ocean_.reset(new Ocean(64, 10, finalPass_.get()));
         grassFactory_.reset(new GrassFactory(terrain_.get()));
-        grass_.reset(grassFactory_->createGrass(QVector2D(0, 0), 200.0, 10.0, 20.0, 20.0));
+        // grass_.reset(grassFactory_->createGrass(QVector2D(0, 0), 200.0, 10.0, 20.0, 20.0));
 
         // Adding objects into reflection pass
         reflection_->addObject(skydome_.get());
         reflection_->addObject(terrain_.get());
-        reflection_->addObject(grass_.get());
+        // reflection_->addObject(grass_.get());
 
         // Adding objects into final pass
         finalPass_->addObject(skydome_.get());
         finalPass_->addObject(terrain_.get());
         finalPass_->addObject(ocean_.get());
-        finalPass_->addObject(grass_.get());
+        // finalPass_->addObject(grass_.get());
 
         // gOperGL settings
         glEnable(GL_DEPTH_TEST);
@@ -183,6 +183,7 @@ public:
 
 	    do_camera_move();
 
+        terrain_->underWaterCulling(QVector4D(0.0, 1.0, 0.0, 0.0));
         if (camera_->getPosition().y() >= 0) {
             // reflection
             camera_->reflectCamera(QVector4D(0.0, 1.0, 0.0, 0.0), reflectCamera_.get());
@@ -194,6 +195,7 @@ public:
         }
         reflection_->renderScene();
 
+        terrain_->disableUnderWaterCulling();
         finalPass_->useTexture(reflection_->texture());
         finalPass_->setCamera(camera_.get());
         finalPass_->renderScene(fbo);

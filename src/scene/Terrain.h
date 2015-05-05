@@ -84,6 +84,15 @@ public:
         program.setUniformValue(heightLocation, textureUnit);
     }
 
+    void disableUnderWaterCulling() {
+        underWaterCull = true;
+    }
+
+    void underWaterCulling(QVector4D plane) {
+        underWaterCull = true;
+        waterPlane = plane;
+    }
+
 private:
     
     /**
@@ -112,6 +121,9 @@ protected:
     int grid;
     int levels;
     int size;
+
+    bool underWaterCull;
+    QVector4D waterPlane;
 
     unique_ptr<QOpenGLTexture> decalmap[3];
     unique_ptr<QOpenGLTexture> heightmap;

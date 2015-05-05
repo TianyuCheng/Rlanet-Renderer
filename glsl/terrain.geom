@@ -11,6 +11,9 @@ uniform vec2 uOffset;
 uniform vec2 uScale;
 uniform float uGrid;
 
+uniform bool uUnderWaterCull;
+uniform vec4 uCullingPlane;
+
 uniform vec3 uCamera;
 uniform vec2 uRange;                // (range, morphArea)
 
@@ -62,29 +65,39 @@ vec3 computeNormal(vec2 gridPos) {
     return normalize(cross(p - py, p - px));
 }
 
-void main(void)
-{
+bool underWater(vec4 plane, vec3 p1, vec3 p2, vec3 p3) {
+    vec3 p = plane.xyz;
+    float d = p.z;
+    return (dot(p, p1) + d < 0) && (dot(p, p2) + d < 0) && (dot(p, p3) + d < 0);
+}
+
+void main(void) {
     vec3 a = gl_in[0].gl_Position.xyz;
     vec3 b = gl_in[1].gl_Position.xyz;
     vec3 c = gl_in[2].gl_Position.xyz;
     vec3 normal = cross((b - a), (c - a));
 
-    // back face culling with geometry shader
-    if (dot(normal, a) >= 0.0 && 
-        dot(normal, b) >= 0.0 &&    
-        dot(normal, c) >= 0.0) {
-        for (int i = 0; i < gl_in.length(); i++)
-        {
-            gl_Position = gl_in[i].gl_Position;
-            frag.pos = vertices[i].pos;
-            frag.view = vertices[i].view;
-            frag.normal = vertices[i].normal;
-            frag.heightUV = vertices[i].heightUV;
-            frag.texCoords = vertices[i].texCoords;
-            frag.linearZ = vertices[i].linearZ;
-            EmitVertex();
+    if (uUnderWaterCull && !underWater(uCullingPlane, a, b, c)) {
+
+        // back face culling with geometry shader
+        if (dot(normal, a) >= 0.0 && 
+            dot(normal, b) >= 0.0 &&    
+            dot(normal, c) >= 0.0) {
+            for (int i = 0; i < gl_in.length(); i++)
+            {
+                gl_Position = gl_in[i].gl_Position;
+                frag.pos = vertices[i].pos;
+                frag.view = vertices[i].view;
+                frag.normal = vertices[i].normal;
+                frag.heightUV = vertices[i].heightUV;
+                frag.texCoords = vertices[i].texCoords;
+                frag.linearZ = vertices[i].linearZ;
+                EmitVertex();
+            }
+            EndPrimitive();
         }
-        EndPrimitive();
+    
     }
+
 
 }
