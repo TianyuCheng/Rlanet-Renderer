@@ -41,6 +41,7 @@ public:
      * */
     PlanetRenderManager() : resolution(1024, 768) {
         drawMode = GL_FILL;
+        action_flag_ = 0;
     }
 
     virtual ~PlanetRenderManager() {
@@ -133,10 +134,10 @@ public:
 
         // Instantiate scene objects
         skydome_.reset(new TextureSkyDome(64, finalPass_.get()));
-        terrain_.reset(new Terrain(64, 5, finalPass_.get()));
-        ocean_.reset(new Ocean(64, 5, finalPass_.get()));
+        terrain_.reset(new Terrain(64, 10, finalPass_.get()));
+        ocean_.reset(new Ocean(64, 10, finalPass_.get()));
         grassFactory_.reset(new GrassFactory(terrain_.get()));
-        grass_.reset(grassFactory_->createGrass(QVector2D(1500, 1500), 200.0, 10.0, 20.0, 20.0));
+        grass_.reset(grassFactory_->createGrass(QVector2D(0, 0), 200.0, 10.0, 20.0, 20.0));
 
         // Adding objects into reflection pass
         reflection_->addObject(skydome_.get());

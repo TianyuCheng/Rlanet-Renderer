@@ -78,7 +78,7 @@ void main(void) {
     vec3 pos = gl_in[0].gl_Position.xyz;
     float height = pos.y;
     vec2 uv = pos.xz / 16384.0 - vec2(0.5, 0.5);
-    float posy = terrainHeight(uv);
+    float posy = terrainHeight(uv) + 50.0;
     pos = vec3(pos.x, posy, pos.z);
 
     float angle = rand(pos.zx);

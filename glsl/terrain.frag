@@ -12,6 +12,7 @@ uniform float uGrid;
 
 in fData
 {
+    vec3 pos;
     vec3 view;
     vec3 normal;
     vec2 heightUV;

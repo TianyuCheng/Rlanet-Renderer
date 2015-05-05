@@ -16,6 +16,7 @@ uniform vec2 uRange;                // (range, morphArea)
 
 in vData
 {
+    vec3 pos;
     vec3 view;
     vec3 normal;
     vec2 heightUV;
@@ -25,6 +26,7 @@ in vData
 
 out fData
 {
+    vec3 pos;
     vec3 view;
     vec3 normal;
     vec2 heightUV;
@@ -74,6 +76,7 @@ void main(void)
         for (int i = 0; i < gl_in.length(); i++)
         {
             gl_Position = gl_in[i].gl_Position;
+            frag.pos = vertices[i].pos;
             frag.view = vertices[i].view;
             frag.normal = vertices[i].normal;
             frag.heightUV = vertices[i].heightUV;
