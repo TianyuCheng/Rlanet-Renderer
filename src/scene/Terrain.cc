@@ -110,18 +110,19 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         QImage decal_dirt("../textures/decal_dirt.jpg");
         QImage decal_grass("../textures/decal_grass.jpg");
         QImage decal_snow("../textures/decal_snow.jpg");
+        QImage decal_noise("../textures/noisy_terrain.jpg");
 
         // Generate heightmap using seed
         int r = 128;
         int w  = r * 2 * M_PI;
         int h = r * M_PI;
         QImage height(w, h, QImage::Format_RGB32);
-        NoiseGenerator::SphericalHeightmap(height, r, 100);
+        NoiseGenerator::SphericalHeightmap(height, r, clock());
 
         size = 2048;        // put it here temporarily
 
         // Check whether texture are loaded
-        if (decal_dirt.isNull() || decal_grass.isNull() || decal_snow.isNull() || height.isNull()) {
+        if (decal_dirt.isNull() || decal_grass.isNull() || decal_snow.isNull() || height.isNull() || decal_noise.isNull()) {
             qDebug() << "Decal/Height map for terrain has not been found!";
             exit(-1);
         }
@@ -129,6 +130,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         decalmap[1].reset(new QOpenGLTexture(decal_dirt));
         decalmap[2].reset(new QOpenGLTexture(decal_snow));
         heightmap.reset(new QOpenGLTexture(height));
+        noisemap.reset(new QOpenGLTexture(decal_noise));
 
         decalmap[0]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         decalmap[0]->setMagnificationFilter(QOpenGLTexture::Linear);
@@ -139,11 +141,15 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         decalmap[2]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         decalmap[2]->setMagnificationFilter(QOpenGLTexture::Linear);
 
-
         heightmap->setWrapMode(QOpenGLTexture::Repeat);
         heightmap->setMinificationFilter(QOpenGLTexture::Linear);
         heightmap->setMagnificationFilter(QOpenGLTexture::Linear);
         heightmap->setWrapMode(QOpenGLTexture::Repeat);
+
+        noisemap->setWrapMode(QOpenGLTexture::Repeat);
+        noisemap->setMinificationFilter(QOpenGLTexture::Linear);
+        noisemap->setMagnificationFilter(QOpenGLTexture::Linear);
+        noisemap->setWrapMode(QOpenGLTexture::Repeat);
     }
 
     // Initialize ranges
@@ -249,15 +255,18 @@ void Terrain::uniform() {
     decalmap[0]->bind(2);
     decalmap[1]->bind(3);
     decalmap[2]->bind(4);
+    noisemap->bind(5);
 
     int heightLocation = program.uniformLocation("uHeightmap");
     int decalLocation0 = program.uniformLocation("uDecalmap0");
     int decalLocation1 = program.uniformLocation("uDecalmap1");
     int decalLocation2 = program.uniformLocation("uDecalmap2");
+    int noiseLocation = program.uniformLocation("uNoisemap");
     program.setUniformValue(heightLocation, 1);
     program.setUniformValue(decalLocation0, 2);
     program.setUniformValue(decalLocation1, 3);
     program.setUniformValue(decalLocation2, 4);
+    program.setUniformValue(noiseLocation, 5);
     program.setUniformValue("uGrid", float(grid));
 
     Camera* camera = dynamic_cast<Scene*>(parent)->getCamera();

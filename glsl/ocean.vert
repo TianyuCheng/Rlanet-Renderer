@@ -113,7 +113,7 @@ void main()
     vec4 noproj = uMVMatrix * uTransform * vec4(morphedPos, 1.0);
     /* vec4 noproj = uMVMatrix * uTransform * vec4(wrap(radius, pos), 1.0); */
     gl_Position = uPMatrix * noproj;
-    linearZ = (-noproj.z-1.0)/(5000.0-1.0);
+    linearZ = (-noproj.z-1.0)/(10000.0-1.0);
 
     /* vColor = vec4((700 + pos.y) / 1400.0, 1.0 - (700 + pos.y) / 1400.0, 0.0, 1.0); */
     vDecalTexCoord = pos.xz / 512.0;

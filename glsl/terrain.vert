@@ -17,6 +17,7 @@ uniform vec3 uCamera;
 uniform vec2 uRange;                // (range, morphArea)
 
 uniform sampler2D uHeightmap;
+uniform sampler2D uNoisemap;
 
 out vData
 {
@@ -29,6 +30,25 @@ out vData
 
 const float PI = 3.1415926;
 const float SQRT2 = 1.4142;
+
+float sampledNoise(vec2 x) {
+    return texture(uNoisemap, (x + vec2(0.5, 0.5)/256.0)).r;
+}
+
+float fbm(vec2 x) {
+    float sum = 0.0;
+
+    float lacunarity = 2.0;
+    float persistence = 0.6;
+    float frequency = 1.0;
+    float amplitude = 1.0;
+
+    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
+    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
+    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
+    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
+    return sum;
+}
 
 // Transform a xz-plane to sphere
 vec3 wrap(float radius, vec3 morphedPos) {
@@ -48,7 +68,7 @@ vec3 wrap(float radius, vec3 morphedPos) {
  */
 float terrainHeight(vec2 uv) {
     float coarse = texture(uHeightmap, uv).x * 3200.0 - 1600.0;
-    return coarse;
+    return coarse + fbm(uv) * 50.0;
 }
 
 /**
@@ -125,6 +145,6 @@ void main()
     vertex.normal = computeNormal(aVertex.xz);
     vertex.view = (uMVMatrix * vec4(morphedPos, 1.0)).xyz;
     vertex.heightUV = uv;
-    vertex.texCoords = morphedPos.xz / 512.0;
-    vertex.linearZ = (-noproj.z-1.0)/(5000.0-1.0);
+    vertex.texCoords = morphedPos.xz / 128.0;
+    vertex.linearZ = (-noproj.z-1.0)/(10000.0-1.0);
 }

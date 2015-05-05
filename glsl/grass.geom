@@ -33,7 +33,7 @@ vec4 quarternionFromAxisAndAngle(vec3 axis, float angle) {
 
 vec4 transform(vec3 pos) {
     vec4 noproj = uMVMatrix * vec4(pos, 1.0);
-    linearZ = (-noproj.z - 1.0) / (5000.0 - 1.0);
+    linearZ = (-noproj.z - 1.0) / (10000.0 - 1.0);
     return uPMatrix * noproj;
 }
 

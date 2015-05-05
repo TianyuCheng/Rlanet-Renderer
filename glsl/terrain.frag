@@ -4,6 +4,9 @@ uniform sampler2D uHeightmap;
 uniform sampler2D uDecalmap0;
 uniform sampler2D uDecalmap1;
 uniform sampler2D uDecalmap2;
+uniform sampler2D uNoisemap;
+
+uniform int  uLevel;                // for debugging purpose, consider deprecated
 
 uniform float uGrid;
 
@@ -33,21 +36,21 @@ void main()
     float height = texture(uHeightmap, frag.heightUV).x;
 
     vec3 decal;
-    if (height < 0.4) 
+    if (height < 0.5) 
         decal = texture(uDecalmap0, frag.texCoords).xyz;
-    else if (height < 0.5) 
+    else if (height < 0.6) 
         decal = mix(
                     texture(uDecalmap0, frag.texCoords).xyz,
                     texture(uDecalmap1, frag.texCoords).xyz,
-                    (height - 0.4) * 10.0
+                    (height - 0.5) * 10.0
                 );
-    else if (height < 0.7) 
-        decal = texture(uDecalmap1, frag.texCoords).xyz;
     else if (height < 0.8) 
+        decal = texture(uDecalmap1, frag.texCoords).xyz;
+    else if (height < 0.9) 
         decal = mix(
                     texture(uDecalmap1, frag.texCoords).xyz,
                     texture(uDecalmap2, frag.texCoords).xyz,
-                    (height - 0.7) * 10.0
+                    (height - 0.8) * 10.0
                 );
     else 
         decal = texture(uDecalmap2, frag.texCoords).xyz;
