@@ -10,6 +10,7 @@ I know a lot of people have already done a lot of work in similar projects, but 
 With a planet, one can do a wide range of simulation, such as evolution, or even more ambitiously, a solar system, etc. It will be a lot of fun.
 
 ![Sample Image](./universalsim.jpg)
+(credit: image from universe sim http://imgur.com/gallery/BDhnd)
 
 Basic features
 ----------------
