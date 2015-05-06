@@ -110,6 +110,25 @@ public:
         }
     }
 
+    void mouseDragStarted(int x, int y) {
+        dragStartX = x;
+        dragStartY = y;
+    }
+
+    void mouseDragging(int x, int y) {
+        int diffX = x - dragStartX;
+        int diffY = y - dragStartY;
+
+        dragStartX = x;
+        dragStartY = y;
+        
+        double angleX = 90 * diffX / (resolution.width() / 2.0);
+        camera_->turnRight(angleX);
+
+        double angleY = 90 * diffY / (resolution.height() / 2.0);
+        camera_->lookUp(angleY);
+    }
+
     void prepare() {
         int width = resolution.width();
         int height = resolution.height();
@@ -250,6 +269,10 @@ private:
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<Camera> reflectCamera_;
     uint64_t action_flag_;
+
+    // Mouse movement
+    int dragStartX;
+    int dragStartY;
 };
 
 

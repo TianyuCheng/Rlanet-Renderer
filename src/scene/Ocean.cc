@@ -2,14 +2,14 @@
 
 Ocean::Ocean(int grid, int levels, Scene *parent) : Terrain(grid, levels, parent) {
 
-    QImage decal_ocean("../textures/decal_ocean.jpg");
+    QImage ocean_displacement("../textures/ocean_vertex_displacement.jpg");
     // Check whether texture are loaded
-    if (decal_ocean.isNull()) {
+    if (ocean_displacement.isNull()) {
         qDebug() << "Decal/Height map for ocean has not been found!";
         exit(-1);
     }
 
-    decalmap[0].reset(new QOpenGLTexture(decal_ocean));
+    decalmap[0].reset(new QOpenGLTexture(ocean_displacement));
     decalmap[0]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     decalmap[0]->setMagnificationFilter(QOpenGLTexture::Linear);
 }
@@ -28,9 +28,9 @@ void Ocean::initialize() {
 }
 
 void Ocean::uniform() {
-    // decalmap[0]->bind(0);
-    // int decalLocation0 = program.uniformLocation("uDecalmap0");
-    // program.setUniformValue(decalLocation0, 0);
+    decalmap[0]->bind(1);
+    int decalLocation0 = program.uniformLocation("uVertexDisplacement");
+    program.setUniformValue(decalLocation0, 1);
 
     float elapsedTime = float(time.elapsed()) / 1e3;
     program.setUniformValue("uTime", elapsedTime);

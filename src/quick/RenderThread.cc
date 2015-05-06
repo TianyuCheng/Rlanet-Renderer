@@ -156,18 +156,42 @@ void RenderThread::setup_ui_signals(QObject* ui)
 		SLOT(camera_move(qreal, qreal, qreal)),
 		Qt::QueuedConnection); // Must be QueuedConnection
 #endif
-    // Connect for key press events
+    // Connect for key events
 	connect(ui,
 		SIGNAL(keypressed(int, int, int, QString)), // Identical name as in main.qml. Note: real->qreal
 		this,
 		SLOT(keyPressed(int, int, int, QString)),
 		Qt::QueuedConnection); // Must be QueuedConnection
 
-    // Connect for key release events
 	connect(ui,
 		SIGNAL(keyreleased(int, int, int, QString)), // Identical name as in main.qml. Note: real->qreal
 		this,
 		SLOT(keyReleased(int, int, int, QString)),
+		Qt::QueuedConnection); // Must be QueuedConnection
+
+    // Connect for mouse events
+	connect(ui,
+		SIGNAL(mouseclicked(int, int, bool, int, int)), // Identical name as in main.qml. Note: real->qreal
+		this,
+		SLOT(mouseClicked(int, int, bool, int, int)),
+		Qt::QueuedConnection); // Must be QueuedConnection
+
+	connect(ui,
+		SIGNAL(mousedragstarted(int, int)), // Identical name as in main.qml. Note: real->qreal
+		this,
+		SLOT(mouseDragStarted(int, int)),
+		Qt::QueuedConnection); // Must be QueuedConnection
+
+	connect(ui,
+		SIGNAL(mousedragfinished(int, int)), // Identical name as in main.qml. Note: real->qreal
+		this,
+		SLOT(mouseDragFinished(int, int)),
+		Qt::QueuedConnection); // Must be QueuedConnection
+
+	connect(ui,
+		SIGNAL(mousedragging(int, int)), // Identical name as in main.qml. Note: real->qreal
+		this,
+		SLOT(mouseDragging(int, int)),
 		Qt::QueuedConnection); // Must be QueuedConnection
 
 	// Note: In theory we don't need to specify Qt::QueuedConnection because
@@ -195,4 +219,20 @@ void RenderThread::keyPressed(int count, int key, int modifiers, QString text) {
 void RenderThread::keyReleased(int count, int key, int modifiers, QString text) {
     // qDebug() << "Key Released" << text;
     if (renderMgr) renderMgr->keyReleased(count, key, modifiers, text);
+}
+
+void RenderThread::mouseClicked(int buttons, int modifiers, bool wasHeld, int x, int y) {
+    if (renderMgr) renderMgr->mouseClicked(buttons, modifiers, wasHeld, x, y);
+}
+
+void RenderThread::mouseDragStarted(int x, int y) {
+    if (renderMgr) renderMgr->mouseDragStarted(x, y);
+}
+
+void RenderThread::mouseDragging(int x, int y) {
+    if (renderMgr) renderMgr->mouseDragging(x, y);
+}
+
+void RenderThread::mouseDragFinished(int x, int y) {
+    if (renderMgr) renderMgr->mouseDragFinished(x, y);
 }

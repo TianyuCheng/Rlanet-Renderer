@@ -31,6 +31,11 @@ public slots:
 #endif
     void keyPressed(int, int, int, QString);
     void keyReleased(int, int, int, QString);
+
+    void mouseClicked(int buttons, int modifiers, bool wasHeld, int x, int y);
+    void mouseDragStarted(int x, int y);
+    void mouseDragging(int x, int y);
+    void mouseDragFinished(int x, int y);
 signals:
 	void textureReady(int id, const QSize &size);
 

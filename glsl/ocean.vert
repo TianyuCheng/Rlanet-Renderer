@@ -8,6 +8,8 @@ uniform mat4 uPMatrix;
 uniform mat4 uNMatrix;
 uniform mat4 uTransform;
 
+uniform sampler2D uVertexDisplacement;
+
 uniform vec3 uCamera;
 uniform vec2 uRange;                // (range, morphArea)
 
@@ -28,6 +30,11 @@ out vData
 } vertex;
 
 const float PI = 3.1415926;
+
+float displacement(vec2 gridPos) {
+    vec2 uv = gridPos * uScale / vec2(250.0, 250.0);
+    return texture(uVertexDisplacement, uv).r;
+}
 
 float wave(vec2 pos, float amplitude, float speed, float waveLength, vec2 direction) {
     float frequency = 2.0 * PI / waveLength;
@@ -57,9 +64,9 @@ float waves(vec2 pos) {
     float amplitude, speed, waveLength;
     vec2 direction;
 
-    /* amplitude = 20.2; speed = 5.0; waveLength = 100.0; direction = vec2(1.0, 1.0); */
-    /* sum += wave(pos, amplitude, speed, waveLength, direction); */
-    /* normal += computeNormal(pos, amplitude, speed, waveLength, direction); */
+    amplitude = 40.0; speed = 5.0; waveLength = 200.0; direction = vec2(1.0, 1.0);
+    sum += wave(pos, amplitude, speed, waveLength, direction);
+    normal += computeNormal(pos, amplitude, speed, waveLength, direction);
 
     amplitude = 0.5; speed = 0.005; waveLength = 0.003; direction = vec2(0.5, 0.3);
     sum += wave(pos, amplitude, speed, waveLength, direction);
@@ -75,6 +82,7 @@ float waves(vec2 pos) {
 
     vertex.normal = normal;
     return sum;
+    // return sum + displacement(aVertex.xz) * 10.0;
 }
 
 /**

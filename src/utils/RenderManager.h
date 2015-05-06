@@ -29,6 +29,14 @@ public:
     virtual void keyPressed(int count, int key, int modifiers, QString text) = 0;
     virtual void keyReleased(int count, int key, int modifiers, QString text) = 0;
 
+    /**
+     * Please implement these methods to enable mouse controls
+     * */
+    virtual void mouseClicked(int buttons, int modifiers, bool wasHeld, int x, int y) {}
+    virtual void mouseDragStarted(int x, int y) {}
+    virtual void mouseDragging(int x, int y) {}
+    virtual void mouseDragFinished(int x, int y) {}
+
     int fps() { return _fpsVal; }
 
     void setContext(QQmlContext *c) { context = c; }

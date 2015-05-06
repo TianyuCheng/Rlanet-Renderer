@@ -29,11 +29,13 @@ void main()
     // Uniform for light will be implemented later
     vec3 lightPos = vec3(0.0, 5000.0, 0.0);
     vec3 lightAmbient = vec3(0.1, 0.1, 0.1);
-    vec3 lightDiffuse = vec3(0.8, 0.8, 0.8);
+    vec3 lightDiffuse = vec3(1.0, 1.0, 1.0);
+    vec3 lightSpecular = vec3(1.0, 1.0, 1.0);
 
     vec3 n = normalize(frag.normal);
     vec3 v = normalize(-frag.view);
     vec3 l = normalize(lightPos - frag.view);
+    vec3 h = (l + v) / 2.0;
 
     vec4 clipReflection = uPMatrix * uMVMatrix * vec4(frag.pos.x, 0.0, frag.pos.z, 1.0);
     if (uCamera.y >= 0) clipReflection.t *= -1.0;
@@ -43,8 +45,9 @@ void main()
 
     vec3 ambient = lightAmbient;
     vec3 diffuse = lightDiffuse * clamp(0.0, 1.0, max(0.0, dot(n, l)));
+    vec3 specular = lightSpecular * clamp(0.0, 1.0, pow(dot(n, h), 5.0));
 
-    vec3 color = (ambient + diffuse) * decal;
+    vec3 color = (ambient + diffuse + specular) * decal;
     frag_color = vec4(color, 0.5);
     gl_FragDepth = frag.linearZ;
 }

@@ -27,7 +27,10 @@ Item {
 		signal keyreleased(int count, int key, int modifiers, string text)
 
 		/* mouse events */
-		// signal
+		signal mouseclicked(int buttons, int modifiers, bool wasHeld, int x, int y);
+        signal mousedragstarted(int x, int y);
+        signal mousedragging(int x, int y);
+        signal mousedragfinished(int x, int y);
 
 		/*
 		 * Step 2: accept keyboard signals, and translate them to UI
@@ -50,6 +53,29 @@ Item {
 			renderer.keyreleased(event.count, event.key, event.modifiers, event.text);
 			event.accepted = true;
 		}
+        MouseArea {
+            id: mouseArea
+            anchors.fill: parent
+            drag.target: renderer
+            drag.axis: Drag.XandYAxis
+            onClicked: {
+                renderer.mouseclicked(mouse.buttons, mouse.modifiers, mouse.wasHeld, mouseX, mouseY);
+                mouse.accepted = true;
+            }
+            onPressed: {
+                renderer.mousedragstarted(mouseX, mouseY);
+                mouse.accepted = true;
+            }
+            onReleased: {
+                renderer.mousedragfinished(mouseX, mouseY);
+                mouse.accepted = true;
+            }
+            onPositionChanged: {
+                if (drag.active) {
+                    renderer.mousedragging(mouseX, mouseY);
+                }
+            }
+        }
 	}
 
 	Audio {
@@ -128,7 +154,7 @@ Item {
             id: menu_list
             width: parent.width
             height: 200
-            anchors.top: menu_caption.bottom
+            anchors.top: menu_caption.bottom; anchors.topMargin: 5
 
             // style
             radius: 10
