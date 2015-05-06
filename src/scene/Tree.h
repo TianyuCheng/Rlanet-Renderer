@@ -21,11 +21,17 @@
 
 class TreeFactory;
 
+enum TreeType { 
+    PALM = 0,
+    TREE1,
+    NUM_TREES
+};
+
 class Tree : public Billboard
 {
     friend class TreeFactory;
 public:
-    Tree(TreeFactory *factory);
+    Tree(TreeFactory *factory, TreeType treeType);
     virtual ~Tree();
 
     void uniform();
@@ -33,6 +39,7 @@ public:
 
 private:
     TreeFactory *factory;
+    TreeType treeType;
 };
 
 /**
@@ -52,11 +59,11 @@ public:
     void update() {}
     void render() {} 
 
-    Tree* createTree(QVector2D center, double radius, double spacing, double size, double height, int seed = 0);
+    Tree* createTree(TreeType treeType, QVector2D center, double radius, double spacing, double size, double height, int seed = 0);
 
 private:
-    std::unique_ptr<QOpenGLTexture> treeBlade;
-    std::unique_ptr<QOpenGLTexture> treeBladeAlpha;
+    QVector<QOpenGLTexture*> treeBlade;
+    QVector<QOpenGLTexture*> treeBladeAlpha;
     Terrain *terrain;
 };
 

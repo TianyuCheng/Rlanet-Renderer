@@ -161,20 +161,23 @@ public:
         grass_.reset(grassFactory_->createGrass(QVector2D(1000, 1000), 1000.0, 30.0, 40.0, 20.0));
 
         treeFactory_.reset(new TreeFactory(terrain_.get()));
-        tree_.reset(treeFactory_->createTree(QVector2D(2000, 2000), 1000.0, 200.0, 140.0, 200.0));
+        tree1_.reset(treeFactory_->createTree(TreeType::PALM, QVector2D(2000, 2000), 1000.0, 200.0, 140.0, 200.0));
+        tree2_.reset(treeFactory_->createTree(TreeType::TREE1, QVector2D(3100, 3100), 1000.0, 200.0, 140.0, 200.0));
 
         // Adding objects into reflection pass
         reflection_->addObject(skydome_.get());
         reflection_->addObject(terrain_.get());
         reflection_->addObject(grass_.get());
-        reflection_->addObject(tree_.get());
+        reflection_->addObject(tree1_.get());
+        reflection_->addObject(tree2_.get());
 
         // Adding objects into final pass
         finalPass_->addObject(skydome_.get());
         finalPass_->addObject(terrain_.get());
         finalPass_->addObject(ocean_.get());
         finalPass_->addObject(grass_.get());
-        finalPass_->addObject(tree_.get());
+        finalPass_->addObject(tree1_.get());
+        finalPass_->addObject(tree2_.get());
 
         // OpenGL settings
         glEnable(GL_DEPTH_TEST);
@@ -241,7 +244,8 @@ public:
         treeFactory_.reset();
 
         grass_.reset();
-        tree_.reset();
+        tree1_.reset();
+        tree2_.reset();
         
         camera_.reset();
         reflectCamera_.reset();
@@ -263,7 +267,8 @@ private:
     std::unique_ptr<GrassFactory> grassFactory_;
     std::unique_ptr<Grass> grass_;
     std::unique_ptr<TreeFactory> treeFactory_;
-    std::unique_ptr<Tree> tree_;
+    std::unique_ptr<Tree> tree1_;
+    std::unique_ptr<Tree> tree2_;
 
     // Camera
     std::unique_ptr<Camera> camera_;

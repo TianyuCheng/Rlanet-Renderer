@@ -39,12 +39,9 @@ TreeFactory::TreeFactory(Terrain *t)
     setShader(QOpenGLShader::Geometry, "../glsl/tree.geom");
     setShader(QOpenGLShader::Fragment, "../glsl/billboard.frag");
 
-    for (int i = 0; i < int(TreeType::NUM_TREES); i++) {
-        QString filename = QString("../textures/billboard/tree%1.jpg");
-        QString filenameAlpha = QString("../textures/billboard/tree_alpha%1.jpg");
-
-        QImage tree(filename.arg(QString::number(i + 1)));
-        QImage treeAlpha(filenameAlpha.arg(QString::number(i + 1)));
+    for (int i = 0; i < 2; i++) {
+        QImage tree(QString("../textures/billboard/tree") + QString::number(i + 1) + QString(".jpg"));
+        QImage treeAlpha(QString("../textures/billboard/treeAlpha") + QString::number(i + 1) + QString(".jpg"));
 
         if (tree.isNull() || treeAlpha.isNull()) {
             qDebug() << "Tree texture has not been found!";
@@ -57,7 +54,7 @@ TreeFactory::TreeFactory(Terrain *t)
         blade->setMagnificationFilter(QOpenGLTexture::Linear);
         blade->setWrapMode(QOpenGLTexture::Repeat);
 
-        QOpenGLTexture *bladeAlpha = new QOpenGLTexture(treeAlpha);
+        QOpenGLTexture *bladeAlpha[i] = new QOpenGLTexture(treeAlpha);
         bladeAlpha->setWrapMode(QOpenGLTexture::Repeat);
         bladeAlpha->setMinificationFilter(QOpenGLTexture::Linear);
         bladeAlpha->setMagnificationFilter(QOpenGLTexture::Linear);
