@@ -153,7 +153,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
     }
 
     // Initialize ranges
-    double range = 16.0;
+    double range = 64.0;
     for (int i = 0; i <= levels; i++) {
         ranges << qMakePair(range, range * 0.85);
         range *= 2.0;
