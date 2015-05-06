@@ -54,7 +54,7 @@ struct TerrainTileInfo : public TileShape<double> {
 	Coordinate init_pos() const { return init_coord; }
 	Coordinate tail_pos() const { return init_coord + shape; }
 	double get_resolution(int LODLevel) const {
-		return res/(2<<LODLevel);
+		return res/(1<<LODLevel);
 	}
 
 private:

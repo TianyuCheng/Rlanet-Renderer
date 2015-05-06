@@ -1,6 +1,7 @@
 #ifndef MACRO_TILE_H
 #define MACRO_TILE_H
 
+#include <stdio.h>
 #include "Tile.h"
 #include "TileBlitter.h"
 #include <boost/integer/static_log2.hpp> 
@@ -31,9 +32,15 @@ public:
 	typedef typename TileInfo::TileElement Element;
 	typedef typename TileInfo::Coordinate Coord;
 
-	MacroTile(const TileInfo& tileinfo, const Seed& seed)
-		:Tile<TileInfo>(tileinfo, seed), pchildren_array_(nullptr)
+	MacroTile(const TileInfo& ti, const Seed& seed)
+		:Tile<TileInfo>(ti, seed), pchildren_array_(nullptr)
 	{
+		fprintf(stderr, "Create child at (%f, %f) shape (%f, %f), resolution %f\n",
+				ti.init_coord.x,
+				ti.init_coord.y,
+				ti.shape.x,
+				ti.shape.y,
+				ti.res);
 	}
 
 	~MacroTile()
@@ -47,7 +54,7 @@ public:
 	{
 		// Sometimes C++ makes things more complicated
 		// Here you CAN'T allocate the expensive (2K bytes for nchild=16) ChildrenPointerArray direclty with new
-		pchildren_array_ = (ChildrenPointerArray*)malloc(sizeof(ChildrenPointerArray));
+		pchildren_array_ = (ChildrenPointerArray*)calloc(1, sizeof(ChildrenPointerArray));
 		// Seeds for children
 		seeds_.resize(nchild*nchild);
 		typename TileInfo::Generator generator(this->seed_);
@@ -66,8 +73,10 @@ public:
 	template<typename SecondTile, typename Splicer = TileSplicer<Element> >
 	bool blit_to(SecondTile& sectile)
 	{
+		fprintf(stderr, "%s firstres %f secres %f\n", __func__, this->get_resolution(0), sectile.get_resolution(0));
 		auto blit_cursor = create_blitter(sectile, *this);
 		do {
+			blit_cursor.tell();
 			auto iblock = blit_cursor.current_iblock();
 			auto oblock = blit_cursor.current_oblock();
 			Splicer splicer(iblock, oblock);
@@ -81,20 +90,25 @@ public:
 	{
 		Ancestors ancestors;
 		TileSetCursorPosition pos;
-		ancestors.emplace_back(this);
 		MTile* cursor = this;
 		double objres = area.get_resolution(0);
-		while (cursor->get_resolution(childlod) > objres) {
+		fprintf(stderr, "LOD %d, cursor res %f, objres %f\n", childlod, cursor->get_resolution(childlod), objres);
+		do {
 			ancestors.emplace_back(cursor);
-			auto childpos = which(area.init_pos());
+			auto childpos = cursor->which(area.init_pos());
+			fprintf(stderr, "Current MTile %p, child pos (%d, %d)\n", cursor, childpos.x, childpos.y);
 			pos.emplace_back(childpos);
-			cursor = child(childpos);
-		}
-		// TODO: LOD
+			cursor = cursor->child(childpos);
+		} while (cursor->get_resolution(childlod) > objres);
+		int leastlod = 0;
+		while (cursor->get_resolution(leastlod) > objres)
+			leastlod++;
+		fprintf(stderr, "Use LOD %d\n", leastlod);
 		if (pancestors) {
 			*pancestors = ancestors;
 		}
-		return Cursor(pos, ancestors);
+		pos.tell();
+		return Cursor(pos, ancestors, leastlod);
 	}
 
 	Vec2D<int> which(const Coord& coord)
