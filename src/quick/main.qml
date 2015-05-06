@@ -15,6 +15,7 @@ Item {
 		anchors.margins: 0
 		transform: Scale { origin.x: 0; origin.y: parent.height/2; yScale: -1}
 
+        property string fps : "0"
 		/*
 		 * Step 1: add UI signals to send.
 		 *
@@ -121,6 +122,12 @@ Item {
                     }
                 }
             }
+        }
+
+        Text {
+            id: fpsText
+            anchors.right: parent.right
+            text: "fps: "
         }
     } // end of rectangle
 

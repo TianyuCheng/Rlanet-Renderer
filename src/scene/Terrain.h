@@ -85,7 +85,7 @@ public:
     }
 
     void disableUnderWaterCulling() {
-        underWaterCull = true;
+        underWaterCull = false;
     }
 
     void underWaterCulling(QVector4D plane) {

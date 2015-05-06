@@ -77,25 +77,38 @@ void main(void) {
     vec3 c = gl_in[2].gl_Position.xyz;
     vec3 normal = cross((b - a), (c - a));
 
-    if (uUnderWaterCull && !underWater(uCullingPlane, a, b, c)) {
+    if (!uUnderWaterCull || (uUnderWaterCull && !underWater(uCullingPlane, a, b, c))) {
 
-        // back face culling with geometry shader
-        if (dot(normal, a) >= 0.0 && 
-            dot(normal, b) >= 0.0 &&    
-            dot(normal, c) >= 0.0) {
-            for (int i = 0; i < gl_in.length(); i++)
-            {
-                gl_Position = gl_in[i].gl_Position;
-                frag.pos = vertices[i].pos;
-                frag.view = vertices[i].view;
-                frag.normal = vertices[i].normal;
-                frag.heightUV = vertices[i].heightUV;
-                frag.texCoords = vertices[i].texCoords;
-                frag.linearZ = vertices[i].linearZ;
-                EmitVertex();
-            }
-            EndPrimitive();
+        for (int i = 0; i < gl_in.length(); i++)
+        {
+            gl_Position = gl_in[i].gl_Position;
+            frag.pos = vertices[i].pos;
+            frag.view = vertices[i].view;
+            frag.normal = vertices[i].normal;
+            frag.heightUV = vertices[i].heightUV;
+            frag.texCoords = vertices[i].texCoords;
+            frag.linearZ = vertices[i].linearZ;
+            EmitVertex();
         }
+        EndPrimitive();
+
+        /* // back face culling with geometry shader */
+        /* if (dot(normal, a) >= 0.0 &&  */
+        /*     dot(normal, b) >= 0.0 &&     */
+        /*     dot(normal, c) >= 0.0) { */
+        /*     for (int i = 0; i < gl_in.length(); i++) */
+        /*     { */
+        /*         gl_Position = gl_in[i].gl_Position; */
+        /*         frag.pos = vertices[i].pos; */
+        /*         frag.view = vertices[i].view; */
+        /*         frag.normal = vertices[i].normal; */
+        /*         frag.heightUV = vertices[i].heightUV; */
+        /*         frag.texCoords = vertices[i].texCoords; */
+        /*         frag.linearZ = vertices[i].linearZ; */
+        /*         EmitVertex(); */
+        /*     } */
+        /*     EndPrimitive(); */
+        /* } */
     
     }
 

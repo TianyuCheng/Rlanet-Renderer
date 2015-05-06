@@ -132,10 +132,11 @@ void main()
     float radius = 2048.0;
 
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
-    float morphK = computeMorphK(aVertex.xz, pos);
+    /* float morphK = computeMorphK(aVertex.xz, pos); */
     /* float morphK = 0.0; */
 
-    vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy;
+    /* vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy; */
+    vec3 morphedPos = pos;
     vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
     morphedPos.y = terrainHeight(uv);
 

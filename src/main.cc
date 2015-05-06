@@ -154,8 +154,8 @@ public:
 
         // Instantiate scene objects
         skydome_.reset(new TextureSkyDome(64, finalPass_.get()));
-        terrain_.reset(new Terrain(64, 10, finalPass_.get()));
-        ocean_.reset(new Ocean(64, 10, finalPass_.get()));
+        terrain_.reset(new Terrain(32, 5, finalPass_.get()));
+        ocean_.reset(new Ocean(32, 5, finalPass_.get()));
 
         grassFactory_.reset(new GrassFactory(terrain_.get()));
         grass_.reset(grassFactory_->createGrass(QVector2D(1000, 1000), 1000.0, 30.0, 40.0, 20.0));
@@ -185,10 +185,10 @@ public:
         double interval = getInterval();
 
 	    if (action_flag_ & CAMERA_LEFT) {
-		    camera_->turnLeft(3);
+		    camera_->turnLeft(1);
 	    }
 	    if (action_flag_ & CAMERA_RIGHT) {
-		    camera_->turnRight(3);
+		    camera_->turnRight(1);
 	    }
 	    if (action_flag_ & CAMERA_FORWARD) {
 		    camera_->moveForward(500 * interval);

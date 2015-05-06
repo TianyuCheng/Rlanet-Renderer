@@ -7,6 +7,7 @@ uniform mat4 uNMatrix;
 uniform mat4 uTransform;
 
 uniform sampler2D uRenderTexture;
+uniform sampler2D uVertexDisplacement;
 
 uniform float uGrid;
 uniform vec3 uCamera;
@@ -47,7 +48,7 @@ void main()
     vec3 diffuse = lightDiffuse * clamp(0.0, 1.0, max(0.0, dot(n, l)));
     vec3 specular = lightSpecular * clamp(0.0, 1.0, pow(dot(n, h), 5.0));
 
-    vec3 color = (ambient + diffuse + specular) * decal;
+    vec3 color = (ambient + diffuse + specular) * decal * 0.4;
     frag_color = vec4(color, 0.5);
     gl_FragDepth = frag.linearZ;
 }

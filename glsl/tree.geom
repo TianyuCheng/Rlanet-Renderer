@@ -40,10 +40,10 @@ vec4 transform(vec3 pos) {
 void createFace(float angle, float displacement, float height, vec3 pos) {
     vec4 q = quarternionFromAxisAndAngle(vec3(0.0, 1.0, 0.0), angle);
     
-    vec3 pt1 = vec3( 1.0, 0.0, 0.0);
-    vec3 pt2 = vec3( 1.0, 1.0, 0.0);
-    vec3 pt3 = vec3(-1.0, 0.0, 0.0);
-    vec3 pt4 = vec3(-1.0, 1.0, 0.0);
+    vec3 pt1 = vec3( 0.75, 0.0, 0.0);
+    vec3 pt2 = vec3( 0.75, 1.0, 0.0);
+    vec3 pt3 = vec3(-0.75, 0.0, 0.0);
+    vec3 pt4 = vec3(-0.75, 1.0, 0.0);
 
     vec3 tpt1 = qtransform(q, pt1) + qtransform(q, vec3(0.0, 0.0, -displacement)); tpt1.xz *= uSize; tpt1.y *= height;
     gl_Position = transform(tpt1 + pos); 

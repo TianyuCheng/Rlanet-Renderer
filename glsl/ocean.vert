@@ -39,17 +39,14 @@ float displacement(vec2 gridPos) {
 float wave(vec2 pos, float amplitude, float speed, float waveLength, vec2 direction) {
     float frequency = 2.0 * PI / waveLength;
     float phase = speed * frequency;
-    float k = 3.5;
+    float k = 5.5;
     return 2.0 * amplitude * pow(0.5 + 0.5 * sin(dot(direction, pos) * frequency + uTime * phase), k);
 }
 
-/**
- * gridPos: the global position
- */
 vec3 computeNormal(vec2 pos, float amplitude, float speed, float waveLength, vec2 direction) {
     float frequency = 2.0 * PI / waveLength;
     float phase = speed * frequency;
-    float k = 3.5;
+    float k = 5.5;
     float factor = k * amplitude * frequency 
                  * pow(0.5 + 0.5 * sin(dot(direction, pos) * frequency + uTime * phase), k - 1) 
                  * cos(dot(direction, pos) * frequency + uTime * phase);
@@ -64,25 +61,33 @@ float waves(vec2 pos) {
     float amplitude, speed, waveLength;
     vec2 direction;
 
-    amplitude = 40.0; speed = 5.0; waveLength = 200.0; direction = vec2(1.0, 1.0);
+    amplitude = 2.5; speed = 20.0; waveLength = 145.0; direction = normalize(vec2(1.5, 0.3));
     sum += wave(pos, amplitude, speed, waveLength, direction);
     normal += computeNormal(pos, amplitude, speed, waveLength, direction);
 
-    amplitude = 0.5; speed = 0.005; waveLength = 0.003; direction = vec2(0.5, 0.3);
+    amplitude = 3.2; speed = 30.0; waveLength = 150.0; direction = normalize(vec2(0.2, -0.3));
     sum += wave(pos, amplitude, speed, waveLength, direction);
     normal += computeNormal(pos, amplitude, speed, waveLength, direction);
 
-    amplitude = 0.2; speed = 0.001; waveLength = 0.008; direction = vec2(0.2, -0.3);
+    amplitude = 2.6; speed = 35.0; waveLength = 160.0; direction = normalize(vec2(-0.3, 0.7));
     sum += wave(pos, amplitude, speed, waveLength, direction);
     normal += computeNormal(pos, amplitude, speed, waveLength, direction);
 
-    amplitude = 0.6; speed = 0.003; waveLength = 0.005; direction = vec2(0.3, 0.7);
+    amplitude = 1.6; speed = 50.0; waveLength = 200.0; direction = normalize(vec2(0.9, 0.3));
+    sum += wave(pos, amplitude, speed, waveLength, direction);
+    normal += computeNormal(pos, amplitude, speed, waveLength, direction);
+
+    amplitude = 3.6; speed = 90.0; waveLength = 130.0; direction = normalize(vec2(-0.4, 0.6));
+    sum += wave(pos, amplitude, speed, waveLength, direction);
+    normal += computeNormal(pos, amplitude, speed, waveLength, direction);
+
+    amplitude = 2.1; speed = 50.0; waveLength = 170.0; direction = normalize(vec2(-0.4, 0.2));
     sum += wave(pos, amplitude, speed, waveLength, direction);
     normal += computeNormal(pos, amplitude, speed, waveLength, direction);
 
     vertex.normal = normal;
-    return sum;
-    // return sum + displacement(aVertex.xz) * 10.0;
+    /* return sum; */
+    return sum + displacement(aVertex.xz);
 }
 
 /**
@@ -120,10 +125,12 @@ void main()
     float radius = 2048.0;
 
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
-    float morphK = computeMorphK(aVertex.xz, pos);
-    vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy;
+    /* float morphK = computeMorphK(aVertex.xz, pos); */
+    /* vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy; */
+    vec3 morphedPos = pos;
     vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
-    morphedPos.y = waves(uv);
+    morphedPos.y = waves(morphedPos.xz);
+    /* morphedPos.y = waves(uv); */
     vec4 noproj = uMVMatrix * uTransform * vec4(morphedPos, 1.0);
     /* vec4 noproj = uMVMatrix * uTransform * vec4(wrap(radius, pos), 1.0); */
     gl_Position = uPMatrix * noproj;

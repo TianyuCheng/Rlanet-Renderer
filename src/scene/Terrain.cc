@@ -257,7 +257,6 @@ void Terrain::uniform() {
     decalmap[2]->bind(4);
     noisemap->bind(5);
 
-
     program.setUniformValue("uUnderWaterCull", underWaterCull);
     if (underWaterCull) program.setUniformValue("uCullPlane", waterPlane);
 
