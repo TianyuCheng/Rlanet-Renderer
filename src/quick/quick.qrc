@@ -2,4 +2,8 @@
     <qresource prefix="/">
         <file>main.qml</file>
     </qresource>
+
+    <qresource prefix="/">
+        <file>fonts/neuropol x rg.ttf</file>
+    </qresource>
 </RCC>

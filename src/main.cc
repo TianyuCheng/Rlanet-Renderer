@@ -147,14 +147,14 @@ public:
         // Adding objects into reflection pass
         reflection_->addObject(skydome_.get());
         reflection_->addObject(terrain_.get());
-        // reflection_->addObject(grass_.get());
+        reflection_->addObject(grass_.get());
         reflection_->addObject(tree_.get());
 
         // Adding objects into final pass
         finalPass_->addObject(skydome_.get());
         finalPass_->addObject(terrain_.get());
         finalPass_->addObject(ocean_.get());
-        // finalPass_->addObject(grass_.get());
+        finalPass_->addObject(grass_.get());
         finalPass_->addObject(tree_.get());
 
         // OpenGL settings
@@ -163,6 +163,8 @@ public:
 
     void do_camera_move()
     {
+        double interval = getInterval();
+
 	    if (action_flag_ & CAMERA_LEFT) {
 		    camera_->turnLeft(3);
 	    }
@@ -170,10 +172,10 @@ public:
 		    camera_->turnRight(3);
 	    }
 	    if (action_flag_ & CAMERA_FORWARD) {
-		    camera_->moveForward(50);
+		    camera_->moveForward(500 * interval);
 	    }
 	    if (action_flag_ & CAMERA_BACKWARD) {
-		    camera_->moveBackward(50);
+		    camera_->moveBackward(500 * interval);
 	    }
 	    if (action_flag_ & CAMERA_PITCH_UP) {
 		    camera_->lookUp(5);

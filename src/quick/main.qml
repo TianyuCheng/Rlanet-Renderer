@@ -38,6 +38,10 @@ Item {
 		 * Qt Quick part, without even touching C++ part.
 		 */
 		focus : true;
+        Keys.onEscapePressed: {
+            if (menu.visible == true) menu.visible = false;
+            else menu.visible = true;
+        }
 		Keys.onPressed : {
 			renderer.keypressed(event.count, event.key, event.modifiers, event.text);
 			event.accepted = true;
@@ -55,10 +59,14 @@ Item {
 		loops: Audio.Infinite
 	}
 
+    FontLoader { id: neuropolFont; source: "qrc:/fonts/neuropol x rg.ttf" }
+
     Rectangle {
         id: toolBar
-        width: parent.width; height: 30
+        width: parent.width; height: 50
         color: '#00ffffff'
+        anchors.left: renderer.left; anchors.leftMargin: 5
+        anchors.right: renderer.right; anchors.rightMargin: 5;
         anchors.bottom: renderer.bottom
 
         Button {
@@ -66,6 +74,15 @@ Item {
             text: "Quit"
             onClicked: Qt.quit()
             style: ButtonStyle {
+                label: Text {
+                    renderType: Text.NativeRendering
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    font.family: neuropolFont.name
+                    font.pointSize: 12
+                    color: "#ffffffff"
+                    text: control.text
+                }
                 background: Rectangle {
                     implicitWidth: 100
                     implicitHeight: 25
@@ -79,7 +96,96 @@ Item {
                 }
             }
         }
+    } // end of rectangle
 
-    }
+    Rectangle {
+        id: menu
+        visible: false
+        width: 400; height: 200
+        anchors { horizontalCenter: parent.horizontalCenter; verticalCenter: parent.verticalCenter }
+
+        // style
+        radius: 10
+        border.width: 2
+        border.color: "#aaffffff"
+        color: "#55eeeeee"
+
+        Rectangle {
+            id: menu_caption
+            width: parent.width; height: 40
+            radius: 10
+            Text {
+                text: "Planet Renderer"
+                width: parent.width
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.family: neuropolFont.name
+                font.pointSize: 20
+            }
+        }
+
+        Rectangle {
+            id: menu_list
+            width: parent.width
+            height: 200
+            anchors.top: menu_caption.bottom
+
+            // style
+            radius: 10
+            border.width: 0
+            border.color: "#00ffffff"
+            color: "#00ffffff"
+
+            ListModel {
+                id: menuModel
+                ListElement {
+                    name: "LOD Terrain"
+                }
+                ListElement {
+                    name: "Macro Tile"
+                }
+                ListElement {
+                    name: "Ocean Shader"
+                }
+                ListElement {
+                    name: "Biomes"
+                }
+            }
+
+            ListView {
+                model: menuModel
+                width: parent.width; height: 200
+                anchors.top: parent.top
+                anchors.fill: parent; anchors.margins: 5
+                spacing: 10
+                delegate: Button {
+                    text: name
+                    width: parent.width
+                    style: ButtonStyle {
+                        label: Text {
+                            renderType: Text.NativeRendering
+                            verticalAlignment: Text.AlignVCenter
+                            horizontalAlignment: Text.AlignHCenter
+                            font.family: neuropolFont.name
+                            font.pointSize: 12
+                            color: "#ffffffff"
+                            text: control.text
+                        }
+                        background: Rectangle {
+                            implicitWidth: 100
+                            implicitHeight: 25
+                            border.width: control.activeFocus ? 2 : 1
+                            border.color: "#ffffffff"
+                            radius: 10
+                            gradient: Gradient {
+                                GradientStop { position: 0 ; color: control.pressed ? "#55cccccc" : "#55eeeeee" }
+                                GradientStop { position: 1 ; color: control.pressed ? "#55aaaaaa" : "#55cccccc" }
+                            }
+                        }
+                    }
+                }
+            } // end of list view
+        }
+    } // end of menu
 
 }
