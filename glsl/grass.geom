@@ -79,12 +79,16 @@ void main(void) {
     float height = pos.y;
     vec2 uv = pos.xz / 16384.0 - vec2(0.5, 0.5);
     float posy = terrainHeight(uv) + 50.0;
-    pos = vec3(pos.x, posy, pos.z);
 
-    float angle = rand(pos.zx);
-    float displacement = rand(pos.xz) * 0.5;
+    // do not show grass under water
+    if (posy >= 0.0) {
+        pos = vec3(pos.x, posy, pos.z);
 
-    createFace(angle, displacement, height, pos); 
-    createFace(angle + 2.0 * PI / 3.0, displacement, height, pos); 
-    createFace(angle - 2.0 * PI / 3.0, displacement, height, pos);
+        float angle = rand(pos.zx);
+        float displacement = rand(pos.xz) * 0.5;
+
+        createFace(angle, displacement, height, pos); 
+        createFace(angle + 2.0 * PI / 3.0, displacement, height, pos); 
+        createFace(angle - 2.0 * PI / 3.0, displacement, height, pos);
+    }
 }

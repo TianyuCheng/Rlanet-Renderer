@@ -79,12 +79,15 @@ void main(void) {
     float height = pos.y;
     vec2 uv = pos.xz / 16384.0 - vec2(0.5, 0.5);
     float posy = terrainHeight(uv);
-    pos = vec3(pos.x, posy, pos.z);
 
-    float angle = rand(pos.zx);
+    // do not generate tree under water
+    if (posy >= 0.0) {
+        pos = vec3(pos.x, posy, pos.z);
+        float angle = rand(pos.zx);
 
-    createFace(angle, 0.0, height, pos); angle += PI / 4.0;
-    createFace(angle, 0.0, height, pos); angle += PI / 4.0;
-    createFace(angle, 0.0, height, pos); angle += PI / 4.0;
-    createFace(angle, 0.0, height, pos); 
+        createFace(angle, 0.0, height, pos); angle += PI / 4.0;
+        createFace(angle, 0.0, height, pos); angle += PI / 4.0;
+        createFace(angle, 0.0, height, pos); angle += PI / 4.0;
+        createFace(angle, 0.0, height, pos); 
+    }
 }
