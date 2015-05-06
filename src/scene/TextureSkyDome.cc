@@ -5,8 +5,8 @@ TextureSkyDome::TextureSkyDome(int grid, Scene *parent)
 {
     // drawMode = GL_LINE;
     // Load texture
-    // QImage decal("../textures/decal_sky.jpg");
-    QImage decal("../textures/sky_texture.jpg");
+    // QImage decal("../textures/sky/decal_sky.jpg");
+    QImage decal("../textures/sky/sky_texture.jpg");
     decalmap.reset(new QOpenGLTexture(decal));
     decalmap->setMinificationFilter(QOpenGLTexture::Linear);
     decalmap->setMagnificationFilter(QOpenGLTexture::Linear);

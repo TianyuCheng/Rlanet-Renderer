@@ -20,6 +20,9 @@ void NoiseGenerator::ConvertNoiseMapToQImage(QImage &out, int width, int height,
 void NoiseGenerator::Heightmap(QImage &out, int width, int height, int seed) {
     if (seed) NoiseGenerator::perlin.SetSeed(seed);
 
+    perlin.SetOctaveCount(6);
+    perlin.SetFrequency(1.0);
+
     noise::utils::NoiseMap noiseMap;
     noise::utils::NoiseMapBuilderSphere noiseMapBuilder;
     noiseMapBuilder.SetSourceModule (perlin);
@@ -41,6 +44,9 @@ void NoiseGenerator::SphericalHeightmap(QImage &out, int radius, int seed) {
     int height = int(radius * M_PI);
 
     if (seed) NoiseGenerator::perlin.SetSeed(seed);
+
+    perlin.SetOctaveCount(6);
+    perlin.SetFrequency(1.0);
 
     noise::utils::NoiseMap noiseMap;
     noise::utils::NoiseMapBuilderSphere noiseMapBuilder;

@@ -107,10 +107,10 @@ Terrain::Terrain(int g, int l, Scene *parent) :
 
     {
         // Load terrain texture from file
-        QImage decal_dirt("../textures/decal_dirt.jpg");
-        QImage decal_grass("../textures/decal_grass.jpg");
-        QImage decal_snow("../textures/decal_snow.jpg");
-        QImage decal_noise("../textures/noisy_terrain.jpg");
+        QImage decal_dirt("../textures/terrain/decal_dirt.jpg");
+        QImage decal_grass("../textures/terrain/decal_grass.jpg");
+        QImage decal_snow("../textures/terrain/decal_snow.jpg");
+        QImage decal_noise("../textures/terrain/noisy_terrain.jpg");
 
         // Generate heightmap using seed
         int r = 128;
