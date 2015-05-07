@@ -90,6 +90,64 @@ float waves(vec2 pos) {
     // return sum + displacement(aVertex.xz);
 }
 
+vec3 gerstnerWave(vec2 pos,float steepness, float amplitude, float speed, float waveLength, vec2 direction) {
+    float frequency = 2.0 * PI / waveLength;
+    float phase = speed * frequency;
+    float commonFactor = dot(direction, pos) * frequency + uTime * phase;
+    return vec3(
+        steepness * amplitude * direction.x * cos(commonFactor),
+        amplitude * sin(commonFactor),
+        steepness * amplitude * direction.y * cos(commonFactor)
+    );
+}
+
+vec3 computeGerstnerNormal(vec2 pos, float steepness, float amplitude, float speed, float waveLength, vec2 direction) {
+    float frequency = 2.0 * PI / waveLength;
+    float phase = speed * frequency;
+    float commonFactor = frequency * amplitude;
+    float inner = dot(direction, pos) * frequency + uTime * phase;
+    return vec3(
+        -direction.x * commonFactor * cos(inner),
+        - steepness * commonFactor * sin(inner),
+        -direction.y * commonFactor * cos(inner)
+    );
+}
+
+vec3 gerstnerWaves(vec2 pos) {
+    vec3 sum = vec3(pos.x, 0.0, pos.y);
+    vec3 normal = vec3(0.0, 1.0, 0.0);
+    float amplitude, speed, waveLength, steepness;
+    vec2 direction;
+
+    steepness = 1.3; amplitude = 2.5; speed = 20.0; waveLength = 145.0; direction = normalize(vec2(1.5, 0.3));
+    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
+    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
+
+    amplitude = 3.2; speed = 30.0; waveLength = 150.0; direction = normalize(vec2(0.2, -0.3));
+    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
+    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
+
+    amplitude = 2.6; speed = 35.0; waveLength = 160.0; direction = normalize(vec2(-0.3, 0.7));
+    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
+    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
+
+    amplitude = 1.6; speed = 50.0; waveLength = 200.0; direction = normalize(vec2(0.9, 0.3));
+    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
+    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
+
+    amplitude = 3.6; speed = 90.0; waveLength = 130.0; direction = normalize(vec2(-0.4, 0.6));
+    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
+    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
+
+    amplitude = 2.1; speed = 50.0; waveLength = 170.0; direction = normalize(vec2(-0.4, 0.2));
+    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
+    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
+
+    vertex.normal = normal;
+    return sum;
+}
+
+
 /**
  * gridPos: normalized coordinate [0,1]
  * vertex: world space position
@@ -119,7 +177,8 @@ void main()
     float morphK = computeMorphK(aVertex.xz, pos); 
     vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy;
     vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
-    morphedPos.y = waves(morphedPos.xz);
+    /* morphedPos.y = waves(morphedPos.xz); */
+    morphedPos = gerstnerWaves(morphedPos.xz);
     /* morphedPos.y = waves(uv); */
     vec4 noproj = uMVMatrix * uTransform * vec4(morphedPos, 1.0);
     /* vec4 noproj = uMVMatrix * uTransform * vec4(wrap(radius, pos), 1.0); */
