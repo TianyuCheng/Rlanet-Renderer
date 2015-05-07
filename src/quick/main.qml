@@ -127,7 +127,7 @@ Item {
         Text {
             id: fpsText
             anchors.right: parent.right
-            text: "fps: "
+            text: "fps: " + fps
         }
     } // end of rectangle
 

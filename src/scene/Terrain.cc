@@ -111,6 +111,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         QImage decal_grass("../textures/terrain/decal_grass.jpg");
         QImage decal_snow("../textures/terrain/decal_snow.jpg");
         QImage decal_noise("../textures/terrain/noisy_terrain.jpg");
+        QImage alpha_caustics("../textures/ocean/caustics.jpg");
 
         // Generate heightmap using seed
         int r = 128;
@@ -122,7 +123,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         size = 2048;        // put it here temporarily
 
         // Check whether texture are loaded
-        if (decal_dirt.isNull() || decal_grass.isNull() || decal_snow.isNull() || height.isNull() || decal_noise.isNull()) {
+        if (decal_dirt.isNull() || decal_grass.isNull() || decal_snow.isNull() || height.isNull() || decal_noise.isNull() || alpha_caustics.isNull()) {
             qDebug() << "Decal/Height map for terrain has not been found!";
             exit(-1);
         }
@@ -131,6 +132,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         decalmap[2].reset(new QOpenGLTexture(decal_snow));
         heightmap.reset(new QOpenGLTexture(height));
         noisemap.reset(new QOpenGLTexture(decal_noise));
+        waterCaustics.reset(new QOpenGLTexture(alpha_caustics));
 
         decalmap[0]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         decalmap[0]->setMagnificationFilter(QOpenGLTexture::Linear);
@@ -150,6 +152,11 @@ Terrain::Terrain(int g, int l, Scene *parent) :
         noisemap->setMinificationFilter(QOpenGLTexture::Linear);
         noisemap->setMagnificationFilter(QOpenGLTexture::Linear);
         noisemap->setWrapMode(QOpenGLTexture::Repeat);
+
+        waterCaustics->setWrapMode(QOpenGLTexture::Repeat);
+        waterCaustics->setMinificationFilter(QOpenGLTexture::Linear);
+        waterCaustics->setMagnificationFilter(QOpenGLTexture::Linear);
+        waterCaustics->setWrapMode(QOpenGLTexture::Repeat);
     }
 
     // Initialize ranges
@@ -190,6 +197,12 @@ Terrain::Terrain(int g, int l, Scene *parent) :
 Terrain::~Terrain() {
     qDeleteAll( children );  //  deletes all the values stored in "children"
     children.clear();        //  removes all items from children
+
+    for (int i = 0; i < 3; i++)
+        decalmap[i].reset();
+    heightmap.reset();
+    noisemap.reset();
+    waterCaustics.reset();
 }
 
 void Terrain::updatePatches() {
@@ -256,6 +269,7 @@ void Terrain::uniform() {
     decalmap[1]->bind(3);
     decalmap[2]->bind(4);
     noisemap->bind(5);
+    waterCaustics->bind(6);
 
     program.setUniformValue("uUnderWaterCull", underWaterCull);
     if (underWaterCull) program.setUniformValue("uCullPlane", waterPlane);
@@ -265,16 +279,21 @@ void Terrain::uniform() {
     int decalLocation1 = program.uniformLocation("uDecalmap1");
     int decalLocation2 = program.uniformLocation("uDecalmap2");
     int noiseLocation = program.uniformLocation("uNoisemap");
+    int causticsLocation = program.uniformLocation("uWaterCaustics");
     program.setUniformValue(heightLocation, 1);
     program.setUniformValue(decalLocation0, 2);
     program.setUniformValue(decalLocation1, 3);
     program.setUniformValue(decalLocation2, 4);
     program.setUniformValue(noiseLocation, 5);
+    program.setUniformValue(causticsLocation, 6);
     program.setUniformValue("uGrid", float(grid));
 
     Camera* camera = dynamic_cast<Scene*>(parent)->getCamera();
     QVector3D cameraPos = camera->getPosition();
     program.setUniformValue("uCamera", cameraPos);
+
+    float elapsedTime = float(time.elapsed()) / 1e3;
+    program.setUniformValue("uTime", elapsedTime);
 
     CHECK_GL_ERROR("after sets uniforms");
 }
@@ -288,6 +307,7 @@ void Terrain::initialize() {
     this->setShader(QOpenGLShader::Geometry, "../glsl/terrain.geom");
     this->setShader(QOpenGLShader::Fragment, "../glsl/terrain.frag");
     SceneObject::initialize();
+    time.start();
 }
 
 void Terrain::render()

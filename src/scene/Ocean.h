@@ -12,9 +12,6 @@ public:
 
     void initialize();
     void uniform();
-
-private:
-    QTime time;
 };
 
 #endif /* end of include guard: OCEAN_H */

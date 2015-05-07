@@ -128,6 +128,7 @@ protected:
     unique_ptr<QOpenGLTexture> decalmap[3];
     unique_ptr<QOpenGLTexture> heightmap;
     unique_ptr<QOpenGLTexture> noisemap;
+    unique_ptr<QOpenGLTexture> waterCaustics;
 
     // List of distances ranges for LOD <range, morph>
     QVector< QPair<double, double> > ranges;
@@ -137,6 +138,8 @@ protected:
 
     // List of patch to render
     QVector<TerrainPatch*> selectedPatches;
+
+    QTime time;
 };
 
 

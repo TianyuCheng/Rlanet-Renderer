@@ -2,7 +2,7 @@
 
 Ocean::Ocean(int grid, int levels, Scene *parent) : Terrain(grid, levels, parent) {
 
-    QImage ocean_displacement("../textures/ocean_vertex_displacement.jpg");
+    QImage ocean_displacement("../textures/ocean/vtf.jpg");
     // Check whether texture are loaded
     if (ocean_displacement.isNull()) {
         qDebug() << "Decal/Height map for ocean has not been found!";
@@ -18,13 +18,12 @@ Ocean::~Ocean() {
 }
 
 void Ocean::initialize() {
-    time.start();
-
     this->setShader(QOpenGLShader::Vertex, "../glsl/ocean.vert");
     this->setShader(QOpenGLShader::Geometry, "../glsl/ocean.geom");
     this->setShader(QOpenGLShader::Fragment, "../glsl/ocean.frag");
 
     SceneObject::initialize();
+    time.start();
 }
 
 void Ocean::uniform() {

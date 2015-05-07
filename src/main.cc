@@ -179,6 +179,8 @@ public:
         finalPass_->addObject(tree1_.get());
         finalPass_->addObject(tree2_.get());
 
+        // setContextProperty("fps", "0");
+
         // OpenGL settings
         glEnable(GL_DEPTH_TEST);
     }
@@ -210,7 +212,7 @@ public:
 
     void render(QOpenGLFramebufferObject *fbo) {
 
-        setContextProperty("fps", QString::number(fps()));
+        // setContextProperty("fps", QString::number(fps()));
 
 	    do_camera_move();
 

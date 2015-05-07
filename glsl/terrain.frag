@@ -5,10 +5,13 @@ uniform sampler2D uDecalmap0;
 uniform sampler2D uDecalmap1;
 uniform sampler2D uDecalmap2;
 uniform sampler2D uNoisemap;
+uniform sampler2D uWaterCaustics;
 
 uniform int  uLevel;                // for debugging purpose, consider deprecated
 
+uniform vec3 uCamera;
 uniform float uGrid;
+uniform float uTime;
 
 in fData
 {
@@ -59,7 +62,11 @@ void main()
     vec3 ambient = lightAmbient;
     vec3 diffuse = lightDiffuse * clamp(0.0, 1.0, max(0.0, dot(n, l)));
 
-    vec3 color = (ambient + diffuse) * decal;
+    vec3 underWaterEffects = vec3(1.0, 1.0, 1.0);
+    if (uCamera.y < 0 && frag.pos.y < 0) 
+        underWaterEffects = vec3(0.3, 0.3, 0.3) + 0.7 * texture(uWaterCaustics, frag.pos.xz / 1024.0 + uTime / 16.0).xyz;
+
+    vec3 color = (ambient + diffuse) * decal * underWaterEffects;
     frag_color = vec4(color, 1.0);
     gl_FragDepth = frag.linearZ;
 }
