@@ -77,8 +77,12 @@ float fbm(vec2 pos)
 
 void main()
 {
+    float r = 0.5 * cos(vPos.y);
+    float t = vPos.x;
+    vec2 uv = vec2(0.5, 0.5) + r * vec2(cos(t), sin(t));
+
     // No computation, fast
-    vec3 pic = texture(uDecalmap, vUV).rgb;
+    vec3 pic = texture(uDecalmap, uv).rgb;
     frag_color = vec4(pic, 1.0);
 
     /* // fBm-based sky, slow */

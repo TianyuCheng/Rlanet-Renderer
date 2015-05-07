@@ -19,7 +19,7 @@ const float PI = 3.1415926;
 vec3 hemisphere(float radius, vec2 xz, float y) {
     float theta = xz.x * 2.0 * PI;
     float phi = xz.y * 0.5 * PI;
-    vPos = vec2(phi, theta);
+    vPos = vec2(theta, phi);
 
     float rho = radius + y;
     return vec3(
