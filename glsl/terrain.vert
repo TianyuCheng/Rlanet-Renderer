@@ -107,23 +107,12 @@ vec2 morphVertex(vec2 gridPos, vec2 vertex, float morphK) {
 
 float computeMorphK(vec2 gridPos, vec3 vertex) {
     vec2 uv = vertex.xz / 16384.0 - vec2(0.5, 0.5);
-    // vertex.y = terrainHeight(uv);      // approximate
+    vertex.y = terrainHeight(uv);      // approximate
     vec3 camera = uCamera;
-    /* camera.y = 0.0; */
     float dist = distance(camera, vertex);
     float morphStart = uRange.y * 2.0;
     float morphEnd = uRange.x * 2.0 * sqrt(2.0);
     float morphLerpK = clamp((dist - morphStart) / (morphEnd-morphStart), 0.0, 1.0);
-
-    // Hack for detecting edge
-    vec2 scaledGridPos = gridPos * uGrid;
-    float x = scaledGridPos.x;
-    float y = scaledGridPos.y;
-    if (x == uGrid || y == uGrid || x == 0 || y == 0) {
-        if (morphLerpK >= 0.5) morphLerpK = 1.0;
-        else morphLerpK = 0.0;
-    }
-
     return morphLerpK;
 }
 
@@ -132,8 +121,7 @@ void main()
     float radius = 2048.0;
 
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
-    // float morphK = computeMorphK(aVertex.xz, pos);
-    float morphK = 0.0;
+    float morphK = computeMorphK(aVertex.xz, pos);
 
     vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy;
     vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);

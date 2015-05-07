@@ -212,6 +212,7 @@ public:
 
     void render(QOpenGLFramebufferObject *fbo) {
 
+        // qDebug() << fps();
         // setContextProperty("fps", QString::number(fps()));
 
 	    do_camera_move();

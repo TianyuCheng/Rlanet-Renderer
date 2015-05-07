@@ -11,8 +11,8 @@ TerrainPatch::TerrainPatch(QVector2D p, int l, QVector< QPair<double, double> > 
     // We just insert a dummy value of 1000 for height. However, we can
     // change it when we generate the heightmap by itself
     int size = ranges[level].first;
-    QVector3D min = QVector3D(p.x(), -1000.0, p.y());
-    QVector3D max = QVector3D(p.x() + size, 1000.0, p.y() + size);
+    QVector3D min = QVector3D(p.x(), -2000.0, p.y());
+    QVector3D max = QVector3D(p.x() + size, 2000.0, p.y() + size);
     bounds.setMin(min);
     bounds.setMax(max);
     bounds.updateCorners();
@@ -41,20 +41,21 @@ void TerrainPatch::selectPatches(Camera &camera, QVector3D &cameraPos, QVector<T
 
     int size = ranges[level].first;
 
-    if (level == 0 || !bounds.intersectSphere(cameraPos, ranges[level - 1].first)) {
-        // Add this node to scene
+    if (level == 0 || !bounds.intersectSphere(cameraPos, ranges[level].first)) {
         selectedPatches << this;
     }
+    else if (!bounds.intersectSphere(cameraPos, ranges[level - 1].first)) {
+        // Add this node to scene
+        // selectedPatches << this;
+        initializeChildren();
+        for (int i = 0; i < 4; i++) 
+            selectedPatches << children[i];
+    }
     else {
-        if (!bounds.intersectSphere(cameraPos, ranges[level].first)) {
-            // this patch is not even in the current range
-            selectedPatches << this;
-        }
-        else {
-            // this patch has some patches that lying in the high detailed range
-            // Partially add this patch
-            this->partiallySelectPatches(camera, cameraPos, selectedPatches);
-        }
+        initializeChildren();
+        // this patch has some patches that lying in the high detailed range
+        // Partially add this patch
+        this->partiallySelectPatches(camera, cameraPos, selectedPatches);
     }
 }
 
@@ -68,8 +69,6 @@ void TerrainPatch::initializeChildren() {
 }
 
 void TerrainPatch::partiallySelectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches) {
-    
-    initializeChildren();
 
     // try recursively adding children
     for (int i = 0; i < 4; i++) {
