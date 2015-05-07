@@ -85,7 +85,7 @@ void main(void) {
         pos = vec3(pos.x, posy, pos.z);
 
         float angle = rand(pos.zx);
-        float displacement = rand(pos.xz) * 0.5;
+        float displacement = rand(pos.xz);
 
         createFace(angle, displacement, height, pos); 
         createFace(angle + 2.0 * PI / 3.0, displacement, height, pos); 
