@@ -4,12 +4,13 @@
 #include "MacroTile.h"
 
 struct TileSetCursorPosition : public std::vector<Vec2D<int>> {
-	void tell() const
+	void tell(bool linefeed = true) const
 	{
 		fprintf(stderr, "%s: ", __func__);
 		for(const auto& iter : *this)
-			fprintf(stderr, "(%d, %d) ", iter.x, iter.y);
-		fprintf(stderr, "\n");
+			fprintf(stderr, "(%3d, %3d) ", iter.x, iter.y);
+		if (linefeed)
+			fprintf(stderr, "\n");
 	}
 
 };
@@ -25,6 +26,56 @@ inline bool operator<(const TileSetCursorPosition& lhs, const TileSetCursorPosit
 		iter2++;
 	}
 	return *iter1 < *iter2;
+}
+
+inline bool collide_le(const TileSetCursorPosition& lhs, const TileSetCursorPosition& rhs)
+{
+	if (lhs.size() != rhs.size())
+		return false;
+	size_t i = 0;
+	for(; i < lhs.size() && lhs[i] == rhs[i]; i++)
+		;
+	bool ret = collide_le(lhs[i], rhs[i]);
+	if (ret) {
+		fprintf(stderr, "COLLIDE\n");
+		lhs.tell();
+		rhs.tell();
+	}
+	return ret;
+}
+
+inline bool collide_l(const TileSetCursorPosition& lhs, const TileSetCursorPosition& rhs)
+{
+	if (lhs.size() != rhs.size())
+		return false;
+	size_t i = 0;
+	for(; i < lhs.size() && lhs[i] == rhs[i]; i++)
+		;
+	bool ret = collide_l(lhs[i], rhs[i]);
+	if (ret) {
+		fprintf(stderr, "COLLIDE\n");
+		lhs.tell();
+		rhs.tell();
+	}
+	return ret;
+}
+
+
+inline bool operator<=(const TileSetCursorPosition& lhs, const TileSetCursorPosition& rhs)
+{
+	if (lhs.size() != rhs.size())
+		return false;
+#if TILE_DEBUG
+	fprintf(stderr, "Comparing "); lhs.tell(false); fprintf(stderr, "\tand\t"); rhs.tell();
+#endif
+	size_t i = 0;
+	for(; i < lhs.size() && lhs[i] == rhs[i]; i++)
+		;
+#if TILE_DEBUG
+	fprintf(stderr, "\tNeed to Compare (%d, %d) and (%d, %d)\n", lhs[i].x, lhs[i].y,
+			rhs[i].x, rhs[i].y);
+#endif
+	return lhs[i] < rhs[i];
 }
 
 template<typename TileInfo, int nchild>
@@ -73,22 +124,31 @@ struct TileHierarchyCursor {
 	{
 		Vec2D<int> dvec(dx, dy);
 		ssize_t iter = now.size() - 1;
+#if TILE_DEBUG
+		fprintf(stderr, "%s before move (%d, %d): ", __func__, dx, dy); this->now.tell();
+#endif
 
 		do {
 			bool ret = false;
 			now[iter] += dvec; // Move cursor at current tile level
 			if (!now[iter].wrap(nchild, nchild))
 				ret = true; // No need to move higher level cursor
-			now.tell();
 			iter--;
 			if (iter > 0) {
 				// Maintain ancestors
 				ancestors[iter + 1] = ancestors[iter]->child(now[iter+1]);
 			}
-			if (ret) // Return if done
+			if (ret) { // Return if done
+#if TILE_DEBUG
+				fprintf(stderr, "\t after move: "); this->now.tell();
+#endif
 				return ret;
+			}
 			// Otherwise proceed to higher level
-		} while (iter > 0);
+		} while (iter >= 0);
+#if TILE_DEBUG
+		fprintf(stderr, "\t [OOB!] after move: "); this->now.tell();
+#endif
 		// OOB apparently
 		return false;
 	}
@@ -117,13 +177,13 @@ public:
 		mins(_mins), maxs(_maxs),
 		write_pos_(0,0), sectile(_sect)
 	{
-		fprintf(stderr, "%s %p, pixels (%d, %d)\n", __func__, this,
+		fprintf(stderr, "%s %p, pixels (%lu, %lu)\n", __func__, this,
 				_sect.get_shape_info().nline(),
 				_sect.get_shape_info().nelement()/_sect.get_shape_info().nline()
 				);
-		mins.tell();
-		maxs.tell();
-		this->now.tell();
+		fprintf(stderr, "\tmaxs\t"); maxs.tell();
+		fprintf(stderr, "\tmins\t"); mins.tell();
+		fprintf(stderr, "\tnow\t"); this->now.tell();
 	}
 
 	TileSetCursorPosition mins, maxs; // Bounds, used by CR LF and successor
@@ -131,18 +191,22 @@ public:
 
 	bool oob() const
 	{
+#if 1 //TILE_DEBUG
 		fprintf(stderr, "Checkint OOB %p\n", this);
 		fprintf(stderr, "\tmaxs\t"); maxs.tell();
 		fprintf(stderr, "\tmins\t"); mins.tell();
 		fprintf(stderr, "\tnow\t"); this->now.tell();
-		if (maxs < this->now || this->now < mins)
+#endif
+		if (collide_le(maxs, this->now) || collide_l(this->now, mins)) {
+			fprintf(stderr, "\n\t OOB at "); this->now.tell();
 			return true;
+		}
 		return false;
 	}
 
-	void tell()
+	void tell(bool linefeed = true)
 	{
-		fprintf(stderr, "BlitterFromMTile current: \n"); this->now.tell();
+		fprintf(stderr, "BlitterFromMTile current: "); this->now.tell(linefeed);
 	}
 	/*
  	 * Time to learn the original meaning of these two words
@@ -156,12 +220,15 @@ public:
 		for(size_t i = 0; i < mins.size(); i++) {
 			this->now[i].y = mins[i].y;
 		}
+		fprintf(stderr, "%s to: ",__func__); this->now.tell();
 		write_pos_.y = 0;
 	}
 
 	bool line_feed()
 	{
+#if TILE_DEBUG
 		fprintf(stderr, "%s\n", __func__);
+#endif
 		bool ret = this->down();
 		write_pos_.x++;
 		return !oob() && ret;
@@ -181,9 +248,11 @@ public:
 		SourceTile *now = this->current_tile();
 		Coord min, max;
 		get_blitting_region(min, max);
+#if TILE_DEBUG
 		fprintf(stderr, "iblock (%f, %f) - (%f, %f)\n",
 				min.x, min.y,
 				max.x, max.y);
+#endif
 		return now->get_ioblock(min, max, 0);
 	}
 
@@ -191,15 +260,19 @@ public:
 	{
 		Coord min, max;
 		get_blitting_region(min, max);
+#if TILE_DEBUG
 		fprintf(stderr, "oblock (%f, %f) - (%f, %f)\n",
 				min.x, min.y,
 				max.x, max.y);
+#endif
 		return sectile.get_ioblock(min, max, 0);
 	}
 
 	bool next()
 	{
+#if TILE_DEBUG_
 		fprintf(stderr, "Tile pos (%d, %d)\n", write_pos_.x, write_pos_.y);
+#endif
 		this->right(); // Move one step right
 		if (!oob())
 			return true;

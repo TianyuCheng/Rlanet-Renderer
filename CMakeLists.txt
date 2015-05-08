@@ -76,8 +76,9 @@ target_link_libraries(PlanetRenderer PlanetEssential ${OPENGL_LIBRARIES} ${OPENG
 
 # Test cases
 add_executable(test_tile src/test/test_tile.cc)
+AUX_SOURCE_DIRECTORY(src/test/ PLANET_TEST_CASES)
 
 # Generate cscope.files
-set(ALL_SRC ${SRC} ${PLANET_HDRS} ${PLANET_UTIL_SRCS} ${PLANET_SCENE_SRCS})
+set(ALL_SRC ${SRC} ${PLANET_HDRS} ${PLANET_UTIL_SRCS} ${PLANET_SCENE_SRCS} ${PLANET_TEST_CASES})
 string(REPLACE ";" "\n" ALL_SRC "${ALL_SRC}")
 file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/cscope.files "${ALL_SRC}")

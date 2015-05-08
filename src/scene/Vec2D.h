@@ -25,11 +25,11 @@ struct Vec2D {
 	bool wrap(T maxx, T maxy) // Return true if need wrap x to [0, maxx) (similar to y)
 	{
 		bool ret = false;
-		while (x > maxx) {
+		while (x >= maxx) {
 			x -= maxx;
 			ret = true;
 		}
-		while (y > maxy) {
+		while (y >= maxy) {
 			y -= maxy;
 			ret = true;
 		}
@@ -67,19 +67,43 @@ struct Vec2D {
 template<typename T>
 inline bool operator < (const Vec2D<T>& lhs, const Vec2D<T>& rhs)
 {
+	return lhs.x < rhs.x || (lhs.x == rhs.x && lhs.y < rhs.y);
+}
+
+template<typename T>
+inline bool operator <= (const Vec2D<T>& lhs, const Vec2D<T>& rhs)
+{
+	return lhs.x <= rhs.x || (lhs.x == rhs.x && lhs.y <= rhs.y);
+}
+
+template<typename T>
+inline bool collide_le(const Vec2D<T>& lhs, const Vec2D<T>& rhs)
+{
+	return lhs.x <= rhs.x || lhs.y <= rhs.y;
+}
+
+template<typename T>
+inline bool collide_l(const Vec2D<T>& lhs, const Vec2D<T>& rhs)
+{
 	return lhs.x < rhs.x || lhs.y < rhs.y;
 }
 
 template<typename T>
 inline bool operator > (const Vec2D<T>& lhs, const Vec2D<T>& rhs)
 {
-	return lhs.x > rhs.x || lhs.y > rhs.y;
+	return lhs.x > rhs.x || (lhs.x == rhs.x && lhs.y > rhs.y);
 }
 
 template<typename T>
 inline bool operator != (const Vec2D<T>& lhs, const Vec2D<T>& rhs)
 {
 	return lhs.x != rhs.x || lhs.y != rhs.y;
+}
+
+template<typename T>
+inline bool operator == (const Vec2D<T>& lhs, const Vec2D<T>& rhs)
+{
+	return lhs.x == rhs.x && lhs.y == rhs.y;
 }
 
 template<typename T, typename Scalar>

@@ -5,6 +5,8 @@
 #include <vector>
 #include <functional>
 
+#define TILE_DEBUG 0
+
 #include "Vec2D.h"
 #include "TileIO.h"
 #include "TileInfo.h"

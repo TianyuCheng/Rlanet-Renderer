@@ -16,7 +16,7 @@ int main()
 	TileShape<double> target;
 	target.init_coord = Vec2D<double>(1e6, 1e6);
 	target.shape = Vec2D<double>(1e6, 1e6);
-	target.res = 1e5;
+	target.res = 1e3;
 	fprintf(stderr, "Target res %f\n", target.res);
 	TerrainTileInfo query(target);
 	fprintf(stderr, "Query res %f\n", query.get_resolution(0));

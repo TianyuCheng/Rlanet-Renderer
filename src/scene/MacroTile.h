@@ -35,7 +35,7 @@ public:
 	MacroTile(const TileInfo& ti, const Seed& seed)
 		:Tile<TileInfo>(ti, seed), pchildren_array_(nullptr)
 	{
-		fprintf(stderr, "Create child at (%f, %f) shape (%f, %f), resolution %f\n",
+		fprintf(stderr, "Create MacroTile at (%f, %f) shape (%f, %f), resolution %f\n",
 				ti.init_coord.x,
 				ti.init_coord.y,
 				ti.shape.x,
@@ -76,7 +76,15 @@ public:
 		fprintf(stderr, "%s firstres %f secres %f\n", __func__, this->get_resolution(0), sectile.get_resolution(0));
 		auto blit_cursor = create_blitter(sectile, *this);
 		do {
+#if TILE_DEBUG
 			blit_cursor.tell();
+#endif
+#if 0
+			blit_cursor.tell(false);
+			fprintf(stderr, "\r");
+#else
+			blit_cursor.tell(true);
+#endif
 			auto iblock = blit_cursor.current_iblock();
 			auto oblock = blit_cursor.current_oblock();
 			Splicer splicer(iblock, oblock);
@@ -92,22 +100,27 @@ public:
 		TileSetCursorPosition pos;
 		MTile* cursor = this;
 		double objres = area.get_resolution(0);
-		fprintf(stderr, "LOD %d, cursor res %f, objres %f\n", childlod, cursor->get_resolution(childlod), objres);
+#if TILE_DEBUG
+		fprintf(stderr, "LOD %d, cursor res %f, objres %f\n", childlod, cursor->get_resolution(0), objres);
+#endif
 		do {
 			ancestors.emplace_back(cursor);
 			auto childpos = cursor->which(area.init_pos());
+#if TILE_DEBUG
 			fprintf(stderr, "Current MTile %p, child pos (%d, %d)\n", cursor, childpos.x, childpos.y);
+#endif
 			pos.emplace_back(childpos);
 			cursor = cursor->child(childpos);
-		} while (cursor->get_resolution(childlod) > objres);
-		int leastlod = 0;
+		} while (cursor->get_resolution(0) > objres);
+		int leastlod = childlod;
 		while (cursor->get_resolution(leastlod) > objres)
-			leastlod++;
-		fprintf(stderr, "Use LOD %d\n", leastlod);
+			leastlod--;
+#if TILE_DEBUG
+		fprintf(stderr, "Use LOD %d, resolution %f\n", leastlod, cursor->get_resolution(leastlod));
+#endif
 		if (pancestors) {
 			*pancestors = ancestors;
 		}
-		pos.tell();
 		return Cursor(pos, ancestors, leastlod);
 	}
 
