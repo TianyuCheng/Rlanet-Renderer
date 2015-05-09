@@ -88,80 +88,32 @@ Item {
 
     FontLoader { id: neuropolFont; source: "qrc:/fonts/neuropol x rg.ttf" }
 
-    Rectangle {
-        id: toolBar
-        width: parent.width; height: 50
-        color: '#00ffffff'
-        anchors.left: renderer.left; anchors.leftMargin: 5
-        anchors.right: renderer.right; anchors.rightMargin: 5;
-        anchors.bottom: renderer.bottom
-
-        Button {
+    Bar {
+        id: toolbar
+        RoundButton {
             anchors { left: parent.left; verticalCenter: parent.verticalCenter }
             text: "Quit"
             onClicked: Qt.quit()
-            style: ButtonStyle {
-                label: Text {
-                    renderType: Text.NativeRendering
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    font.family: neuropolFont.name
-                    font.pointSize: 12
-                    color: "#ffffffff"
-                    text: control.text
-                }
-                background: Rectangle {
-                    implicitWidth: 100
-                    implicitHeight: 25
-                    border.width: control.activeFocus ? 2 : 1
-                    border.color: "#ffffffff"
-                    radius: 10
-                    gradient: Gradient {
-                        GradientStop { position: 0 ; color: control.pressed ? "#55cccccc" : "#55eeeeee" }
-                        GradientStop { position: 1 ; color: control.pressed ? "#55aaaaaa" : "#55cccccc" }
-                    }
-                }
-            }
         }
 
-        Text {
-            id: fpsText
-            anchors.right: parent.right
-            text: "fps: " + fps
-        }
-    } // end of rectangle
-
-    Rectangle {
+        // Text {
+        //     id: fpsText
+        //     anchors.right: parent.right
+        //     text: "fps: " + fps
+        // }
+    }
+    
+    Popup {
         id: menu
         visible: false
         width: 400; height: 200
         anchors { horizontalCenter: parent.horizontalCenter; verticalCenter: parent.verticalCenter }
 
-        // style
-        radius: 10
-        border.width: 2
-        border.color: "#aaffffff"
-        color: "#55eeeeee"
-
-        Rectangle {
-            id: menu_caption
-            width: parent.width; height: 40
-            radius: 10
-            Text {
-                text: "Planet Renderer"
-                width: parent.width
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                font.family: neuropolFont.name
-                font.pointSize: 20
-            }
-        }
-
         Rectangle {
             id: menu_list
             width: parent.width
             height: 200
-            anchors.top: menu_caption.bottom; anchors.topMargin: 5
+            anchors.top: parent.top; anchors.topMargin: 45
 
             // style
             radius: 10
@@ -171,18 +123,10 @@ Item {
 
             ListModel {
                 id: menuModel
-                ListElement {
-                    name: "LOD Terrain"
-                }
-                ListElement {
-                    name: "Macro Tile"
-                }
-                ListElement {
-                    name: "Ocean Shader"
-                }
-                ListElement {
-                    name: "Biomes"
-                }
+                ListElement { name: "LOD Terrain" }
+                ListElement { name: "Macro Tile" }
+                ListElement { name: "Ocean Shader" }
+                ListElement { name: "Biomes" }
             }
 
             ListView {
@@ -191,34 +135,13 @@ Item {
                 anchors.top: parent.top
                 anchors.fill: parent; anchors.margins: 5
                 spacing: 10
-                delegate: Button {
+                delegate: RoundButton {
                     text: name
                     width: parent.width
-                    style: ButtonStyle {
-                        label: Text {
-                            renderType: Text.NativeRendering
-                            verticalAlignment: Text.AlignVCenter
-                            horizontalAlignment: Text.AlignHCenter
-                            font.family: neuropolFont.name
-                            font.pointSize: 12
-                            color: "#ffffffff"
-                            text: control.text
-                        }
-                        background: Rectangle {
-                            implicitWidth: 100
-                            implicitHeight: 25
-                            border.width: control.activeFocus ? 2 : 1
-                            border.color: "#ffffffff"
-                            radius: 10
-                            gradient: Gradient {
-                                GradientStop { position: 0 ; color: control.pressed ? "#55cccccc" : "#55eeeeee" }
-                                GradientStop { position: 1 ; color: control.pressed ? "#55aaaaaa" : "#55cccccc" }
-                            }
-                        }
-                    }
                 }
             } // end of list view
         }
-    } // end of menu
+
+    }
 
 }

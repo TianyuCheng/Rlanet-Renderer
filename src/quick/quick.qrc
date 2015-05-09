@@ -4,6 +4,18 @@
     </qresource>
 
     <qresource prefix="/">
+        <file>RoundButton.qml</file>
+    </qresource>
+
+    <qresource prefix="/">
+        <file>Bar.qml</file>
+    </qresource>
+
+    <qresource prefix="/">
+        <file>Popup.qml</file>
+    </qresource>
+
+    <qresource prefix="/">
         <file>fonts/neuropol x rg.ttf</file>
     </qresource>
 </RCC>
