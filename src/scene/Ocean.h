@@ -4,8 +4,7 @@
 #include <QTime>
 #include <Terrain.h>
 
-class Ocean : public Terrain
-{
+class Ocean : public Terrain {
 public:
     Ocean (int grid, int levels, Scene *parent);
     virtual ~Ocean ();

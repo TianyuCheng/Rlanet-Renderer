@@ -138,6 +138,9 @@ protected:
 	QVector<TerrainPatch*> selectedPatches;
 
 	QTime time;
+private:
+	void init_gl_resource();
+	void init_vert();
 };
 
 

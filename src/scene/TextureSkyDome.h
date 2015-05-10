@@ -10,8 +10,7 @@
 
 using std::unique_ptr;
 
-class TextureSkyDome : public SceneObject
-{
+class TextureSkyDome : public SceneObject {
 public:
     TextureSkyDome(int grid, Scene *scene);
 

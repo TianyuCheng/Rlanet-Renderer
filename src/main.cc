@@ -9,8 +9,7 @@
 #include <Grass.h>
 #include <Tree.h>
 
-class PlanetRenderManager : public RenderManager
-{
+class PlanetRenderManager : public RenderManager {
 	enum ACTION_BIT {
 		_CAMERA_LEFT_BIT = 0,
 		_CAMERA_RIGHT_BIT,

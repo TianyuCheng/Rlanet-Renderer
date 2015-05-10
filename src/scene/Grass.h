@@ -21,8 +21,7 @@
 
 class GrassFactory;
 
-class Grass : public Billboard
-{
+class Grass : public Billboard {
 	friend class GrassFactory;
 public:
 	Grass(GrassFactory *factory);
