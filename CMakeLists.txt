@@ -57,6 +57,12 @@ qt5_add_resources(RESOURCES src/quick/quick.qrc)
 file(GLOB PLANET_HDRS
     src/scene/*.h
 )
+file(GLOB QUICK_HDRS
+    src/quick/*.h
+)
+file(GLOB UTIL_HDRS
+    src/utils/*.h
+)
 AUX_SOURCE_DIRECTORY(src/scene/ PLANET_SCENE_SRCS)
 AUX_SOURCE_DIRECTORY(src/quick/ PLANET_QUICK_SRCS)
 AUX_SOURCE_DIRECTORY(src/utils/ PLANET_QUICK_SRCS)
@@ -79,6 +85,7 @@ add_executable(test_tile src/test/test_tile.cc)
 AUX_SOURCE_DIRECTORY(src/test/ PLANET_TEST_CASES)
 
 # Generate cscope.files
-set(ALL_SRC ${SRC} ${PLANET_HDRS} ${PLANET_UTIL_SRCS} ${PLANET_SCENE_SRCS} ${PLANET_TEST_CASES})
+set(ALL_SRC ${SRC} ${PLANET_HDRS} ${PLANET_QUICK_SRCS} ${PLANET_SCENE_SRCS}
+	${PLANET_TEST_CASES} ${QUICK_HDRS} ${UTIL_HDRS})
 string(REPLACE ";" "\n" ALL_SRC "${ALL_SRC}")
 file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/cscope.files "${ALL_SRC}")
