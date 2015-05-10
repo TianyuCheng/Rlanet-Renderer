@@ -26,16 +26,6 @@ public slots:
 	/*
  	 * Step 3: a slot to handle cameramove singal from the UI
 	 */
-#if 0
-	void camera_move(qreal dx, qreal dy, qreal dz);
-#endif
-	void keyPressed(int, int, int, QString);
-	void keyReleased(int, int, int, QString);
-
-	void mouseClicked(int buttons, int modifiers, bool wasHeld, int x, int y);
-	void mouseDragStarted(int x, int y);
-	void mouseDragging(int x, int y);
-	void mouseDragFinished(int x, int y);
 signals:
 	void textureReady(int id, const QSize &size);
 

@@ -49,6 +49,9 @@ bool RenderThread::init_context(QOpenGLContext* parent_ctx)
 	ctx_->moveToThread(this);
 	qDebug("Move ctx %p to thread %p\n", ctx_.get(), this);
 
+	if (renderMgr)
+		renderMgr->moveToThread(this);
+
 	return true;
 }
 
@@ -158,39 +161,39 @@ void RenderThread::setup_ui_signals(QObject* ui)
 #endif
 	// Connect for key events
 	connect(ui,
-		SIGNAL(keypressed(int, int, int, QString)), // Identical name as in main.qml. Note: real->qreal
-		this,
+		SIGNAL(keypressed(int, int, int, QString)),
+		renderMgr,
 		SLOT(keyPressed(int, int, int, QString)),
 		Qt::QueuedConnection); // Must be QueuedConnection
 
 	connect(ui,
-		SIGNAL(keyreleased(int, int, int, QString)), // Identical name as in main.qml. Note: real->qreal
-		this,
+		SIGNAL(keyreleased(int, int, int, QString)),
+		renderMgr,
 		SLOT(keyReleased(int, int, int, QString)),
-		Qt::QueuedConnection); // Must be QueuedConnection
+		Qt::QueuedConnection);
 
 	// Connect for mouse events
 	connect(ui,
-		SIGNAL(mouseclicked(int, int, bool, int, int)), // Identical name as in main.qml. Note: real->qreal
-		this,
+		SIGNAL(mouseclicked(int, int, bool, int, int)),
+		renderMgr,
 		SLOT(mouseClicked(int, int, bool, int, int)),
-		Qt::QueuedConnection); // Must be QueuedConnection
+		Qt::QueuedConnection);
 
 	connect(ui,
-		SIGNAL(mousedragstarted(int, int)), // Identical name as in main.qml. Note: real->qreal
-		this,
+		SIGNAL(mousedragstarted(int, int)),
+		renderMgr,
 		SLOT(mouseDragStarted(int, int)),
-		Qt::QueuedConnection); // Must be QueuedConnection
+		Qt::QueuedConnection);
 
 	connect(ui,
-		SIGNAL(mousedragfinished(int, int)), // Identical name as in main.qml. Note: real->qreal
-		this,
+		SIGNAL(mousedragfinished(int, int)),
+		renderMgr,
 		SLOT(mouseDragFinished(int, int)),
 		Qt::QueuedConnection); // Must be QueuedConnection
 
 	connect(ui,
-		SIGNAL(mousedragging(int, int)), // Identical name as in main.qml. Note: real->qreal
-		this,
+		SIGNAL(mousedragging(int, int)),
+		renderMgr,
 		SLOT(mouseDragging(int, int)),
 		Qt::QueuedConnection); // Must be QueuedConnection
 
@@ -210,29 +213,3 @@ void RenderThread::camera_move(qreal dx, qreal dy, qreal dz)
 	scene_->getCamera()->move(QVector3D(dx, dy, dz));
 }
 #endif
-
-void RenderThread::keyPressed(int count, int key, int modifiers, QString text) {
-	// qDebug() << "Key Pressed" << text;
-	if (renderMgr) renderMgr->keyPressed(count, key, modifiers, text);
-}
-
-void RenderThread::keyReleased(int count, int key, int modifiers, QString text) {
-	// qDebug() << "Key Released" << text;
-	if (renderMgr) renderMgr->keyReleased(count, key, modifiers, text);
-}
-
-void RenderThread::mouseClicked(int buttons, int modifiers, bool wasHeld, int x, int y) {
-	if (renderMgr) renderMgr->mouseClicked(buttons, modifiers, wasHeld, x, y);
-}
-
-void RenderThread::mouseDragStarted(int x, int y) {
-	if (renderMgr) renderMgr->mouseDragStarted(x, y);
-}
-
-void RenderThread::mouseDragging(int x, int y) {
-	if (renderMgr) renderMgr->mouseDragging(x, y);
-}
-
-void RenderThread::mouseDragFinished(int x, int y) {
-	if (renderMgr) renderMgr->mouseDragFinished(x, y);
-}

@@ -21,7 +21,7 @@ class PlanetRenderManager : public RenderManager
 	};
 #define DEFINE_ACTION(A)	A = (1 << _##A##_BIT),
 
-	enum  : uint64_t {
+	enum : uint64_t {
 		DEFINE_ACTION(CAMERA_LEFT)
 			DEFINE_ACTION(CAMERA_RIGHT)
 			DEFINE_ACTION(CAMERA_FORWARD)
@@ -305,9 +305,7 @@ int main(int argc, char *argv[])
 
 	Application app("PlanetRenderer", argc, argv);
 
-#if 0
 	app.registerRenderManager(new PlanetRenderManager());
-#endif
 
 	return app.exec();
 }

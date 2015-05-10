@@ -24,6 +24,7 @@ public:
 	virtual void render(QOpenGLFramebufferObject *) = 0;
 	virtual void shutdown()  = 0;
 
+public slots:
 	/**
 	 * Please implement these methods to enable key controls
 	 * */
@@ -38,6 +39,7 @@ public:
 	virtual void mouseDragging(int x, int y) {}
 	virtual void mouseDragFinished(int x, int y) {}
 
+public:
 	int fps() { return _fpsVal; }
 
 	void setContext(QQmlContext *c) { context = c; }
