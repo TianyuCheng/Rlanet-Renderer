@@ -29,13 +29,13 @@ public slots:
 #if 0
 	void camera_move(qreal dx, qreal dy, qreal dz);
 #endif
-    void keyPressed(int, int, int, QString);
-    void keyReleased(int, int, int, QString);
+	void keyPressed(int, int, int, QString);
+	void keyReleased(int, int, int, QString);
 
-    void mouseClicked(int buttons, int modifiers, bool wasHeld, int x, int y);
-    void mouseDragStarted(int x, int y);
-    void mouseDragging(int x, int y);
-    void mouseDragFinished(int x, int y);
+	void mouseClicked(int buttons, int modifiers, bool wasHeld, int x, int y);
+	void mouseDragStarted(int x, int y);
+	void mouseDragging(int x, int y);
+	void mouseDragFinished(int x, int y);
 signals:
 	void textureReady(int id, const QSize &size);
 
@@ -52,7 +52,7 @@ public:
 	QOpenGLContext* context() const { return ctx_.get(); }
 
 public:
-    static RenderManager *renderMgr;
+	static RenderManager *renderMgr;
 	void setup_ui_signals(QObject*);
 
 private:
