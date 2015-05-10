@@ -1,7 +1,6 @@
 #ifndef BILLBOARD_H
 #define BILLBOARD_H
 
-
 #include <cmath>
 #include <ctime>
 #include <cstdlib>
@@ -20,19 +19,18 @@
 
 class BillboardFactory;
 
-class Billboard : public SceneObject
-{
+class Billboard : public SceneObject {
 public:
-    Billboard(BillboardFactory *factory);
-    virtual ~Billboard();
+	Billboard(BillboardFactory *factory);
+	virtual ~Billboard();
 
-    void setSize(double s) { size = s; }
-    void placeBillboard(QVector2D coordinate, double height);
+	void setSize(double s) { size = s; }
+	void placeBillboard(QVector2D coordinate, double height);
 
-    void render();
+	void render();
 
 protected:
-    double size;
+	double size;
 };
 
 /**
@@ -40,19 +38,22 @@ protected:
  * yet it does so only because it needs to reuse the 
  * shader methods in SceneObject
  * */
-class BillboardFactory : protected SceneObject
-{
-    friend class Billboard;
+class BillboardFactory : protected SceneObject {
+	friend class Billboard;
 public:
-    BillboardFactory(QString name);
-    virtual ~BillboardFactory();
+	BillboardFactory(QString name);
+	virtual ~BillboardFactory();
 
-    /* dummy functions that we do not use */
-    void uniform() {}
-    void update() {}
-    void render() {} 
+	/* void the render procedure */
+	void render() {} 
 
-    void createBillboard(Billboard *board, QVector2D center, double radius, double spacing, double size, double height, int seed = 0);
+	void createBillboard(Billboard *board,
+			QVector2D center,
+			double radius,
+			double spacing,
+			double size,
+			double height,
+			int seed = 0);
 };
 
 #endif /* end of include guard: BILLBOARD_H */

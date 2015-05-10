@@ -20,39 +20,38 @@ using std::unique_ptr;
 
 class Terrain;
 
-class TerrainPatch
-{
-    friend class Terrain;
+class TerrainPatch {
+	friend class Terrain;
 public:
-    TerrainPatch(QVector2D pos, int level, QVector< QPair<double, double> > *ranges);
-    virtual ~TerrainPatch ();
+	TerrainPatch(QVector2D pos, int level, QVector< QPair<double, double> > *ranges);
+	virtual ~TerrainPatch ();
 
-    void selectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches);
-
-protected:
-    void partiallySelectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches);
-    void initializeChildren();
+	void selectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches);
 
 protected:
-    QVector2D pos;     // the position of pos of patch
-    int level;
-    BoundingBox bounds;
+	void partiallySelectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches);
+	void initializeChildren();
 
-    // Quad-Tree like structure
-    /**
-     * Indexing by quadrant
-     * +---------+---------+
-     * |         |         |
-     * |   p2    |    p1   |
-     * |         |         |
-     * +---------+---------+
-     * |         |         |
-     * |   p3    |    p4   |
-     * |         |         |
-     * +---------+---------+
-     * */
-    TerrainPatch *children[4];
-    QVector< QPair<double, double> > ranges;
+protected:
+	QVector2D pos;		// the position of pos of patch
+	int level;
+	BoundingBox bounds;
+
+	// Quad-Tree like structure
+	/**
+	 * Indexing by quadrant
+	 * +---------+---------+
+	 * |         |         |
+	 * |   p2    |    p1   |
+	 * |         |         |
+	 * +---------+---------+
+	 * |         |         |
+	 * |   p3    |    p4   |
+	 * |         |         |
+	 * +---------+---------+
+	 * */
+	TerrainPatch *children[4];
+	QVector< QPair<double, double> > ranges;
 };
 
 
@@ -61,85 +60,84 @@ protected:
  *  It is designed to be implemented with CDLOD (Continuous Distance-Dependent Level-Of-Detail).
  *  Terrain class also encapsulates the rendering of all the patches of terrain.
  **/
-class Terrain : public SceneObject
-{
+class Terrain : public SceneObject {
 public:
-    // Must provide a scene, because it needs to update 
-    // according to the move of camera
-    Terrain(int grid, int levels, Scene *parent);
+	// Must provide a scene, because it needs to update 
+	// according to the move of camera
+	Terrain(int grid, int levels, Scene *parent);
 
-    virtual ~Terrain ();
+	virtual ~Terrain ();
 
-    void uniform();
+	void uniform();
 
-    void update();
+	void update();
 
-    void render();
+	void render();
 
-    void initialize();
+	void initialize();
 
-    void bindHeightmap(QOpenGLShaderProgram &program, QString name, GLuint textureUnit = 1) {
-        heightmap->bind(textureUnit);
-        int heightLocation = program.uniformLocation(name);
-        program.setUniformValue(heightLocation, textureUnit);
-    }
+	void bindHeightmap(QOpenGLShaderProgram &program, QString name, GLuint textureUnit = 1) {
+		heightmap->bind(textureUnit);
+		int heightLocation = program.uniformLocation(name);
+		program.setUniformValue(heightLocation, textureUnit);
+	}
 
-    void disableUnderWaterCulling() {
-        underWaterCull = false;
-    }
+	void disableUnderWaterCulling() {
+		underWaterCull = false;
+	}
 
-    void underWaterCulling(QVector4D plane) {
-        underWaterCull = true;
-        waterPlane = plane;
-    }
+	void underWaterCulling(QVector4D plane) {
+		underWaterCull = true;
+		waterPlane = plane;
+	}
 
 private:
-    
-    /**
-     * updatePatches() checks whether it needs 
-     * new patches of terrain. If camera moves
-     * to some new region, it will check the 
-     * patches within * the square of length 
-     * = 2 * zFar has been generated. If not,
-     * generate the patch.
-     * */
-    void updatePatches();
 
-    /**
-     * select patches to render from all patches.
-     * This is a recursive call into TerrainPatch.
-     * Selected patches will be put into selectedPatches.
-     * */
-    void selectPatches(Camera &camera, QVector3D &cameraPos);
+	/**
+	 * updatePatches() checks whether it needs 
+	 * new patches of terrain. If camera moves
+	 * to some new region, it will check the 
+	 * patches within * the square of length 
+	 * = 2 * zFar has been generated. If not,
+	 * generate the patch.
+	 * */
+	void updatePatches();
 
-    // Debugging ranges and morph area info
-    void rangesInfo();
-    void allPatchesInfo();
+	/**
+	 * select patches to render from all patches.
+	 * This is a recursive call into TerrainPatch.
+	 * Selected patches will be put into selectedPatches.
+	 * */
+	void selectPatches(Camera &camera, QVector3D &cameraPos);
+
+	// Debugging ranges and morph area info
+	void rangesInfo();
+	void allPatchesInfo();
 
 protected:
-    // Number of vertices on one side
-    int grid;
-    int levels;
-    int size;
+	// Number of vertices on one side
+	int grid;
+	int levels;
+	int size;
 
-    bool underWaterCull;
-    QVector4D waterPlane;
+	bool underWaterCull;
+	QVector4D waterPlane;
 
-    unique_ptr<QOpenGLTexture> decalmap[3];
-    unique_ptr<QOpenGLTexture> heightmap;
-    unique_ptr<QOpenGLTexture> noisemap;
-    unique_ptr<QOpenGLTexture> waterCaustics;
+	unique_ptr<QOpenGLTexture> decalmap[3];
+	unique_ptr<QOpenGLTexture> heightmap;
+	unique_ptr<QOpenGLTexture> noisemap;
+	unique_ptr<QOpenGLTexture> waterCaustics;
 
-    // List of distances ranges for LOD <range, morph>
-    QVector< QPair<double, double> > ranges;
+	// List of distances ranges for LOD <range, morph>
+	QVector< QPair<double, double> > ranges;
 
-    // List of children patch
-    QMap< QPair<int, int>, TerrainPatch*> children;
+	// List of children patch
+	QMap< QPair<int, int>, TerrainPatch*> children;
 
-    // List of patch to render
-    QVector<TerrainPatch*> selectedPatches;
+	// List of patch to render
+	QVector<TerrainPatch*> selectedPatches;
 
-    QTime time;
+	QTime time;
 };
 
 

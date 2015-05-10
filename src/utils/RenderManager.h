@@ -7,8 +7,7 @@
 
 #include <Camera.h>
 
-class RenderManager : public QObject
-{
+class RenderManager : public QObject {
 	Q_OBJECT;
 public:
 	RenderManager() { lastTime = 0; _fpsVal = 0; }

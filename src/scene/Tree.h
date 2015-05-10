@@ -22,24 +22,23 @@
 class TreeFactory;
 
 enum TreeType { 
-    PALM = 0,
-    TREE1,
-    NUM_TREES
+	PALM = 0,
+	TREE1,
+	NUM_TREES
 };
 
-class Tree : public Billboard
-{
-    friend class TreeFactory;
+class Tree : public Billboard {
+	friend class TreeFactory;
 public:
-    Tree(TreeFactory *factory, TreeType treeType);
-    virtual ~Tree();
+	Tree(TreeFactory *factory, TreeType treeType);
+	virtual ~Tree();
 
-    void uniform();
-    void update();
+	void uniform();
+	void update();
 
 private:
-    TreeFactory *factory;
-    TreeType treeType;
+	TreeFactory *factory;
+	TreeType treeType;
 };
 
 /**
@@ -47,24 +46,21 @@ private:
  * yet it does so only because it needs to reuse the 
  * shader methods in SceneObject
  * */
-class TreeFactory : public BillboardFactory
-{
-    friend class Tree;
+class TreeFactory : public BillboardFactory {
+	friend class Tree;
 public:
-    TreeFactory(Terrain *terrain);
-    virtual ~TreeFactory();
+	TreeFactory(Terrain *terrain);
+	virtual ~TreeFactory();
 
-    /* dummy functions that we do not use */
-    void uniform() {}
-    void update() {}
-    void render() {} 
+	/* void render() function */
+	void render() {} 
 
-    Tree* createTree(TreeType treeType, QVector2D center, double radius, double spacing, double size, double height, int seed = 0);
+	Tree* createTree(TreeType treeType, QVector2D center, double radius, double spacing, double size, double height, int seed = 0);
 
 private:
-    QVector<QOpenGLTexture*> treeBlade;
-    QVector<QOpenGLTexture*> treeBladeAlpha;
-    Terrain *terrain;
+	QVector<QOpenGLTexture*> treeBlade;
+	QVector<QOpenGLTexture*> treeBladeAlpha;
+	Terrain *terrain;
 };
 
 #endif /* end of include guard: TREE_H */

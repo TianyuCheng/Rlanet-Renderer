@@ -222,8 +222,7 @@ public:
 			// reflection
 			camera_->reflectCamera(QVector4D(0.0, 1.0, 0.0, 0.0), reflectCamera_.get());
 			reflection_->setCamera(reflectCamera_.get());
-		}
-		else {
+		} else {
 			// refraction
 			reflection_->setCamera(camera_.get());
 		}
@@ -236,6 +235,10 @@ public:
 	}
 
 	void shutdown() {
+		/*
+ 		 * Release GL resource here since we need GL context to do
+		 * this.
+		 */
 		// Reset scenes
 		reflection_.reset();
 		finalPass_.reset();
@@ -250,8 +253,10 @@ public:
 		tree1_.reset();
 		tree2_.reset();
 
+#if 0 // No, we don't need to release normal objects.
 		camera_.reset();
 		reflectCamera_.reset();
+#endif
 	}
 
 private:

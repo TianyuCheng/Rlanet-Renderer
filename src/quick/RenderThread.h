@@ -51,14 +51,6 @@ private:
 	std::unique_ptr<QOpenGLFramebufferObject> renderfbo_, displayfbo_;
 	QSize size_;
 
-#if 0
-	std::unique_ptr<Scene> scene_;
-	std::unique_ptr<Terrain> terrian_;
-	std::unique_ptr<Ocean> ocean_;
-    std::unique_ptr<TextureSkyDome> skydome_;
-    std::unique_ptr<Grass> grass_;
-#endif
-
 	std::unique_ptr<QOpenGLVertexArrayObject> vao_;
 	bool shutdown_ = false;
 };

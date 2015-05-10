@@ -23,16 +23,16 @@ class GrassFactory;
 
 class Grass : public Billboard
 {
-    friend class GrassFactory;
+	friend class GrassFactory;
 public:
-    Grass(GrassFactory *factory);
-    virtual ~Grass();
+	Grass(GrassFactory *factory);
+	virtual ~Grass();
 
-    void uniform();
-    void update();
+	void uniform();
+	void update();
 
 private:
-    GrassFactory *factory;
+	GrassFactory *factory;
 };
 
 /**
@@ -42,22 +42,20 @@ private:
  * */
 class GrassFactory : public BillboardFactory
 {
-    friend class Grass;
+	friend class Grass;
 public:
-    GrassFactory(Terrain *terrain);
-    virtual ~GrassFactory();
+	GrassFactory(Terrain *terrain);
+	virtual ~GrassFactory();
 
-    /* dummy functions that we do not use */
-    void uniform() {}
-    void update() {}
-    void render() {} 
+	/* void render */
+	void render() {} 
 
-    Grass* createGrass(QVector2D center, double radius, double spacing, double size, double height, int seed = 0);
+	Grass* createGrass(QVector2D center, double radius, double spacing, double size, double height, int seed = 0);
 
 private:
-    std::unique_ptr<QOpenGLTexture> grassBlade;
-    std::unique_ptr<QOpenGLTexture> grassBladeAlpha;
-    Terrain *terrain;
+	std::unique_ptr<QOpenGLTexture> grassBlade;
+	std::unique_ptr<QOpenGLTexture> grassBladeAlpha;
+	Terrain *terrain;
 };
 
 #endif /* end of include guard: GRASS_H */

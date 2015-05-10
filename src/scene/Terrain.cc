@@ -316,7 +316,7 @@ void Terrain::render()
 	//qDebug("uOffset location: %d", loc);
 	// Drawing only using line mode for LOD visualization
 	// drawMode = GL_LINE;
-    glPolygonMode( GL_FRONT_AND_BACK, drawMode );
+	glPolygonMode( GL_FRONT_AND_BACK, drawMode );
 	CHECK_GL_ERROR("set polygon mode");
 
 	vbo_.bind();
@@ -345,8 +345,8 @@ void Terrain::render()
 		CHECK_GL_ERROR("After Terrian bind uScale");
 		program.setUniformValue("uLevel", patch->level);
 		CHECK_GL_ERROR("After Terrian bind uLevel");
-        QPair<double, double> range = ranges[patch->level];
-        QVector2D ranges = QVector2D(range.first, range.second);
+		QPair<double, double> range = ranges[patch->level];
+		QVector2D ranges = QVector2D(range.first, range.second);
 		program.setUniformValue("uRange", ranges);
 
 		// draw all the triangles

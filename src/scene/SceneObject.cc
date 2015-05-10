@@ -36,72 +36,72 @@ SceneObject::SceneObject(SceneObject &obj) {
 #endif
 
 SceneObject::~SceneObject() {
-    program.removeAllShaders();
+	program.removeAllShaders();
 }
 
 // Set the vertex shader or fragment shader
 void SceneObject::setShader(QOpenGLShader *shader) {
-    // Check whether shader is compiled
-    QString where = "SceneObject.cpp: setShader()";
-    QString what  = "%1 Shader of %2 is null";
-    Q_ASSERT_X(
-            type == QOpenGLShader::ShaderType::Vertex || 
-            type == QOpenGLShader::ShaderType::Fragment || 
-            type == QOpenGLShader::ShaderType::Geometry ,
-            __func__,
-            QString("The type of shader for ") + name + QString(" is neither Vertex nor Fragment"));
-    Q_ASSERT_X(shader->isCompiled(), __func__,
-            QString("The type of shader for ") + name + QString(" is not compiled."));
+	// Check whether shader is compiled
+	QString where = "SceneObject.cpp: setShader()";
+	QString what  = "%1 Shader of %2 is null";
+	Q_ASSERT_X(
+			type == QOpenGLShader::ShaderType::Vertex || 
+			type == QOpenGLShader::ShaderType::Fragment || 
+			type == QOpenGLShader::ShaderType::Geometry ,
+			__func__,
+			QString("The type of shader for ") + name + QString(" is neither Vertex nor Fragment"));
+	Q_ASSERT_X(shader->isCompiled(), __func__,
+			QString("The type of shader for ") + name + QString(" is not compiled."));
 
-    // assign the shader
-    switch (shader->shaderType()) {
-        case QOpenGLShader::Vertex:
-            vShader.reset(shader);
-            break;
-        case QOpenGLShader::Fragment:
-            fShader.reset(shader);
-            break;
-        case QOpenGLShader::Geometry:
-            gShader.reset(shader);
-            break;
-    }
+	// assign the shader
+	switch (shader->shaderType()) {
+		case QOpenGLShader::Vertex:
+			vShader.reset(shader);
+			break;
+		case QOpenGLShader::Fragment:
+			fShader.reset(shader);
+			break;
+		case QOpenGLShader::Geometry:
+			gShader.reset(shader);
+			break;
+	}
 
-    // make sure the shader is attached and linked
-    if (!program.addShader(shader)) {
-        qDebug() << "add shader for object " << name << " failed!";
-        exit(-1);
-    }
-    if (!program.link()) {
-        qDebug() << "link shader for object " << name << " failed!";
-        exit(-1);
-    }
+	// make sure the shader is attached and linked
+	if (!program.addShader(shader)) {
+		qDebug() << "add shader for object " << name << " failed!";
+		exit(-1);
+	}
+	if (!program.link()) {
+		qDebug() << "link shader for object " << name << " failed!";
+		exit(-1);
+	}
 }
 
 void SceneObject::setShader(QOpenGLShader::ShaderType type, QString filename) {
-    // Read from file to compile the source
-    QFile file(QDir::currentPath() + QDir::separator() + filename);
+	// Read from file to compile the source
+	QFile file(QDir::currentPath() + QDir::separator() + filename);
 
-    qDebug() << "Load shader file: " << QDir::currentPath() + QDir::separator() + filename;
+	qDebug() << "Load shader file: " << QDir::currentPath() + QDir::separator() + filename;
 
-    // Check for validity of the file
-    if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        qDebug() << "shader file " << filename << " cannot be opened!";
-        exit(-1);
-    }
+	// Check for validity of the file
+	if (!file.open(QFile::ReadOnly | QFile::Text)) {
+		qDebug() << "shader file " << filename << " cannot be opened!";
+		exit(-1);
+	}
 
-    QTextStream in(&file);
-    QString source = in.readAll();
-    
-    QOpenGLShader *shader = new QOpenGLShader(type);
-    
-    // Check whether the shader compiles
-    if (!shader->compileSourceCode(source)) {
-        qDebug() << QString("Shader compiles failure: ") + shader->log();
-        exit(-1);
-    }
+	QTextStream in(&file);
+	QString source = in.readAll();
 
-    // call the other setShader to complete linking
-    setShader(shader);
+	QOpenGLShader *shader = new QOpenGLShader(type);
+
+	// Check whether the shader compiles
+	if (!shader->compileSourceCode(source)) {
+		qDebug() << QString("Shader compiles failure: ") + shader->log();
+		exit(-1);
+	}
+
+	// call the other setShader to complete linking
+	setShader(shader);
 }
 
 void SceneObject::initialize() {
@@ -118,11 +118,11 @@ void SceneObject::initialize() {
 	ibo_.write(0, indices.constData(), size);
 	ibo_.setUsagePattern(QOpenGLBuffer::StaticDraw);
 
-    tbo_.create();
-    tbo_.bind();
-    size = texcoords.size() * sizeof(QVector2D);
-    tbo_.allocate(size);
-    tbo_.write(0, texcoords.constData(), size);
+	tbo_.create();
+	tbo_.bind();
+	size = texcoords.size() * sizeof(QVector2D);
+	tbo_.allocate(size);
+	tbo_.write(0, texcoords.constData(), size);
 
 	REPORT_GL_STATUS("Create GL Buffers");
 
@@ -130,9 +130,9 @@ void SceneObject::initialize() {
 
 	vertexLocation_ = program.attributeLocation("aVertex");
 	attributes["vertex"] = vertexLocation_;
-    
-    texcoordLocation_ = program.attributeLocation("aTexCoord");
-    attributes["texcoord"] = texcoordLocation_;
+
+	texcoordLocation_ = program.attributeLocation("aTexCoord");
+	attributes["texcoord"] = texcoordLocation_;
 
 	//qDebug("Vertex attribute location %d\n", attributes["vertex"]);
 
@@ -150,15 +150,15 @@ void SceneObject::initialize() {
 	program.release();
 #endif
 	ibo_.release();
-    tbo_.release();
+	tbo_.release();
 	vbo_.release();
 
 	qDebug("VBO: %d, IBO %d, TBO %d", vbo_.bufferId(), ibo_.bufferId(), tbo_.bufferId());
-    initialized = true;
+	initialized = true;
 }
 
 void SceneObject::doubleCheck() const { 
-    Q_ASSERT(program.hasOpenGLShaderPrograms());
+	Q_ASSERT(program.hasOpenGLShaderPrograms());
 }
 
 /** 
@@ -186,9 +186,9 @@ void SceneObject::render() {
 	program.setAttributeBuffer(vertexLocation_, GL_FLOAT, 0, 3);
 	program.enableAttributeArray(vertexLocation_);
 
-    tbo_.bind();
-    program.setAttributeBuffer(texcoordLocation_, GL_FLOAT, 0, 2);
-    program.enableAttributeArray(texcoordLocation_);
+	tbo_.bind();
+	program.setAttributeBuffer(texcoordLocation_, GL_FLOAT, 0, 2);
+	program.enableAttributeArray(texcoordLocation_);
 
 	ibo_.bind();
 	CHECK_GL_ERROR("After buffer");
@@ -198,34 +198,34 @@ void SceneObject::render() {
 			GL_UNSIGNED_INT,	// type
 			NULL);			// Does not matter with ibo
 	CHECK_GL_ERROR("After render");
-    ibo_.release();
-    tbo_.release();
+	ibo_.release();
+	tbo_.release();
 	vbo_.release();
 }
 
 void SceneObject::loadIdentity() {
-    transform.setToIdentity();
+	transform.setToIdentity();
 }
 
 void SceneObject::scale(double s) {
-    transform.scale(s);
+	transform.scale(s);
 }
 
 void SceneObject::scale(double sx, double sy, double sz) {
-    transform.scale(sx, sy, sz);
+	transform.scale(sx, sy, sz);
 }
 
 void SceneObject::translate(QVector3D offset) {
-    transform.translate(offset);
+	transform.translate(offset);
 }
 
 void SceneObject::rotate(double angle, QVector3D axis) {
-    transform.rotate(angle, axis);
+	transform.rotate(angle, axis);
 }
 
 // Compute the transformation matrix with scene graph
 QMatrix4x4 SceneObject::computeTransformFromRoot() {
-    if (parent == nullptr) 
-        return transform;
-    return transform * parent->computeTransformFromRoot();
+	if (parent == nullptr) 
+		return transform;
+	return transform * parent->computeTransformFromRoot();
 }

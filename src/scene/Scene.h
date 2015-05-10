@@ -17,66 +17,66 @@
 class Scene : public SceneObject
 {
 public:
-    Scene(QString name, QSize resolution);
-    virtual ~Scene();
+	Scene(QString name, QSize resolution);
+	virtual ~Scene();
 
-    /**
-     * Add object into the scene
-     * */
-    void addObject(SceneObject* object);
+	/**
+	 * Add object into the scene
+	 * */
+	void addObject(SceneObject* object);
 
-    /**
-     * Render all visible objects to framebuffer.
-     *
-     * Output: current Framebuffer object
-     *
-     * Note: Currently it just draws all the objects in the 
-     * scene, but possible to optimize. 
-     *
-     * if fbo == nullptr, then we render it into scene's own
-     * fbo.
-     * */
-    void renderScene(QOpenGLFramebufferObject *fbo = nullptr);
+	/**
+	 * Render all visible objects to framebuffer.
+	 *
+	 * Output: current Framebuffer object
+	 *
+	 * Note: Currently it just draws all the objects in the 
+	 * scene, but possible to optimize. 
+	 *
+	 * if fbo == nullptr, then we render it into scene's own
+	 * fbo.
+	 * */
+	void renderScene(QOpenGLFramebufferObject *fbo = nullptr);
 
-    /**
-     * Scene Update
-     * */
-    void update() {}
-    void uniform() {}
+	/**
+	 * Scene Update
+	 * */
+	void update() {}
+	void uniform() {}
 
-    /**
-     * Camera
-     * */
-    void setCamera(Camera *cam) { camera = cam; }
-    Camera* getCamera() { return camera; }
+	/**
+	 * Camera
+	 * */
+	void setCamera(Camera *cam) { camera = cam; }
+	Camera* getCamera() { return camera; }
 
-    void resize(QSize res);
+	void resize(QSize res);
 
-    void discardTexture() { lastPass = -1; }
-    void useTexture(GLuint texture) { lastPass = texture; }
+	void discardTexture() { lastPass = -1; }
+	void useTexture(GLuint texture) { lastPass = texture; }
 
-    GLuint texture() const;
-    GLuint takeTexture() const;
-
-private:
-    void init_fbo();
+	GLuint texture() const;
+	GLuint takeTexture() const;
 
 private:
-    // Name for debugging and displaying
-    QString name;
-    QSize resolution;
+	void init_fbo();
 
-    // Camera object encapsulation
-    Camera *camera;
+private:
+	// Name for debugging and displaying
+	QString name;
+	QSize resolution;
 
-    // Framebuffer object
-    unique_ptr<QOpenGLFramebufferObject> fbo_;
+	// Camera object encapsulation
+	Camera *camera;
 
-    // List of objects inside the scene
-    QVector<SceneObject*> objects;
+	// Framebuffer object
+	unique_ptr<QOpenGLFramebufferObject> fbo_;
 
-    bool fbo_ready;
-    int lastPass;
+	// List of objects inside the scene
+	QVector<SceneObject*> objects;
+
+	bool fbo_ready;
+	int lastPass;
 };
 
 #endif /* end of include guard: SCENE_H */
