@@ -36,6 +36,7 @@ void main()
     vWorld = pos;
 
     pos.xz += uCenter.xz;
+    pos.y -= 100.0;
     vec4 shared_vert = uTransform * vec4(pos, 1.0);
     gl_Position = uPMatrix * uMVMatrix * shared_vert;
     vUV = aVertex.xz;
