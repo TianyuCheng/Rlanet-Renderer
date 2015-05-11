@@ -61,10 +61,16 @@ void TerrainPatch::selectPatches(Camera &camera,
 		for (int i = 0; i < 4; i++) 
 			selectedPatches << children[i];
 	} else {
-		initializeChildren();
-		// this patch has some patches that lying in the high detailed range
-		// Partially add this patch
-		this->partiallySelectPatches(camera, cameraPos, selectedPatches);
+        initializeChildren();
+        // this patch has some patches that lying in the high detailed range
+        // Partially add this patch
+        // this->partiallySelectPatches(camera, cameraPos, selectedPatches);
+
+        // try recursively adding children
+        for (int i = 0; i < 4; i++) {
+            TerrainPatch *child = children[i];
+            child->selectPatches(camera, cameraPos, selectedPatches);
+        }
 	}
 }
 
@@ -76,36 +82,6 @@ void TerrainPatch::initializeChildren() {
 	children[2] = new TerrainPatch(QVector2D(pos.x(), pos.y()), level - 1, &ranges);
 	children[3] = new TerrainPatch(QVector2D(pos.x() + nextSize, pos.y()), level - 1, &ranges);
 }
-
-void TerrainPatch::partiallySelectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches) {
-
-	// try recursively adding children
-	for (int i = 0; i < 4; i++) {
-		TerrainPatch *child = children[i];
-		// first test with current level
-		if (child->level == 0) {
-			selectedPatches << child;
-		}
-		else if (!child->bounds.intersectSphere(cameraPos, ranges[level - 1].first)) {
-			selectedPatches << child;
-		}
-		else {
-			child->initializeChildren();
-			if (!child->bounds.intersectSphere(cameraPos, ranges[child->level - 1].first)) {
-				child->initializeChildren();
-				selectedPatches << child->children[0];
-				selectedPatches << child->children[1];
-				selectedPatches << child->children[2];
-				selectedPatches << child->children[3];
-			}
-			else {
-				child->selectPatches(camera, cameraPos, selectedPatches);
-			}
-
-		}
-	}
-}
-
 
 // Terrain class
 

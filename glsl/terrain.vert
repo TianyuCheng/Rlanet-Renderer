@@ -110,9 +110,12 @@ float computeMorphK(vec2 gridPos, vec3 vertex) {
     vertex.y = terrainHeight(uv);      // approximate
     vec3 camera = uCamera;
     float dist = distance(camera, vertex);
+
     float morphStart = uRange.y * 2.0;
-    float morphEnd = uRange.x * 2.0 * sqrt(2.0);
-    float morphLerpK = clamp((dist - morphStart) / (morphEnd-morphStart), 0.0, 1.0);
+    float morphEnd = uRange.x * 4.0;
+    morphEnd = morphEnd + (morphStart - morphEnd) * 0.01;       // lerp
+    vec2 morphConsts = vec2(morphEnd / (morphEnd - morphStart), 1.0 / (morphEnd - morphStart));
+    float morphLerpK = 1.0 - clamp(morphConsts.x - dist * morphConsts.y, 0.0, 1.0);
     return morphLerpK;
 }
 

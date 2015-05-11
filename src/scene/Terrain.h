@@ -30,7 +30,6 @@ public:
 	void selectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches);
 
 protected:
-	void partiallySelectPatches(Camera &camera, QVector3D &cameraPos, QVector<TerrainPatch*> &selectedPatches);
 	void initializeChildren();
 
 protected:
