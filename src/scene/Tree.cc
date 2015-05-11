@@ -13,20 +13,21 @@ Tree::~Tree() {
 }
 
 void Tree::uniform() {
-    // uniform height map
-    factory->terrain->bindHeightmap(program, "uHeightmap", 1);
-	CHECK_GL_ERROR("After uniform");
+	// uniform height map
+	CHECK_GL_ERROR("Tree: before bind uHeightmap");
+	factory->terrain->bindHeightmap(program, "uHeightmap", 1);
+	CHECK_GL_ERROR("Tree: After uniform uHeightmap");
 
-    // uniform the tree texture and alpha map
-    factory->treeBlade[int(treeType)]->bind(2);
-    factory->treeBladeAlpha[int(treeType)]->bind(3);
-    program.setUniformValue("uDecalmap", 2);
-    program.setUniformValue("uAlphamap", 3);
-	CHECK_GL_ERROR("After uniform");
+	// uniform the tree texture and alpha map
+	factory->treeBlade[int(treeType)]->bind(2);
+	factory->treeBladeAlpha[int(treeType)]->bind(3);
+	program.setUniformValue("uDecalmap", 2);
+	program.setUniformValue("uAlphamap", 3);
+	CHECK_GL_ERROR("Tree After uAlphamap");
 
-    // uniform the size of tree
-    program.setUniformValue("uSize", float(size));
-	CHECK_GL_ERROR("After uniform");
+	// uniform the size of tree
+	program.setUniformValue("uSize", float(size));
+	CHECK_GL_ERROR("Tree: After uSize");
 }
 
 void Tree::update() {

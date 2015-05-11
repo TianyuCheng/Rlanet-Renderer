@@ -9,11 +9,13 @@ Billboard::~Billboard() {
 
 }
 
-void Billboard::placeBillboard(QVector2D coordinate, double height) {
+void Billboard::placeBillboard(QVector2D coordinate, double height)
+{
 	vertices << QVector3D(coordinate.x(), coordinate.y(), height);
 }
 
-void Billboard::render() {
+void Billboard::render()
+{
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

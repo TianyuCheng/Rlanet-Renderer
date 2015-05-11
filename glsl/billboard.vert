@@ -8,5 +8,5 @@ uniform mat4 uPMatrix;
 
 void main()
 {
-    gl_Position = vec4(aVertex.xzy, 1.0);
+	gl_Position = vec4(aVertex.xzy, 1.0);
 }
