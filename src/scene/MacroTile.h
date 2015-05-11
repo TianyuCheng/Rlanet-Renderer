@@ -4,17 +4,10 @@
 #include <stdio.h>
 #include "Tile.h"
 #include "TileBlitter.h"
+#include "SubTile.h"
 #include <boost/integer/static_log2.hpp> 
 
-#if 0
-constexpr int constlog2(int n)
-{
-	int ret = 0;
-	while (n >>= 1)
-		ret++;
-	return ret;
-}
-#endif
+#include "ZearthFwd.h"
 
 template<typename TileInfo, int _nchild>
 class MacroTile : public Tile<TileInfo> {
@@ -28,19 +21,36 @@ public:
 	typedef std::vector<MTile*> Ancestors;
 	typedef MTilePointer ChildrenPointerArray[nchild][nchild];
 	typedef typename TileInfo::TileSeed Seed;
+	typedef typename TileInfo::FloatType FloatType;
 	typedef Seed (*SeedArray)[nchild][nchild];
 	typedef typename TileInfo::TileElement Element;
 	typedef typename TileInfo::Coordinate Coord;
 
-	MacroTile(const TileInfo& ti, const Seed& seed)
+	MacroTile(const TileInfo& ti, const Seed& seed, SubTile<TileInfo>* pattern = nullptr)
 		:Tile<TileInfo>(ti, seed), pchildren_array_(nullptr)
 	{
-		fprintf(stderr, "Create MacroTile at (%f, %f) shape (%f, %f), resolution %f\n",
+		if (pattern) {
+			// Copy the pattern from the parent tile
+			size_t nelem = pattern->nelem();
+			this->pattern_.resize(nelem);
+			auto in = pattern->getio();
+			TileIO<Element> out(this->pattern_.data(),
+					pattern->lineelem(),
+					pattern->lineelem() * sizeof(Element),
+					pattern->nline());
+			TileSplicer<Element> splicer(in, out);
+			splicer.splice(nelem);
+		}
+		fprintf(stderr, "Create MacroTile at (%f, %f) shape (%f, %f)"
+				", resolution %f, pattern %p (size: %lu)\n",
 				ti.init_coord.x,
 				ti.init_coord.y,
 				ti.shape.x,
 				ti.shape.y,
-				ti.res);
+				ti.res,
+				pattern,
+				this->pattern_.size()
+				);
 	}
 
 	~MacroTile()
@@ -97,25 +107,28 @@ public:
 			Ancestors* pancestors = nullptr)
 	{
 		Ancestors ancestors;
+		ancestors.emplace_back(this); // The root
+
 		TileSetCursorPosition pos;
 		MTile* cursor = this;
-		double objres = area.get_resolution(0);
-#if TILE_DEBUG
-		fprintf(stderr, "LOD %d, cursor res %f, objres %f\n", childlod, cursor->get_resolution(0), objres);
+		auto objres = area.get_resolution(0);
+#if 1 //TILE_DEBUG
+		fprintf(stderr, "Total LOD %d, cursor res %f, objres %f\n", childlod, cursor->get_resolution(0), objres);
 #endif
-		do {
-			ancestors.emplace_back(cursor);
+		while (cursor->get_resolution(0) > objres) { // We may stop at the top
 			auto childpos = cursor->which(area.init_pos());
 #if TILE_DEBUG
 			fprintf(stderr, "Current MTile %p, child pos (%d, %d)\n", cursor, childpos.x, childpos.y);
 #endif
 			pos.emplace_back(childpos);
 			cursor = cursor->child(childpos);
-		} while (cursor->get_resolution(0) > objres);
+			ancestors.emplace_back(cursor);
+		}
+
 		int leastlod = childlod;
 		while (cursor->get_resolution(leastlod) > objres)
 			leastlod--;
-#if TILE_DEBUG
+#if 1 //TILE_DEBUG
 		fprintf(stderr, "Use LOD %d, resolution %f\n", leastlod, cursor->get_resolution(leastlod));
 #endif
 		if (pancestors) {
@@ -144,19 +157,29 @@ public:
 		return *ptr;
 	}
 
-	MTile* create_chile_at(const Vec2D<int>& id) {
+	MTile* create_chile_at(const Vec2D<int>& id)
+	{
 		TileInfo ti = this->shape_;
 		ti.shape /= nchild;
 		ti.res /= nchild;
 		ti.init_coord.x = id.x * ti.shape.x;
 		ti.init_coord.y = id.y * ti.shape.y;
-		return new MTile(ti, TileInfo::Generator::GenSeed()); // TODO GenSeed
+
+		this->gen(); // ensure details are there
+		Element* start = &this->elems_[0];
+		Vec2D<int> subshape(this->shape_.nline() / nchild,
+				this->shape_.nelem_in_line() / nchild);
+		size_t ix = id.x * subshape.x;
+		size_t iy = id.y * subshape.y;
+		size_t stride = this->shape_.nelem_in_line();
+		start += ix * stride + iy;
+		SubTile<TileInfo> pattern(start, subshape, stride);
+
+		return new MTile(ti, TileInfo::Generator::GenSeed(), &pattern); // TODO GenSeed
 	}
 protected:
 	ChildrenPointerArray* pchildren_array_;
 	std::vector<Seed> seeds_;
 };
-
-typedef MacroTile<TerrainTileInfo, 16> Zearth; // The Earth
 
 #endif

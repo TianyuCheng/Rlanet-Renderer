@@ -1,3 +1,4 @@
+#include "Noise.h"
 #include "Ocean.h"
 
 Ocean::Ocean(int grid, int levels, Scene *parent) : Terrain(grid, levels, parent) {

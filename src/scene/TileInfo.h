@@ -14,6 +14,11 @@ struct TileShape {
 	{
 	}
 
+	TileShape(const Vec2D<T>& ic, const Vec2D<T>& is, const T& ir)
+		:init_coord(ic), shape(is), res(ir)
+	{
+	}
+
 	TileShape(const TileShape& t)
 		:init_coord(t.init_coord),shape(t.shape),res(t.res)
 	{
@@ -21,19 +26,16 @@ struct TileShape {
 };
 
 // We also need TileInfo concenpt for sampling purpose
-struct TerrainTileInfo : public TileShape<double> {
-#if 0
-	double theta_, dtheta_;
-	double phi_, dphi_;
-#endif
-	TerrainTileInfo(TileShape<double>& tileshape)
+struct TerrainTileInfo : public TileShape<float> {
+	TerrainTileInfo(const TileShape<float>& tileshape)
 		:TileShape(tileshape)
 	{
 		ishape_ = shape/res;
 		nelem_ = ishape_.x * ishape_.y;
 	}
-	typedef double TileElement; // Height
-	typedef Vec2D<double> Coordinate; // Coordinate
+	typedef float FloatType;
+	typedef float TileElement; // Height
+	typedef Vec2D<FloatType> Coordinate; // Coordinate
 	typedef BlankNoise Generator;
 	typedef typename Generator::Seed TileSeed; // Seed for noise generation
 
@@ -51,9 +53,10 @@ struct TerrainTileInfo : public TileShape<double> {
 
 	size_t nelement() const { return nelem_; }
 	size_t nline() const { return ishape_.x; }
+	size_t nelem_in_line() const { return ishape_.y; }
 	Coordinate init_pos() const { return init_coord; }
 	Coordinate tail_pos() const { return init_coord + shape; }
-	double get_resolution(int LODLevel) const {
+	FloatType get_resolution(int LODLevel) const {
 		return res*(1<<LODLevel);
 	}
 

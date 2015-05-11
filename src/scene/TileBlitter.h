@@ -92,6 +92,11 @@ struct TileHierarchyCursor {
 	{
 	}
 
+	TileHierarchyCursor(const TileHierarchyCursor& cursor)
+	{
+		*this = cursor;
+	}
+
 	/*
  	 * Invariant Condition
 	 * ancestor[i+1] == ancestors[i].child(now[i]);
@@ -128,16 +133,21 @@ struct TileHierarchyCursor {
 		fprintf(stderr, "%s before move (%d, %d): ", __func__, dx, dy); this->now.tell();
 #endif
 
-		do {
-			bool ret = false;
+		bool ret = false;
+		while (iter >= 0) {
 			now[iter] += dvec; // Move cursor at current tile level
 			if (!now[iter].wrap(nchild, nchild))
 				ret = true; // No need to move higher level cursor
-			iter--;
-			if (iter > 0) {
+			if (iter >= 0) {
 				// Maintain ancestors
-				ancestors[iter + 1] = ancestors[iter]->child(now[iter+1]);
+				fprintf(stderr, "Move to MTile %p (%d, %d)\n",
+						ancestors.back(),
+						now[iter].x,
+						now[iter].y
+						);
+				ancestors[iter + 1] = ancestors[iter]->child(now[iter]);
 			}
+			iter--;
 			if (ret) { // Return if done
 #if TILE_DEBUG
 				fprintf(stderr, "\t after move: "); this->now.tell();
@@ -145,7 +155,7 @@ struct TileHierarchyCursor {
 				return ret;
 			}
 			// Otherwise proceed to higher level
-		} while (iter >= 0);
+		}
 #if TILE_DEBUG
 		fprintf(stderr, "\t [OOB!] after move: "); this->now.tell();
 #endif
@@ -167,13 +177,13 @@ public:
 	typedef typename TargetTile::Element TargetElement;
 	typedef typename SourceTile::Coord Coord;
 
-	BlitterFromMTile(const TileSetCursorPosition& start,
+	BlitterFromMTile(const TileCursor& start,
 			const std::vector<SourceTile*>& anc,
 			const TileSetCursorPosition& _mins,
 			const TileSetCursorPosition& _maxs,
 			TargetTile &_sect
 			)
-		:TileHierarchyCursor<SourceTile>(start, anc),
+		:TileHierarchyCursor<SourceTile>(start),
 		mins(_mins), maxs(_maxs),
 		write_pos_(0,0), sectile(_sect)
 	{
@@ -184,6 +194,7 @@ public:
 		fprintf(stderr, "\tmaxs\t"); maxs.tell();
 		fprintf(stderr, "\tmins\t"); mins.tell();
 		fprintf(stderr, "\tnow\t"); this->now.tell();
+		fprintf(stderr, "\tLOD%d\n", this->LODLevel);
 	}
 
 	TileSetCursorPosition mins, maxs; // Bounds, used by CR LF and successor
@@ -191,7 +202,7 @@ public:
 
 	bool oob() const
 	{
-#if 1 //TILE_DEBUG
+#if TILE_DEBUG
 		fprintf(stderr, "Checkint OOB %p\n", this);
 		fprintf(stderr, "\tmaxs\t"); maxs.tell();
 		fprintf(stderr, "\tmins\t"); mins.tell();
@@ -231,7 +242,7 @@ public:
 #endif
 		bool ret = this->down();
 		write_pos_.x++;
-		return !oob() && ret;
+		return ret && !oob();
 	}
 
 	void get_blitting_region(Coord& min, Coord& max)
@@ -253,7 +264,7 @@ public:
 				min.x, min.y,
 				max.x, max.y);
 #endif
-		return now->get_ioblock(min, max, 0);
+		return now->get_ioblock(min, max, this->LODLevel);
 	}
 
 	TileIO<TargetElement> current_oblock()
@@ -273,8 +284,8 @@ public:
 #if TILE_DEBUG_
 		fprintf(stderr, "Tile pos (%d, %d)\n", write_pos_.x, write_pos_.y);
 #endif
-		this->right(); // Move one step right
-		if (!oob())
+		bool notoverflow = this->right(); // Move one step right
+		if (notoverflow && !oob())
 			return true;
 		carriage_return();
 		return line_feed();
@@ -291,7 +302,8 @@ create_blitter(TargetTile& target, SourceTile& source)
 	fprintf(stderr, "shape_res %f\n", tileregion.get_resolution(0));
 	std::vector<SourceTile*> ancestors;
 	auto cursor_min = source.find_best_match(tileregion, &ancestors);
-	fprintf(stderr, "cursor_min "); cursor_min.now.tell();
+	fprintf(stderr, "cursor_min "); cursor_min.now.tell(false);
+	fprintf(stderr, "\t LOD %d\n", cursor_min.LODLevel);
 	// Query the tail pos
 	auto shapecorner = tileregion;
 	shapecorner.init_coord += target.tail_pos();
@@ -301,7 +313,7 @@ create_blitter(TargetTile& target, SourceTile& source)
 	target.adjust_resolution(cursor_min.get_resolution());
 	fprintf(stderr, "adjust input resolution to %f\n", target.get_resolution(0));
 
-	return BlitterFromMTile<SourceTile, TargetTile>(cursor_min.now,
+	return BlitterFromMTile<SourceTile, TargetTile>(cursor_min,
 			ancestors,
 			cursor_min.now,
 			cursor_max.now,

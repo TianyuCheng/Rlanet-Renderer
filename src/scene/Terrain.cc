@@ -1,3 +1,5 @@
+#include <boost/range/irange.hpp>
+#include "MacroTile.h"
 #include "Terrain.h"
 
 // TerrainPatch class
@@ -124,6 +126,13 @@ Terrain::Terrain(int g, int l, Scene *parent) :
 	// All levels of terrain patch will be using exactly the 
 	// same set of vertices, but with different scales
 	init_vert();
+
+	/*
+ 	 * Create the earth
+	 */
+	earth_.reset(new Zearth(TerrainTileInfo(TileShape<float>({0.0f, 0.0f},
+				{4e6,4e6},
+				4e6/1024.0)), 9527));
 }
 
 Terrain::~Terrain()
@@ -157,37 +166,35 @@ void Terrain::init_gl_resource()
 	size = 2048;        // put it here temporarily
 
 	// Check whether texture are loaded
-	if (decal_dirt.isNull() || decal_grass.isNull() || decal_snow.isNull() || height.isNull() || decal_noise.isNull() || alpha_caustics.isNull()) {
+	if (decal_dirt.isNull() ||
+	    decal_grass.isNull() ||
+	    decal_snow.isNull() ||
+	    height.isNull() ||
+	    decal_noise.isNull() ||
+	    alpha_caustics.isNull()) {
 		qDebug() << "Decal/Height map for terrain has not been found!";
 		exit(-1);
 	}
 	decalmap[0].reset(new QOpenGLTexture(decal_grass));
 	decalmap[1].reset(new QOpenGLTexture(decal_dirt));
 	decalmap[2].reset(new QOpenGLTexture(decal_snow));
-	heightmap.reset(new QOpenGLTexture());
 	noisemap.reset(new QOpenGLTexture(decal_noise));
 	waterCaustics.reset(new QOpenGLTexture(alpha_caustics));
 
-	decalmap[0]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-	decalmap[0]->setMagnificationFilter(QOpenGLTexture::Linear);
+	for (auto i : boost::irange(0, 3)) {
+		decalmap[i]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+		decalmap[i]->setMagnificationFilter(QOpenGLTexture::Linear);
+	}
 
-	decalmap[1]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-	decalmap[1]->setMagnificationFilter(QOpenGLTexture::Linear);
-
-	decalmap[2]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-	decalmap[2]->setMagnificationFilter(QOpenGLTexture::Linear);
-
-	heightmap->setWrapMode(QOpenGLTexture::Repeat);
+	heightmap.reset(new QOpenGLTexture(QOpenGLTexture::Target2D));
 	heightmap->setMinificationFilter(QOpenGLTexture::Linear);
 	heightmap->setMagnificationFilter(QOpenGLTexture::Linear);
 	heightmap->setWrapMode(QOpenGLTexture::Repeat);
 
-	noisemap->setWrapMode(QOpenGLTexture::Repeat);
 	noisemap->setMinificationFilter(QOpenGLTexture::Linear);
 	noisemap->setMagnificationFilter(QOpenGLTexture::Linear);
 	noisemap->setWrapMode(QOpenGLTexture::Repeat);
 
-	waterCaustics->setWrapMode(QOpenGLTexture::Repeat);
 	waterCaustics->setMinificationFilter(QOpenGLTexture::Linear);
 	waterCaustics->setMagnificationFilter(QOpenGLTexture::Linear);
 	waterCaustics->setWrapMode(QOpenGLTexture::Repeat);

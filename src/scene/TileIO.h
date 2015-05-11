@@ -104,7 +104,7 @@ public:
 			in_.seek_by_elem(lineelem);
 			out_.seek_by_elem(lineelem);
 			ret += nelem;
-			lineelem -= nelem;
+			nelem -= lineelem;
 			if (nelem <= 0)
 				break;
 		}

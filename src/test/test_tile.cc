@@ -5,6 +5,7 @@ const int nchild = 32;
 
 int main()
 {
+#if 0
 	TileShape<double> earthsize;
 	earthsize.init_coord = Vec2D<double>(0.0, 0.0);
 	earthsize.shape = Vec2D<double>(Equator, Equator);
@@ -23,5 +24,14 @@ int main()
 	Tile<TerrainTileInfo> target_tile(target, 0);
 	
 	earth.blit_to(target_tile);
+#else
+	Zearth earth(TerrainTileInfo(TileShape<float>({0.0f, 0.0f}, {1024.0f, 1024.0f}, 1.0)), 0);
+	Tile<TerrainTileInfo> target_tile(TerrainTileInfo(TileShape<float>({512.0f, 512.0f}, {512.0f, 512.0f}, 0.5)), 0);
+	earth.blit_to(target_tile);
+	fprintf(stderr, "=================================================================\n");
+
+	Tile<TerrainTileInfo> target_tile2(TerrainTileInfo(TileShape<float>({0.0f, 0.0f}, {512.0f, 512.0f}, 2.0)), 0);
+	earth.blit_to(target_tile2);
+#endif
 	return 0;
 }
