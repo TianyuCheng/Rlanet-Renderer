@@ -25,7 +25,7 @@ public:
 	{
 		obuf.resize(nline*nline);
 		for(auto& iter : obuf)
-			iter = drand48();
+			iter = 256.0*drand48();
 	}
 
 	void gen(double* obuf, size_t n)

@@ -55,6 +55,13 @@ public:
 
 	~MacroTile()
 	{
+		if (pchildren_array_) {
+			for(int i = 0; i < nchild; i++)
+				for(int j = 0; j < nchild; j++) {
+					delete (*pchildren_array_)[i][j];
+					(*pchildren_array_)[i][j] = nullptr;
+				}
+		}
 		free(pchildren_array_);
 	}
 
@@ -134,7 +141,11 @@ public:
 		if (pancestors) {
 			*pancestors = ancestors;
 		}
-		return Cursor(pos, ancestors, leastlod);
+		return Cursor(pos,
+				ancestors,
+				leastlod,
+				cursor->get_shape_info().get_block(area.init_pos())
+				);
 	}
 
 	Vec2D<int> which(const Coord& coord)

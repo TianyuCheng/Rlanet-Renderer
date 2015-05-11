@@ -53,6 +53,7 @@ struct TileIO {
 	void seek_by_elem(ssize_t nelem)
 	{
 		if (nelem == lineremain()) { // Most common case
+			linepos_ = 0;
 			seek_by_line(1);
 		} else if (nelem < lineremain()) {
 			linepos_ += nelem;
@@ -94,7 +95,9 @@ public:
 		nelem = std::min(nelem, in_.nelem());
 		nelem = std::min(nelem, out_.nelem());
 		ssize_t ret = 0;
+		int nline = 0;
 		while (nelem > 0) {
+			//fprintf(stderr, "Line: %d nelem %ld\n", nline++, nelem);
 			InElem* ipos = in_.now();
 			OutElem* opos = out_.now();
 
@@ -104,7 +107,7 @@ public:
 
 			in_.seek_by_elem(lineelem);
 			out_.seek_by_elem(lineelem);
-			ret += nelem;
+			ret += lineelem;
 			nelem -= lineelem;
 			if (nelem <= 0)
 				break;

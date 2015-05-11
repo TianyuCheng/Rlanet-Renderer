@@ -50,6 +50,15 @@ struct TerrainTileInfo : public TileShape<float> {
 		return (coord - init_coord) / res;
 	}
 
+	Coordinate get_coord(const Vec2D<int>& id, int LODLevel) const
+	{
+		Coordinate ret(init_coord);
+		FloatType lodres = get_resolution(LODLevel);
+		ret.x += lodres * id.x;
+		ret.y += lodres * id.y;
+		return ret;
+	}
+
 	size_t nelement() const { return nelem_; }
 	size_t nline() const { return ishape_.x; }
 	size_t nelem_in_line() const { return ishape_.y; }

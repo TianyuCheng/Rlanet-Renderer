@@ -34,7 +34,7 @@ public:
 			int LODLevel)
 	{
 		TileInfo lodshape = shape_;
-		lodshape.res = get_resolution(LODLevel);
+		lodshape.recalibre(get_resolution(LODLevel));
 
 		int istart, iend, jstart, jend;
 		ssize_t start = lodshape.get_linear(axesmins);
@@ -74,6 +74,11 @@ public:
 		elems_.clear();
 		shape_.recalibre(newres);
 		alloc_memory();
+	}
+
+	void relocate(const Coord& coord)
+	{
+		shape_.init_coord = coord;
 	}
 protected:
 	TileInfo shape_;
@@ -119,7 +124,7 @@ protected:
 			if (pattern_.empty())
 				total_level = LODLevel;
 			else
-				total_level = lround(log2(shape_.nelement()/pattern_.size())/2);
+				total_level = lround(log2(shape_.nelement()/pattern_.size())/2) - 1;
 			lods_.resize(total_level);
 		}
 		if (pattern_.empty()) { // Downsample
@@ -138,9 +143,11 @@ protected:
 				this, pattern_.data());
 		typename TileInfo::Generator generator(seed_);
 		for(int i = lods_.size() + 1; i > LODLevel; i--) {
+			auto pattern = access_lod_vec(i);
+			auto higher = access_lod_vec(i-1);
 			generator.gen(shape_.nline() >> (i-1), // shape (NxN)
-				*access_lod_vec(i-1), // LOD to generate
-				*access_lod_vec(i)); // pattern
+				*higher, // LOD to generate
+				*pattern); // pattern
 		}
 	}
 };

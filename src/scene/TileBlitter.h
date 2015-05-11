@@ -87,8 +87,10 @@ struct TileHierarchyCursor {
 	typedef typename MTile::Coord Coord;
 
 	TileHierarchyCursor(const TileSetCursorPosition& pos,
-			const std::vector<MTile*>& anc, int lod = 0)
-		:now(pos), ancestors(anc), LODLevel(lod)
+			const std::vector<MTile*>& anc,
+			int lod, 
+			const Vec2D<int> bidx)
+		:now(pos), ancestors(anc), LODLevel(lod), block_idx(bidx)
 	{
 	}
 
@@ -104,6 +106,7 @@ struct TileHierarchyCursor {
 	TileSetCursorPosition now;
 	std::vector<MTile*> ancestors;
 	int LODLevel;
+	Vec2D<int> block_idx;
 
 	MTile* current_tile()
 	{
@@ -310,8 +313,16 @@ create_blitter(TargetTile& target, SourceTile& source)
 	auto cursor_max = source.find_best_match(shapecorner);
 	fprintf(stderr, "cursor_max "); cursor_max.now.tell();
 	fprintf(stderr, "Max resolution: %f\n", shapecorner.get_resolution(0));
+
 	target.adjust_resolution(cursor_min.get_resolution());
-	fprintf(stderr, "adjust input resolution to %f\n", target.get_resolution(0));
+	auto relocoord = ancestors.back()->get_shape_info()
+		.get_coord(cursor_min.block_idx, cursor_min.LODLevel);
+	target.relocate(relocoord);
+	auto newplace = target.get_shape_info();
+	fprintf(stderr, "adjust input, new location (%f, %f) resolution to %f\n",
+			newplace.init_coord.x,
+			newplace.init_coord.y,
+			target.get_resolution(0));
 
 	return BlitterFromMTile<SourceTile, TargetTile>(cursor_min,
 			ancestors,
