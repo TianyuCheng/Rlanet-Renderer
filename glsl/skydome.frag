@@ -92,11 +92,12 @@ void main()
 	vec3 pic = texture(uDecalmap, uv).rgb;
 	float d = distance(vWorld, lightPos);
 	float c;
-	if (d < rad) {
-		c = 100.0;
+	if (d < 2 * rad) {
+		d = d / (2 * rad);
+		c = 1/ pow(d, 3);
 	} else if (d < factor) {
 		d -= rad;
-		d = (factor - d)/factor;
+		d = (factor - d)/(factor - rad);
 		d = clamp(d, 0.0, 1.0);
 		c = pow(d, 0.5);
 	}
