@@ -1,4 +1,5 @@
 #include <QOpenGLTexture>
+#include "SelectGL.h"
 #include "Camera.h"
 #include "HTileSys.h"
 #include "MacroTile.h"
@@ -27,13 +28,30 @@ void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 			0);
 	earth_->blit_to(target_tile);
 	intptr_t stride;
-	void* data = target_tile.access_lod(0, 0, &stride);
+	float* data = target_tile.access_lod(0, 0, &stride);
+
+#if 0
+	for (int i = 0; i < 1024; i++)
+		fprintf(stderr, "%f\t", data[i]);
+	fprintf(stderr, "\n");
+#endif
 
 	auto shape = target_tile.get_shape_info();
 	tex->setSize(shape.nelem_in_line(), shape.nline());
-	tex->setData(QOpenGLTexture::Red,
-		QOpenGLTexture::Float32,
+	tex->create();
+	tex->bind();
+	CHECK_GL_ERROR("After resize and bind tex\n");
+#if 0
+	tex->setData(QOpenGLTexture::RGBA,
+			//QOpenGLTexture::Red,
+			QOpenGLTexture::UInt8,
+		//QOpenGLTexture::Float32,
 			data);
+#else
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, shape.nelem_in_line(), shape.nline(),
+			0, GL_RED, GL_FLOAT, data);
+#endif
+	CHECK_GL_ERROR("After set tex data\n");
 
 	done_ = true;
 	last_pos_ = pos;
