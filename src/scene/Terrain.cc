@@ -1,6 +1,6 @@
 #include <boost/range/irange.hpp>
-#include "MacroTile.h"
 #include "Terrain.h"
+#include "HTileSys.h"
 
 // TerrainPatch class
 
@@ -130,9 +130,7 @@ Terrain::Terrain(int g, int l, Scene *parent) :
 	/*
  	 * Create the earth
 	 */
-	earth_.reset(new Zearth(TerrainTileInfo(TileShape<float>({0.0f, 0.0f},
-				{4e6,4e6},
-				4e6/1024.0)), 9527));
+	hsys_.reset(new HTileSys);
 }
 
 Terrain::~Terrain()
@@ -257,7 +255,10 @@ void Terrain::updatePatches() {
 	selectPatches(*camera, cameraPos);
 }
 
-void Terrain::selectPatches(Camera &camera, QVector3D &cameraPos) {
+void Terrain::selectPatches(Camera &camera, QVector3D &cameraPos)
+{
+	hsys_->upload_heightmap(heightmap.get(), camera);
+
 	selectedPatches.clear();
 	QMapIterator< QPair<int, int>, TerrainPatch*> iter(children);
 	while (iter.hasNext()) {

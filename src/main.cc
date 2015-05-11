@@ -140,8 +140,8 @@ public:
 
 		// For terrain navigation
 		camera_->lookAt(
-				QVector3D(0.0, 150.0, 0.0),
-				QVector3D(0.0, 150.0, 20.0),
+				QVector3D(1000.0, 150.0, 1000.0),
+				QVector3D(1000.0, 150.0, 1020.0),
 				QVector3D(0.0, 1.0, 0.0)
 			       );
 

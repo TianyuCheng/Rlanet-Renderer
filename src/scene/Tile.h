@@ -45,6 +45,7 @@ public:
 		size_t block_lineelem = imaxs.y - imins.y;
 		intptr_t stride;
 		Element* buf = access_lod(LODLevel, start, &stride);
+		stride *= sizeof(Element);
 
 		fprintf(stderr, "\t%s, accessing LOD %d with size %lu\n",
 				__func__,
@@ -71,7 +72,7 @@ public:
 	void adjust_resolution(double newres)
 	{
 		elems_.clear();
-		shape_.res = newres;
+		shape_.recalibre(newres);
 		alloc_memory();
 	}
 protected:

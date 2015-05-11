@@ -30,8 +30,7 @@ struct TerrainTileInfo : public TileShape<float> {
 	TerrainTileInfo(const TileShape<float>& tileshape)
 		:TileShape(tileshape)
 	{
-		ishape_ = shape/res;
-		nelem_ = ishape_.x * ishape_.y;
+		recalibre(res);
 	}
 	typedef float FloatType;
 	typedef float TileElement; // Height
@@ -58,6 +57,13 @@ struct TerrainTileInfo : public TileShape<float> {
 	Coordinate tail_pos() const { return init_coord + shape; }
 	FloatType get_resolution(int LODLevel) const {
 		return res*(1<<LODLevel);
+	}
+
+	void recalibre(double newres)
+	{
+		res = newres;
+		ishape_ = shape/res;
+		nelem_ = ishape_.x * ishape_.y;
 	}
 
 private:

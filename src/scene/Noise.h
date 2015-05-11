@@ -16,12 +16,16 @@ public:
 	template<typename T>
 	void gen(std::vector<T>& obuf)
 	{
+		for(auto& iter : obuf)
+			iter = drand48();
 	}
 
 	template<typename T>
 	void gen(size_t nline, std::vector<T>& obuf, std::vector<T>& pattern)
 	{
 		obuf.resize(nline*nline);
+		for(auto& iter : obuf)
+			iter = drand48();
 	}
 
 	void gen(double* obuf, size_t n)

@@ -16,11 +16,10 @@
 #include <BoundingBox.h>
 #include <NoiseGenerator.h>
 
-#include "ZearthFwd.h"
-
 using std::unique_ptr;
 
 class Terrain;
+class HTileSys;
 
 class TerrainPatch {
 	friend class Terrain;
@@ -142,7 +141,7 @@ protected:
 	QTime time;
 
 	// The Earth
-	unique_ptr<Zearth> earth_;
+	unique_ptr<HTileSys> hsys_;
 private:
 	void init_gl_resource();
 	void init_vert();

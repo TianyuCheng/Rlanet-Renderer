@@ -24,7 +24,8 @@ struct TileIO {
 		linenelem_(linenelem),
 		stride_in_bytes_(stride),
 		linepos_(0),
-		gpos_(0)
+		gpos_(0),
+		nline_(nline)
 	{
 	}
 

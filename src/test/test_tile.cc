@@ -25,13 +25,18 @@ int main()
 	
 	earth.blit_to(target_tile);
 #else
+#if 0
 	Zearth earth(TerrainTileInfo(TileShape<float>({0.0f, 0.0f}, {1024.0f, 1024.0f}, 1.0)), 0);
 	Tile<TerrainTileInfo> target_tile(TerrainTileInfo(TileShape<float>({512.0f, 512.0f}, {512.0f, 512.0f}, 0.5)), 0);
 	earth.blit_to(target_tile);
 	fprintf(stderr, "=================================================================\n");
+	return 0;
+#else
 
-	Tile<TerrainTileInfo> target_tile2(TerrainTileInfo(TileShape<float>({0.0f, 0.0f}, {512.0f, 512.0f}, 2.0)), 0);
+	Zearth earth(TerrainTileInfo(TileShape<float>({0.0f, 0.0f}, {4e6,4e6}, 4e6/1024.0)), 9527);
+	Tile<TerrainTileInfo> target_tile2(TerrainTileInfo(TileShape<float>({0.0f, 0.0f}, {512.0f, 512.0f}, 0.5)), 0);
 	earth.blit_to(target_tile2);
+#endif
 #endif
 	return 0;
 }
