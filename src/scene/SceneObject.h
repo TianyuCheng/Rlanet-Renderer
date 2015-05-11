@@ -106,6 +106,7 @@ public:
 	void setDrawMode(GLenum mode) { drawMode = mode; }
 
 	bool isInitialized() const { return initialized; }
+	QOpenGLShaderProgram* get_program() { return &program; }
 protected:
 	// rendering related variables
 	// vertex array, index array, locations, etc.

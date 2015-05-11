@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "Solar.h"
 
 Scene::Scene(QString n, QSize r) 
 	: SceneObject(n), 
@@ -41,6 +42,11 @@ void Scene::addObject(SceneObject* object)
 	if (!object->isInitialized()) object->initialize();
 }
 
+void Scene::add_light(Light* light)
+{
+	lights_.emplace_back(light);
+}
+
 void Scene::renderScene(QOpenGLFramebufferObject* fbo)
 {
 	/**
@@ -77,6 +83,8 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
 		 * */
 		SceneObject *object = iter;
 		object->program.bind();
+		for(auto light: lights_)
+			light->apply_light(object);
 		//qDebug("Handling %p", object);
 
 		object->setDrawMode(drawMode);

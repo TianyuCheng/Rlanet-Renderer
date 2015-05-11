@@ -14,6 +14,8 @@
 #include <SceneObject.h>
 #include <Camera.h>
 
+class Light;
+
 class Scene : public SceneObject
 {
 public:
@@ -24,6 +26,7 @@ public:
 	 * Add object into the scene
 	 * */
 	void addObject(SceneObject* object);
+	void add_light(Light*);
 
 	/**
 	 * Render all visible objects to framebuffer.
@@ -74,6 +77,7 @@ private:
 
 	// List of objects inside the scene
 	QVector<SceneObject*> objects;
+	std::vector<Light*> lights_;
 
 	bool fbo_ready;
 	int lastPass;

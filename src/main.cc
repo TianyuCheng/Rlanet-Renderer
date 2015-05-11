@@ -8,6 +8,7 @@
 #include <TextureSkyDome.h>
 #include <Grass.h>
 #include <Tree.h>
+#include "Solar.h"
 
 class PlanetRenderManager : public RenderManager {
 	enum ACTION_BIT {
@@ -132,6 +133,13 @@ public:
 		int width = resolution.width();
 		int height = resolution.height();
 
+		solar_ = new Solar("Solar",
+				{0.0, 5000.0, 0.0},
+				100.0,
+				{0.1, 0.1, 0.1},
+				{1.0, 1.0, 1.0},
+				{1.0, 1.0, 1.0});
+
 		// Create camera
 		camera_.reset(new Camera("Viewer Camera"));
 		camera_->setPerspective(45.0, (float)width/(float)height, 1.0, 10000.0);
@@ -164,6 +172,7 @@ public:
 		tree2_.reset(treeFactory_->createTree(TreeType::TREE1, QVector2D(3100, 3100), 1000.0, 200.0, 140.0, 200.0));
 
 		// Adding objects into reflection pass
+		reflection_->add_light(solar_);
 		reflection_->addObject(skydome_.get());
 		reflection_->addObject(terrain_.get());
 		reflection_->addObject(grass_.get());
@@ -171,6 +180,7 @@ public:
 		reflection_->addObject(tree2_.get());
 
 		// Adding objects into final pass
+		finalPass_->add_light(solar_);
 		finalPass_->addObject(skydome_.get());
 		finalPass_->addObject(terrain_.get());
 		finalPass_->addObject(ocean_.get());
@@ -280,6 +290,7 @@ private:
 	// Camera
 	std::unique_ptr<Camera> camera_;
 	std::unique_ptr<Camera> reflectCamera_;
+	Solar* solar_ = nullptr;
 	uint64_t action_flag_;
 
 	// Mouse movement

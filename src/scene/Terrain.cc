@@ -130,20 +130,12 @@ void Terrain::init_gl_resource()
 	QImage decal_noise("../textures/terrain/noisy_terrain.jpg");
 	QImage alpha_caustics("../textures/ocean/caustics.jpg");
 
-	// Generate heightmap using seed
-	int r = 128;
-	int w  = r * 2 * M_PI;
-	int h = r * M_PI;
-	QImage height(w, h, QImage::Format_RGB32);
-	NoiseGenerator::SphericalHeightmap(height, r, clock());
-
 	size = 2048;        // put it here temporarily
 
 	// Check whether texture are loaded
 	if (decal_dirt.isNull() ||
 	    decal_grass.isNull() ||
 	    decal_snow.isNull() ||
-	    height.isNull() ||
 	    decal_noise.isNull() ||
 	    alpha_caustics.isNull()) {
 		qDebug() << "Decal/Height map for terrain has not been found!";

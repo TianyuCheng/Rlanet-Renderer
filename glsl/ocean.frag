@@ -6,6 +6,11 @@ uniform mat4 uPMatrix;
 uniform mat4 uNMatrix;
 uniform mat4 uTransform;
 
+uniform vec3 lightPos;
+uniform vec3 lightAmbient;
+uniform vec3 lightDiffuse;
+uniform vec3 lightSpecular;
+
 uniform sampler2D uRenderTexture;
 uniform sampler2D uVertexDisplacement;
 
@@ -26,13 +31,6 @@ out vec4 frag_color;
 
 void main()
 {
-    // I am going to fake a light here
-    // Uniform for light will be implemented later
-    vec3 lightPos = vec3(0.0, 5000.0, 0.0);
-    vec3 lightAmbient = vec3(0.1, 0.1, 0.1);
-    vec3 lightDiffuse = vec3(1.0, 1.0, 1.0);
-    vec3 lightSpecular = vec3(1.0, 1.0, 1.0);
-
     vec3 n = normalize(frag.normal);
     vec3 v = normalize(-frag.view);
     vec3 l = normalize(lightPos - frag.view);

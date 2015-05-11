@@ -17,7 +17,7 @@ public:
 	void gen(std::vector<T>& obuf)
 	{
 		for(auto& iter : obuf)
-			iter = drand48();
+			iter = 256.0; //drand48();
 	}
 
 	template<typename T>
@@ -25,11 +25,13 @@ public:
 	{
 		obuf.resize(nline*nline);
 		for(auto& iter : obuf)
-			iter = 256.0*drand48();
+			iter = 256.0; //*drand48();
 	}
 
 	void gen(double* obuf, size_t n)
 	{
+		for(size_t i = 0; i < n; i++)
+			obuf[i] = 256.0; //*drand48();
 	}
 
 	static Seed GenSeed() { return random(); }
