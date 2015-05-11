@@ -101,7 +101,11 @@ void main()
 		d = clamp(d, 0.0, 1.0);
 		c = pow(d, 0.5);
 	}
-	frag_color = clamp(sin(lightPolar.y) * c * vec4(pic, 1.0), 0.0, 1.0);
+	float siny = (sin(lightPolar.y) + 0.1) / 1.1;
+	float sinyp = pow(siny, 0.25);
+	float sinypc = clamp(sinyp, 0.1, 1.0);
+	vec4 enhancered = vec4(normalize(vec3(1.0, sinypc, sinypc)), 1.0);
+	frag_color = clamp(sinyp* c * enhancered * vec4(pic, 1.0), 0.0, 1.0);
 
 	/* // fBm-based sky, slow */
 	/* float cloud = fbm(vUV); */
