@@ -12,7 +12,7 @@ uniform vec3 uCenter;
 
 out vec2 vUV;
 out vec2 vPos;
-out vec3 vView;
+out vec3 vWorld;
 
 const float PI = 3.1415926;
 
@@ -33,10 +33,11 @@ void main()
 {
     // perform the vertex transformation
     vec3 pos = hemisphere(9000.0, aVertex.xz, 0.0);
+    vWorld = pos;
+
     pos.xz += uCenter.xz;
-    vec4 MVTVert = uMVMatrix * uTransform * vec4(pos, 1.0);
-    gl_Position = uPMatrix * MVTVert;
+    vec4 shared_vert = uTransform * vec4(pos, 1.0);
+    gl_Position = uPMatrix * uMVMatrix * shared_vert;
     vUV = aVertex.xz;
-    vView = MVTVert.xyz;
 }
 

@@ -21,6 +21,13 @@ public:
 	virtual void apply_light(SceneObject* );
 	virtual void render();
 
+	void update_polar(float theta, float phi) {
+		theta_ = theta;
+		phi_ = phi;
+		update_gloc();
+	}
+
+
 private:
 	QVector3D pos_;
 	float theta_;

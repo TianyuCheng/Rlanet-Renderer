@@ -2,11 +2,12 @@
 
 uniform sampler2D uDecalmap;
 uniform vec2 lightPolar;
+uniform vec3 lightPos;
 uniform float solarRad;
 
 in vec2 vUV;
 in vec2 vPos;
-in vec3 vView;
+in vec3 vWorld;
 
 out vec4 frag_color;
 
@@ -77,22 +78,33 @@ float fbm(vec2 pos)
     return sum;
 }
 
+const float rad = 100.0;
+const float skyrad = 9000.0;
+const float factor = (skyrad - rad) * 2 * PI;
+
 void main()
 {
-    float r = 0.5 * cos(vPos.y);
-    float t = vPos.x;
-    vec2 uv = vec2(0.5, 0.5) + r * vec2(cos(t), sin(t));
+	float r = 0.5 * cos(vPos.y);
+	float t = vPos.x;
+	vec2 uv = vec2(0.5, 0.5) + r * vec2(cos(t), sin(t));
 
-    // No computation, fast
-    vec3 pic = texture(uDecalmap, uv).rgb;
-    if (distance(vPos, lightPolar) * 9000.0 < 1.0)
-	    frag_color = vec4(1.0, 1.0, 1.0, 1.0);
-    else
-	    frag_color = vec4(pic, 1.0);
+	// No computation, fast
+	vec3 pic = texture(uDecalmap, uv).rgb;
+	float d = distance(vWorld, lightPos);
+	float c;
+	if (d < rad) {
+		c = 100.0;
+	} else if (d < factor) {
+		d -= rad;
+		d = (factor - d)/factor;
+		d = clamp(d, 0.0, 1.0);
+		c = pow(d, 0.5);
+	}
+	frag_color = clamp(sin(lightPolar.y) * c * vec4(pic, 1.0), 0.0, 1.0);
 
-    /* // fBm-based sky, slow */
-    /* float cloud = fbm(vUV); */
-    /* vec4 color = vec4(cloud, cloud, cloud, 1.0); */
-    /* vec4 skyColor = vec4(0.49, 0.75, 0.93, 1.0); */
-    /* frag_color = mix(skyColor, 0.6 * smoothstep(0.5, 0.8, color), 0.4); */
+	/* // fBm-based sky, slow */
+	/* float cloud = fbm(vUV); */
+	/* vec4 color = vec4(cloud, cloud, cloud, 1.0); */
+	/* vec4 skyColor = vec4(0.49, 0.75, 0.93, 1.0); */
+	/* frag_color = mix(skyColor, 0.6 * smoothstep(0.5, 0.8, color), 0.4); */
 }

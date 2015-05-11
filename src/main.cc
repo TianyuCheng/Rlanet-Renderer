@@ -135,7 +135,7 @@ public:
 
 		solar_ = new Solar("Solar",
 				0.0,
-				M_PI/2,
+				M_PI * 0.45,
 				100.0,
 				{0.1, 0.1, 0.1},
 				{1.0, 1.0, 1.0},
@@ -226,6 +226,7 @@ public:
 		// setContextProperty("fps", QString::number(fps()));
 
 		do_camera_move();
+		solar_->update_polar(0.8 * M_PI, double(clock())/CLOCKS_PER_SEC * M_PI);
 
 		terrain_->underWaterCulling(QVector4D(0.0, 1.0, 0.0, 0.0));
 		if (camera_->getPosition().y() >= 0) {
