@@ -1,6 +1,8 @@
 #version 330
 
 uniform sampler2D uDecalmap;
+uniform vec2 lightPolar;
+uniform float solarRad;
 
 in vec2 vUV;
 in vec2 vPos;
@@ -83,7 +85,10 @@ void main()
 
     // No computation, fast
     vec3 pic = texture(uDecalmap, uv).rgb;
-    frag_color = vec4(pic, 1.0);
+    if (distance(vPos, lightPolar) * 9000.0 < 1.0)
+	    frag_color = vec4(1.0, 1.0, 1.0, 1.0);
+    else
+	    frag_color = vec4(pic, 1.0);
 
     /* // fBm-based sky, slow */
     /* float cloud = fbm(vUV); */

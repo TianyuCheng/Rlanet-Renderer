@@ -134,7 +134,8 @@ public:
 		int height = resolution.height();
 
 		solar_ = new Solar("Solar",
-				{0.0, 5000.0, 0.0},
+				0.0,
+				M_PI/2,
 				100.0,
 				{0.1, 0.1, 0.1},
 				{1.0, 1.0, 1.0},

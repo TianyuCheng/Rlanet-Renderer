@@ -32,10 +32,11 @@ vec3 hemisphere(float radius, vec2 xz, float y) {
 void main()
 {
     // perform the vertex transformation
-    vec3 pos = hemisphere(4000.0, aVertex.xz, 0.0);
+    vec3 pos = hemisphere(9000.0, aVertex.xz, 0.0);
     pos.xz += uCenter.xz;
-    gl_Position = uPMatrix * uMVMatrix * uTransform * vec4(pos, 1.0);
+    vec4 MVTVert = uMVMatrix * uTransform * vec4(pos, 1.0);
+    gl_Position = uPMatrix * MVTVert;
     vUV = aVertex.xz;
-    vView = (uMVMatrix * uTransform * vec4(pos, 1.0)).xyz;
+    vView = MVTVert.xyz;
 }
 
