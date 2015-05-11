@@ -1,6 +1,7 @@
-#ifndef NOISE_H
-#define NOISE_H
+#ifndef NOISECLASSES_H
+#define NOISECLASSES_H
 
+#include <vector>
 #include <stdlib.h>
 
 // BlankNoise: A noise generator which doesn't do anything
