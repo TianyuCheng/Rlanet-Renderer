@@ -145,7 +145,7 @@ public:
 		camera_.reset(new Camera("Viewer Camera"));
 		camera_->setPerspective(45.0, (float)width/(float)height, 1.0, 10000.0);
 		reflectCamera_.reset(new Camera("Reflection Camera"));
-		reflectCamera_->setPerspective(75.0, 1.0, 1.0, 10000.0);
+		reflectCamera_->setPerspective(45.0, (float)width/(float)height, 1.0, 10000.0);
 
 		// For terrain navigation
 		camera_->lookAt(
