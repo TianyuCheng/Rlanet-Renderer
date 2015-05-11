@@ -8,7 +8,7 @@ public:
 	virtual void apply_light(SceneObject* ) = 0;
 };
 
-class Solar : public Light, public SceneObject {
+class Solar : public Light {
 public:
 	Solar(const QString& name,
 		float theta,
