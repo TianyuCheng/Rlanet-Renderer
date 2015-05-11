@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "HTileSys.h"
 #include "MacroTile.h"
+#include "NoiseGenerator.h"
 
 HTileSys::HTileSys()
 {
@@ -35,6 +36,16 @@ void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 		fprintf(stderr, "%f\t", data[i]);
 	fprintf(stderr, "\n");
 #endif
+#if 1
+	// Generate heightmap using seed
+	int r = 128;
+	int w  = r * 2 * M_PI;
+	int h = r * M_PI;
+
+	QImage height(w, h, QImage::Format_RGB32);
+	NoiseGenerator::SphericalHeightmap(height, r, clock());
+	tex->setData(height);
+#else
 
 	auto shape = target_tile.get_shape_info();
 	tex->setSize(shape.nelem_in_line(), shape.nline());
@@ -52,6 +63,7 @@ void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 			0, GL_RED, GL_FLOAT, data);
 #endif
 	CHECK_GL_ERROR("After set tex data\n");
+#endif
 
 	done_ = true;
 	last_pos_ = pos;
