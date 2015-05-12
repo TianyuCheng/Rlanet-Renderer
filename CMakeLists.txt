@@ -85,6 +85,9 @@ add_executable(test_tile src/test/test_tile.cc src/scene/noiseutils.cc)
 target_link_libraries(test_tile ${LIBNOISE_LIBRARY})
 AUX_SOURCE_DIRECTORY(src/test/ PLANET_TEST_CASES)
 
+add_executable(test_noise src/test/test_noise.cc src/scene/noiseutils.cc)
+target_link_libraries(test_noise ${LIBNOISE_LIBRARY})
+
 # Generate cscope.files
 set(ALL_SRC ${SRC} ${PLANET_HDRS} ${PLANET_QUICK_SRCS} ${PLANET_SCENE_SRCS}
 	${PLANET_TEST_CASES} ${QUICK_HDRS} ${UTIL_HDRS})
