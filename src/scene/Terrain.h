@@ -141,9 +141,9 @@ protected:
 
 	// The Earth
 	unique_ptr<HTileSys> hsys_;
-private:
-	void init_gl_resource();
-	void init_vert();
+protected:
+	virtual void init_gl_resource();
+	virtual void init_vert();
 };
 
 

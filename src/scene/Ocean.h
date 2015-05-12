@@ -11,6 +11,9 @@ public:
 
     void initialize();
     void uniform();
+
+protected:
+	virtual void init_gl_resource();
 };
 
 #endif /* end of include guard: OCEAN_H */

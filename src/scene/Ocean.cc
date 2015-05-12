@@ -3,16 +3,6 @@
 
 Ocean::Ocean(int grid, int levels, Scene *parent) : Terrain(grid, levels, parent) {
 
-    QImage ocean_displacement("../textures/ocean/vtf.jpg");
-    // Check whether texture are loaded
-    if (ocean_displacement.isNull()) {
-        qDebug() << "Decal/Height map for ocean has not been found!";
-        exit(-1);
-    }
-
-    decalmap[0].reset(new QOpenGLTexture(ocean_displacement));
-    decalmap[0]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    decalmap[0]->setMagnificationFilter(QOpenGLTexture::Linear);
 }
 
 Ocean::~Ocean() {
@@ -43,4 +33,18 @@ void Ocean::uniform() {
 
     CHECK_GL_ERROR("after sets uniforms");
     // this->setDrawMode(GL_LINE);
+}
+
+void Ocean::init_gl_resource()
+{
+    QImage ocean_displacement("../textures/ocean/vtf.jpg");
+    // Check whether texture are loaded
+    if (ocean_displacement.isNull()) {
+        qDebug() << "Decal/Height map for ocean has not been found!";
+        exit(-1);
+    }
+
+    decalmap[0].reset(new QOpenGLTexture(ocean_displacement));
+    decalmap[0]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    decalmap[0]->setMagnificationFilter(QOpenGLTexture::Linear);
 }
