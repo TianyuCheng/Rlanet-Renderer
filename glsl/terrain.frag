@@ -44,7 +44,6 @@ vec3 fbm(vec2 x) {
     sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
     sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
     sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
-    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
     return sum;
 }
 
@@ -52,8 +51,7 @@ void main()
 {
     // I am going to fake a light here
     // Uniform for light will be implemented later
-    /* vec3 n = normalize(frag.normal * texture(uNoisemap, frag.pos.xz / 512.0).xyz); */
-    vec3 n = normalize(frag.normal * fbm(frag.pos.xz / 512.0));
+    vec3 n = normalize(frag.normal * fbm(frag.pos.xz / 1024.0));
     vec3 v = normalize(-frag.view);
     vec3 l = normalize(lightPos - frag.view);
 

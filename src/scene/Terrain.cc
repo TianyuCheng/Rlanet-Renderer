@@ -127,7 +127,7 @@ void Terrain::init_gl_resource()
 	QImage decal_dirt("../textures/terrain/decal_dirt.jpg");
 	QImage decal_grass("../textures/terrain/decal_grass.jpg");
 	QImage decal_snow("../textures/terrain/decal_snow.jpg");
-	QImage decal_noise("../textures/terrain/noisy_terrain.jpg");
+	QImage decal_noise("../textures/terrain/normalmap1.png");
 	QImage alpha_caustics("../textures/ocean/caustics.jpg");
 
 	size = 2048;        // put it here temporarily
