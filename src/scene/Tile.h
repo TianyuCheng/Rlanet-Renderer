@@ -154,12 +154,19 @@ protected:
 			auto pattern = access_lod_vec(i);
 			auto higher = access_lod_vec(i-1);
 			generator.gen_from_pattern(
+				shape_.nline() >> (i-1),
 				shape_.nline() >> (i),
-				shape_.nline() >> (i-1), // shape (NxN)
 				*higher, // LOD to generate
 				*pattern,
 				lodseeds_[i]
 				); // pattern
+			fprintf(stderr, "\t\tGenerating LOD %d from LOD %d"
+					", %lu <- %lu "
+					"Seed: %lu\n"
+					,i-1, i,
+					higher->size(), pattern->size(),
+					lodseeds_[i-1]
+					);
 		}
 	}
 };

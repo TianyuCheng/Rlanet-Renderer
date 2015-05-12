@@ -309,7 +309,7 @@ create_blitter(TargetTile& target, SourceTile& source)
 	fprintf(stderr, "\t LOD %d\n", cursor_min.LODLevel);
 	// Query the tail pos
 	auto shapecorner = tileregion;
-	shapecorner.init_coord += target.tail_pos();
+	shapecorner.init_coord = target.tail_pos();
 	auto cursor_max = source.find_best_match(shapecorner);
 	fprintf(stderr, "cursor_max "); cursor_max.now.tell();
 	fprintf(stderr, "Max resolution: %f\n", shapecorner.get_resolution(0));

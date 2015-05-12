@@ -18,7 +18,7 @@ public:
 private:
 	unique_ptr<Zearth> earth_;
 	QVector3D last_pos_;
-	bool done_ = false;
+	bool init_ = false;
 };
 
 #endif

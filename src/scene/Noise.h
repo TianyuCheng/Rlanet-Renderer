@@ -149,6 +149,9 @@ public:
 	{
 		noise::module::Perlin perlin;
 		perlin.SetSeed(seed_);
+		perlin.SetOctaveCount(6);
+		perlin.SetFrequency(1.0);
+
 		height *= sizeof(T)/sizeof(float);
 
 		noise::utils::NoiseMap noiseMap;
@@ -163,6 +166,11 @@ public:
 		const float* idata = noiseMap.GetConstSlabPtr();
 		for(size_t i = 0; i < obuf.size(); i++) {
 			geo_set_from_noise(obuf[i], idata[i], height);
+		}
+		fprintf(stderr, "\tSEED\t%ld\n", seed_);
+		for(size_t i = 0; i < obuf.size(); i++) {
+			if (std::abs(idata[i]) > 1e5)
+				fprintf(stderr, "\t\t%f\n", idata[i]);
 		}
 	}
 
@@ -179,6 +187,8 @@ public:
 		obuf.resize(higher_nline*higher_nline);
 		noise::module::Perlin perlin;
 		perlin.SetSeed(patternseed);
+		perlin.SetOctaveCount(6);
+		perlin.SetFrequency(1.0);
 
 		noise::utils::NoiseMap noiseMap;
 		noise::utils::NoiseMapBuilderSphere noiseMapBuilder;

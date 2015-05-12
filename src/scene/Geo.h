@@ -26,6 +26,6 @@ struct GeoHumidityExtractor {
 	}
 };
 
-#define TOP_TILE_DHEIGHT	(1.5)
+#define TOP_TILE_DHEIGHT	(1.2)
 
 #endif

@@ -96,6 +96,7 @@ public:
 	{
 		fprintf(stderr, "%s firstres %f secres %f\n", __func__, this->get_resolution(0), sectile.get_resolution(0));
 		auto blit_cursor = create_blitter(sectile, *this);
+		fprintf(stderr, "=======Blitter Created======\n");
 		do {
 #if TILE_DEBUG
 			blit_cursor.tell();
@@ -179,6 +180,7 @@ public:
 		ti.res /= nchild;
 		ti.init_coord.x = id.x * ti.shape.x;
 		ti.init_coord.y = id.y * ti.shape.y;
+		ti.init_coord += this->shape_.init_pos();
 
 		this->gen(); // ensure details are there
 		Element* start = &this->elems_[0];

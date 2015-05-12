@@ -18,9 +18,22 @@ HTileSys::~HTileSys()
 
 void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 {
+	QVector3D pos = cam.getPosition();
+#if 0
+	if (pos != last_pos_) {
+		fprintf(stderr, "Camera pos (%f, %f, %f)\n",
+				pos.x(),
+				pos.y(),
+				pos.z());
+		last_pos_ = pos;
+	}
 	if (done_)
 		return;
-	QVector3D pos = cam.getPosition();
+#endif
+	if (init_ &&
+		(std::abs(last_pos_.x() - pos.x()) < 5e4 ||
+		 std::abs(last_pos_.y() - pos.y()) < 5e4 ))
+		return ;
 #if 0
 	Tile<TerrainComponoentMeta> target_tile(
 			TerrainTileInfo(TileShape<float>(
@@ -29,11 +42,15 @@ void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 					0.5)),
 			0);
 #else
+	fprintf(stderr, "Camera pos (%f, %f, %f)\n",
+			pos.x(),
+			pos.y(),
+			pos.z());
 	Tile<TerrainComponoentMeta> target_tile(
 			TerrainTileInfo(TileShape<float>(
-					{1e6, 1e6},
-					{2e6, 2e6},
-					4e6/1024.0)),
+					{pos.x() - 1e5, pos.z() - 1e5},
+					{2e5, 2e5},
+					2e5/1024.0)),
 			0);
 #endif
 	earth_->blit_to(target_tile, GeoHeightExtractor());
@@ -73,7 +90,6 @@ void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 #endif
 	CHECK_GL_ERROR("After set tex data\n");
 #endif
-
-	done_ = true;
+	init_ = true;
 	last_pos_ = pos;
 }
