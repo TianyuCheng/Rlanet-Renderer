@@ -138,19 +138,33 @@ vec3 gerstnerWaves(vec2 pos) {
     sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
     normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
 
-    // smaller waves
+    // choppy waves
 
     steepness = 1.0;
-    amplitude = 3.0; speed = 50.0; waveLength = 220.0; direction = normalize(vec2(0.7, -0.3));
+    amplitude = 3.0; speed = 50.0; waveLength = 320.0; direction = normalize(vec2(0.1, -0.3));
     sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
     normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
 
     steepness = 1.1;
-    amplitude = 2.0; speed = 60.0; waveLength = 210.0; direction = normalize(vec2(0.6, -0.3));
+    amplitude = 2.0; speed = 60.0; waveLength = 410.0; direction = normalize(vec2(0.3, -0.8));
     sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
     normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
 
-    sum += texture(uVertexDisplacement, pos + uTime * vec2(1.0, 1.0)).xyz * 10.0;
+    steepness = 1.2;
+    amplitude = 1.3; speed = 40.0; waveLength = 310.0; direction = normalize(vec2(0.6, 0.5));
+    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
+    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
+
+    steepness = 1.1;
+    amplitude = 1.9; speed = 70.0; waveLength = 210.0; direction = normalize(vec2(0.6, 0.9));
+    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
+    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
+
+    steepness = 1.4;
+    amplitude = 2.9; speed = 50.0; waveLength = 270.0; direction = normalize(vec2(-0.1, 0.7));
+    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
+    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
+
     vertex.normal = normal;
     return sum;
 }
