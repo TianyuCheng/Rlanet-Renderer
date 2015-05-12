@@ -12,6 +12,17 @@ With a planet, one can do a wide range of simulation, such as evolution, or even
 ![Sample Image](./universalsim.jpg)
 (credit: image from universe sim http://imgur.com/gallery/BDhnd)
 
+Project Progress
+---------------------
+![Snapshot](./Screenshots/snapshot1.png)
+![Snapshot](./Screenshots/snapshot2.png)
+![Snapshot](./Screenshots/snapshot3.png)
+![Snapshot](./Screenshots/snapshot4.png)
+![Snapshot](./Screenshots/snapshot5.png)
+![Snapshot](./Screenshots/snapshot6.png)
+![Snapshot](./Screenshots/snapshot7.png)
+![Snapshot](./Screenshots/snapshot8.png)
+
 Basic features
 ----------------
 
@@ -52,3 +63,5 @@ Libraries Planned to Use
 Author
 ------
 Tianyu Cheng
+
+Xinya Zhang
