@@ -82,6 +82,38 @@ void downsample(size_t nline, const std::vector<T>& higher, std::vector<T>& lowe
 	}
 }
 
+inline void geo_expand(GeoInfo& detail, const GeoInfo& pattern, float noise)
+{
+	float ph = pattern.height;
+	float pdh = pattern.dheight;
+	float nh = ph + noise * pdh;
+	detail.height = nh;
+	float ndh = std::min(
+			std::abs(nh - (ph - pdh)),
+			std::abs(nh - (ph+pdh))
+			);
+	ndh = std::min(
+			std::abs(nh - ph),
+			ndh);
+	detail.dheight = ndh;
+}
+
+inline void geo_expand(float& detail, const float& pattern, float noise)
+{
+	detail = pattern;
+}
+
+inline void geo_set_from_noise(GeoInfo& geo, float noise, int height)
+{
+	geo.dheight = TOP_TILE_DHEIGHT / height;
+	geo.height = TOP_TILE_DHEIGHT * noise;
+}
+
+inline void geo_set_from_noise(float& geo, float noise, int height)
+{
+	geo = noise;
+}
+
 class GeoNoise {
 public:
 	typedef long int Seed;
@@ -101,11 +133,20 @@ public:
 		}
 	}
 
+	void gen_lodseeds(std::vector<Seed>& obuf)
+	{
+		struct drand48_data rd;
+		srand48_r((unsigned int)~seed_, &rd);
+		for(auto& iter : obuf) {
+			long int ret;
+			lrand48_r(&rd, &ret);
+			iter = (Seed)ret;
+		}
+	}
+
 	template<typename T>
 	void gen_terrain(std::vector<T>& obuf, int height, int width)
 	{
-		struct drand48_data rd;
-		srand48_r(seed_, &rd);
 		noise::module::Perlin perlin;
 		perlin.SetSeed(seed_);
 		height *= sizeof(T)/sizeof(float);
@@ -119,17 +160,44 @@ public:
 		noiseMapBuilder.SetBounds (-90.0, 90.0, -90.0, 90.0);
 		noiseMapBuilder.Build();
 
-		memcpy(obuf.data(), noiseMap.GetConstSlabPtr(), obuf.size() * sizeof(T));
+		const float* idata = noiseMap.GetConstSlabPtr();
+		for(size_t i = 0; i < obuf.size(); i++) {
+			geo_set_from_noise(obuf[i], idata[i], height);
+		}
 	}
 
 	template<typename T>
-	void gen_from_pattern(size_t nline, std::vector<T>& obuf, std::vector<T>& pattern)
+	void gen_from_pattern(size_t higher_nline,
+			size_t pattern_nline,
+			std::vector<T>& obuf,
+			std::vector<T>& pattern,
+			const Seed& patternseed
+			)
 	{
-		obuf.resize(nline*nline);
-#if 0
-		for(auto& iter : obuf)
-			iter.height = 256.0; //*drand48();
-#endif
+		if (!obuf.empty())
+			return ;
+		obuf.resize(higher_nline*higher_nline);
+		noise::module::Perlin perlin;
+		perlin.SetSeed(patternseed);
+
+		noise::utils::NoiseMap noiseMap;
+		noise::utils::NoiseMapBuilderSphere noiseMapBuilder;
+		noiseMapBuilder.SetSourceModule(perlin);
+		noiseMapBuilder.SetDestNoiseMap(noiseMap);
+		noiseMapBuilder.SetDestSize(int(higher_nline), int(higher_nline));
+		noiseMapBuilder.SetBounds (-90.0, 90.0, -90.0, 90.0);
+		noiseMapBuilder.Build();
+
+		const float* idata = noiseMap.GetConstSlabPtr();
+		for(size_t x = 0; x < higher_nline; x++) {
+			for(size_t y = 0; y < higher_nline; y++) {
+				size_t id = x * higher_nline + y;
+				size_t px = x / 2;
+				size_t py = y / 2;
+				size_t pid = px * pattern_nline + py;
+				geo_expand(obuf[id], pattern[pid], idata[id]);
+			}
+		}
 	}
 
 #if 0

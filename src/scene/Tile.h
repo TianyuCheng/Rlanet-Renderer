@@ -83,6 +83,7 @@ public:
 protected:
 	TileInfo shape_;
 	Seed seed_;
+	std::vector<Seed> lodseeds_;
 	mutable std::vector<Element> elems_; // LOD level 0
 	mutable std::vector<std::vector<Element>> lods_; // LOD level from 1 to nchild -1
 	mutable std::vector<Element> pattern_; // LOD level nchild
@@ -131,6 +132,10 @@ protected:
 			else
 				total_level = lround(log2(shape_.nelement()/pattern_.size())/2) - 1;
 			lods_.resize(total_level);
+
+			lodseeds_.resize(total_level+1);
+			typename TileInfo::Generator generator(seed_);
+			generator.gen_lodseeds(lodseeds_);
 		}
 		if (pattern_.empty()) { // Downsample
 			// Generate the base layer
@@ -148,9 +153,13 @@ protected:
 		for(int i = lods_.size() + 1; i > LODLevel; i--) {
 			auto pattern = access_lod_vec(i);
 			auto higher = access_lod_vec(i-1);
-			generator.gen_from_pattern(shape_.nline() >> (i-1), // shape (NxN)
+			generator.gen_from_pattern(
+				shape_.nline() >> (i),
+				shape_.nline() >> (i-1), // shape (NxN)
 				*higher, // LOD to generate
-				*pattern); // pattern
+				*pattern,
+				lodseeds_[i]
+				); // pattern
 		}
 	}
 };

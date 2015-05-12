@@ -31,7 +31,7 @@ void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 #else
 	Tile<TerrainComponoentMeta> target_tile(
 			TerrainTileInfo(TileShape<float>(
-					{0.0f, 0.0f},
+					{1e6, 1e6},
 					{2e6, 2e6},
 					4e6/1024.0)),
 			0);
