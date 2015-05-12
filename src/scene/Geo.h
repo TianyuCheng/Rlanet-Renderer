@@ -6,7 +6,7 @@
 
 struct GeoInfo {
 	float height; // Average height
-	float humidity;
+	//float humidity;
 	float dheight; // variance
 };
 
@@ -18,6 +18,7 @@ struct GeoHeightExtractor {
 	}
 };
 
+#if 0
 struct GeoHumidityExtractor {
 	void ncopy(GeoInfo* src, size_t n, float* dst)
 	{
@@ -25,7 +26,8 @@ struct GeoHumidityExtractor {
 			dst[i] = src[i].humidity;
 	}
 };
+#endif
 
-#define TOP_TILE_DHEIGHT	(1.2)
+#define TOP_TILE_DHEIGHT	(1.0)
 
 #endif

@@ -2,6 +2,7 @@
 #define NOISECLASSES_H
 
 #include <vector>
+#include <cmath>
 #include <stdlib.h>
 #include <noise/noise.h>
 #include <noiseutils.h>
@@ -53,7 +54,8 @@ template<>
 inline void downsample(GeoInfo& t, const GeoInfo& s1, const GeoInfo& s2, const GeoInfo& s3, const GeoInfo& s4)
 {
 	t.height = (s1.height + s2.height + s3.height + s4.height)/4;
-	t.humidity = (s1.humidity + s2.humidity + s3.humidity + s4.humidity)/4;
+	//t.humidity = (s1.humidity + s2.humidity + s3.humidity + s4.humidity)/4;
+#if 0
 	float peak1 = s1.height+s1.dheight; float peak = peak1;
 	float peak2 = s2.height+s2.dheight; peak = std::max(peak, peak2);
 	float peak3 = s3.height+s3.dheight; peak = std::max(peak, peak3);
@@ -63,6 +65,8 @@ inline void downsample(GeoInfo& t, const GeoInfo& s1, const GeoInfo& s2, const G
 	float trough3 = s3.height-s3.dheight; trough = std::min(trough, trough3);
 	float trough4 = s4.height-s4.dheight; trough = std::min(trough, trough4);
 	t.dheight = (peak - trough)/2;
+#endif
+	t.dheight = (s1.dheight + s2.dheight + s3.dheight + s4.dheight)/8;
 }
 
 
@@ -105,13 +109,23 @@ inline void geo_expand(float& detail, const float& pattern, float noise)
 
 inline void geo_set_from_noise(GeoInfo& geo, float noise, int height)
 {
-	geo.dheight = TOP_TILE_DHEIGHT / height;
+	geo.dheight = TOP_TILE_DHEIGHT / 16;
 	geo.height = TOP_TILE_DHEIGHT * noise;
 }
 
 inline void geo_set_from_noise(float& geo, float noise, int height)
 {
 	geo = noise;
+}
+
+inline void show(const GeoInfo &ob)
+{
+	fprintf(stderr, "\t%f (%e)", ob.height, ob.dheight);
+}
+
+inline void show(const float &ob)
+{
+	fprintf(stderr, "\t%f", ob);
 }
 
 class GeoNoise {
@@ -124,6 +138,7 @@ public:
 
 	void gen_subseed(std::vector<Seed>& obuf)
 	{
+#if 0
 		struct drand48_data rd;
 		srand48_r((unsigned int)seed_, &rd);
 		for(auto& iter : obuf) {
@@ -131,10 +146,16 @@ public:
 			lrand48_r(&rd, &ret);
 			iter = (Seed)ret;
 		}
+#else
+		srand48((unsigned int)seed_);
+		for(auto& iter : obuf)
+			iter = lrand48();
+#endif
 	}
 
 	void gen_lodseeds(std::vector<Seed>& obuf)
 	{
+#if 0
 		struct drand48_data rd;
 		srand48_r((unsigned int)~seed_, &rd);
 		for(auto& iter : obuf) {
@@ -142,6 +163,11 @@ public:
 			lrand48_r(&rd, &ret);
 			iter = (Seed)ret;
 		}
+#else
+		srand48((unsigned int)~seed_);
+		for(auto& iter : obuf)
+			iter = lrand48();
+#endif
 	}
 
 	template<typename T>
@@ -153,25 +179,58 @@ public:
 		perlin.SetFrequency(1.0);
 
 		height *= sizeof(T)/sizeof(float);
+		height += 1;
 
 		noise::utils::NoiseMap noiseMap;
 		noise::utils::NoiseMapBuilderSphere noiseMapBuilder;
+		//noise::utils::NoiseMapBuilderPlane noiseMapBuilder;
 
 		noiseMapBuilder.SetSourceModule(perlin);
 		noiseMapBuilder.SetDestNoiseMap(noiseMap);
 		noiseMapBuilder.SetDestSize (width, height);
 		noiseMapBuilder.SetBounds (-90.0, 90.0, -90.0, 90.0);
+		//noiseMapBuilder.SetBounds (0.0, 1024.0, 0.0, 1024.0);
 		noiseMapBuilder.Build();
 
 		const float* idata = noiseMap.GetConstSlabPtr();
+		idata += width;
+		fprintf(stderr, "\tSEED\t%ld, SIZE %lu, width %d, height %d\n", seed_, obuf.size(), height, width);
+#if 0
+		size_t ip = 0;
 		for(size_t i = 0; i < obuf.size(); i++) {
-			geo_set_from_noise(obuf[i], idata[i], height);
+			if (fabsf(idata[i]) > 0*1e-6) {
+				fprintf(stderr, "\t%f %d", fabsf(idata[i]), fabsf(idata[i]) > 1e6);
+				ip++;
+			}
+			if (ip % 16 == 15)
+				fprintf(stderr, "\n");
 		}
-		fprintf(stderr, "\tSEED\t%ld\n", seed_);
+#endif
+		size_t s = std::min(64UL, obuf.size());
+		for(size_t i = 0; i < s; i++) {
+			fprintf(stderr, "\t%f", fabsf(idata[i]));
+			if (i % 16 == 15)
+				fprintf(stderr, "\n");
+		}
+		fprintf(stderr, "========================================\n");
 		for(size_t i = 0; i < obuf.size(); i++) {
-			if (std::abs(idata[i]) > 1e5)
-				fprintf(stderr, "\t\t%f\n", idata[i]);
+			geo_set_from_noise(obuf[i], idata[i], width);
 		}
+		showall(obuf);
+	}
+
+
+	template<typename T>
+	void showall(std::vector<T>& obuf)
+	{
+#if 1
+		size_t s = std::min(64UL, obuf.size());
+		for(size_t i = 0; i < s; i++) {
+			show(obuf[i]);
+			if (i % 16 == 15)
+				fprintf(stderr, "\n");
+		}
+#endif
 	}
 
 	template<typename T>
@@ -194,11 +253,12 @@ public:
 		noise::utils::NoiseMapBuilderSphere noiseMapBuilder;
 		noiseMapBuilder.SetSourceModule(perlin);
 		noiseMapBuilder.SetDestNoiseMap(noiseMap);
-		noiseMapBuilder.SetDestSize(int(higher_nline), int(higher_nline));
+		noiseMapBuilder.SetDestSize(int(higher_nline)+1, int(higher_nline));
 		noiseMapBuilder.SetBounds (-90.0, 90.0, -90.0, 90.0);
 		noiseMapBuilder.Build();
 
 		const float* idata = noiseMap.GetConstSlabPtr();
+		idata += higher_nline;
 		for(size_t x = 0; x < higher_nline; x++) {
 			for(size_t y = 0; y < higher_nline; y++) {
 				size_t id = x * higher_nline + y;
@@ -208,6 +268,7 @@ public:
 				geo_expand(obuf[id], pattern[pid], idata[id]);
 			}
 		}
+		showall(obuf);
 	}
 
 #if 0

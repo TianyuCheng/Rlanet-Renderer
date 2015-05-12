@@ -6,8 +6,8 @@ int main()
 {
 	int r = 128;
 	int h = r * M_PI;
-	int height = h;
-	int width = r;
+	int height = 3072;
+	int width = 1024;
 	noise::module::Perlin perlin;
 	perlin.SetSeed(9527);
 	perlin.SetOctaveCount(6);
