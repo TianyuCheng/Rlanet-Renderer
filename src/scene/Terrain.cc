@@ -169,22 +169,22 @@ void Terrain::init_gl_resource()
 void Terrain::init_vert()
 {
 	float size = 1.0 / grid;
-	for (int j = 0; j <= grid; j++) {
-		for (int i = 0; i <= grid; i++) {
+	for (int j = -1; j <= grid + 1; j++) {
+		for (int i = -1; i <= grid + 1; i++) {
 			vertices << QVector3D(i * size, 0, j * size);
 		}
 	}
-	for (int j = 0; j < grid; j++) {
-		for (int i = 0; i < grid; i++) {
+	for (int j = 0; j < grid + 1; j++) {
+		for (int i = 0; i < grid + 1; i++) {
 			// Upper triangle
-			indices << (j * (grid + 1) + i + 1)
-				<< (j * (grid + 1) + i) 
-				<< ((j + 1) * (grid + 1) + i);
+			indices << (j * (grid + 3) + i + 1)
+				<< (j * (grid + 3) + i) 
+				<< ((j + 1) * (grid + 3) + i);
 
 			// Bottom triangle
-			indices << ((j + 1) * (grid + 1) + i) 
-				<< ((j + 1) * (grid + 1) + i + 1)
-				<< (j * (grid + 1) + i + 1); 
+			indices << ((j + 1) * (grid + 3) + i) 
+				<< ((j + 1) * (grid + 3) + i + 1)
+				<< (j * (grid + 3) + i + 1); 
 		}
 	}
 }

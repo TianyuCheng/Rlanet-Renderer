@@ -131,18 +131,6 @@ vec3 gerstnerWaves(vec2 pos) {
     sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
     normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
 
-    amplitude = 1.6; speed = 50.0; waveLength = 200.0; direction = normalize(vec2(0.9, 0.3));
-    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
-    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
-
-    amplitude = 3.6; speed = 90.0; waveLength = 130.0; direction = normalize(vec2(-0.4, 0.6));
-    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
-    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
-
-    amplitude = 2.1; speed = 50.0; waveLength = 170.0; direction = normalize(vec2(-0.4, 0.2));
-    sum += gerstnerWave(pos, steepness, amplitude, speed, waveLength, direction);
-    normal += computeGerstnerNormal(pos, steepness, amplitude, speed, waveLength, direction);
-
     vertex.normal = normal;
     return sum;
 }
@@ -175,7 +163,8 @@ void main()
 
     vec3 pos = vec3(uScale * aVertex.xz + uOffset, 0.0).xzy;
     float morphK = computeMorphK(aVertex.xz, pos); 
-    vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy;
+    /* vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy; */
+    vec3 morphedPos = pos;
     vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
     /* morphedPos.y = waves(morphedPos.xz); */
     morphedPos = gerstnerWaves(morphedPos.xz);
