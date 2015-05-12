@@ -32,25 +32,6 @@ out vData
 const float PI = 3.1415926;
 const float SQRT2 = 1.4142;
 
-float sampledNoise(vec2 x) {
-    return texture(uNoisemap, (x + vec2(0.5, 0.5)/256.0)).r;
-}
-
-float fbm(vec2 x) {
-    float sum = 0.0;
-
-    float lacunarity = 2.0;
-    float persistence = 0.6;
-    float frequency = 1.0;
-    float amplitude = 1.0;
-
-    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
-    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
-    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
-    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
-    return sum;
-}
-
 // Transform a xz-plane to sphere
 vec3 wrap(float radius, vec3 morphedPos) {
     float rho = morphedPos.y + radius;
@@ -69,7 +50,7 @@ vec3 wrap(float radius, vec3 morphedPos) {
  */
 float terrainHeight(vec2 uv) {
     float coarse = texture(uHeightmap, uv).x * 3200.0 - 1600.0;
-    return coarse + fbm(uv) * 20.0;
+    return coarse;
 }
 
 /**

@@ -29,11 +29,31 @@ in fData
 
 out vec4 frag_color;
 
+vec3 sampledNoise(vec2 x) {
+    return texture(uNoisemap, (x + vec2(0.5, 0.5)/256.0)).rgb;
+}
+
+vec3 fbm(vec2 x) {
+    vec3 sum = vec3(0.0, 0.0, 0.0);
+
+    float lacunarity = 2.0;
+    float persistence = 0.6;
+    float frequency = 1.0;
+    float amplitude = 1.0;
+
+    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
+    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
+    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
+    sum += sampledNoise(x * frequency) * amplitude; amplitude *= persistence; frequency *= lacunarity;
+    return sum;
+}
+
 void main()
 {
     // I am going to fake a light here
     // Uniform for light will be implemented later
-    vec3 n = normalize(frag.normal);
+    /* vec3 n = normalize(frag.normal * texture(uNoisemap, frag.pos.xz / 512.0).xyz); */
+    vec3 n = normalize(frag.normal * fbm(frag.pos.xz / 512.0));
     vec3 v = normalize(-frag.view);
     vec3 l = normalize(lightPos - frag.view);
 
