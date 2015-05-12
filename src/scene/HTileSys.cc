@@ -10,7 +10,7 @@ HTileSys::HTileSys()
 {
 	earth_.reset(new Zearth(TerrainTileInfo(TileShape<float>({0.0f, 0.0f},
 				{1048576,1048576},
-				1024.0)), 1804289383));
+				2048.0)), 1804289383));
 }
 
 HTileSys::~HTileSys()
