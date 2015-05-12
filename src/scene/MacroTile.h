@@ -65,6 +65,10 @@ public:
 		free(pchildren_array_);
 	}
 
+	void root_set_heightmap(const std::vector<FloatType>& hmap)
+	{
+		// TODO
+	}
 
 	bool is_leaf() const { return pchildren_array_ == nullptr; }
 	void init_children()
@@ -75,7 +79,7 @@ public:
 		// Seeds for children
 		seeds_.resize(nchild*nchild);
 		typename TileInfo::Generator generator(this->seed_);
-		generator.gen(seeds_);
+		generator.gen_subseed(seeds_);
 	}
 	/*
 	 * Transfer a part of the whole terrain hierarchy to a second tile
@@ -87,8 +91,8 @@ public:
 	 * Note: need a working MacroTileBlitCursor class to work, which can
 	 * walk among tiles.
 	 */
-	template<typename SecondTile, typename Splicer = TileSplicer<Element> >
-	bool blit_to(SecondTile& sectile)
+	template<typename SecondTile, typename Adaptor = TransparentSplicer<Element> >
+	bool blit_to(SecondTile& sectile, const Adaptor& adapter = Adaptor())
 	{
 		fprintf(stderr, "%s firstres %f secres %f\n", __func__, this->get_resolution(0), sectile.get_resolution(0));
 		auto blit_cursor = create_blitter(sectile, *this);
@@ -104,7 +108,7 @@ public:
 #endif
 			auto iblock = blit_cursor.current_iblock();
 			auto oblock = blit_cursor.current_oblock();
-			Splicer splicer(iblock, oblock);
+			TileSplicer<Element, typename SecondTile::Element, Adaptor> splicer(iblock, oblock);
 			splicer.splice(oblock.nelem());
 		} while (blit_cursor.next());
 		return true;

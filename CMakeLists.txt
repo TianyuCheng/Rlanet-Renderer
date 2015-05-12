@@ -81,7 +81,8 @@ add_dependencies(PlanetRenderer project_libnoise)
 target_link_libraries(PlanetRenderer PlanetEssential ${OPENGL_LIBRARIES} ${OPENGL_glu_LIBRARIES})
 
 # Test cases
-add_executable(test_tile src/test/test_tile.cc)
+add_executable(test_tile src/test/test_tile.cc src/scene/noiseutils.cc)
+target_link_libraries(test_tile ${LIBNOISE_LIBRARY})
 AUX_SOURCE_DIRECTORY(src/test/ PLANET_TEST_CASES)
 
 # Generate cscope.files

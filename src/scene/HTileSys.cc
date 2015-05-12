@@ -21,22 +21,31 @@ void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 	if (done_)
 		return;
 	QVector3D pos = cam.getPosition();
-	Tile<TerrainTileInfo> target_tile(
+#if 0
+	Tile<TerrainComponoentMeta> target_tile(
 			TerrainTileInfo(TileShape<float>(
 					{0.0f, 0.0f},
 					{512.0f, 512.0f},
 					0.5)),
 			0);
-	earth_->blit_to(target_tile);
+#else
+	Tile<TerrainComponoentMeta> target_tile(
+			TerrainTileInfo(TileShape<float>(
+					{0.0f, 0.0f},
+					{2e6, 2e6},
+					4e6/1024.0)),
+			0);
+#endif
+	earth_->blit_to(target_tile, GeoHeightExtractor());
 	intptr_t stride;
 	float* data = target_tile.access_lod(0, 0, &stride);
 
-#if 0
+#if 1
 	for (int i = 0; i < 1024; i++)
 		fprintf(stderr, "%f\t", data[i]);
 	fprintf(stderr, "\n");
 #endif
-#if 1
+#if 0
 	// Generate heightmap using seed
 	int r = 128;
 	int w  = r * 2 * M_PI;

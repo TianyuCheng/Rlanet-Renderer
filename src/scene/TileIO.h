@@ -80,7 +80,7 @@ private:
 
 template<typename InElem,
 	typename OutElem = InElem,
-	typename Splicer = TransparentSplicer<InElem> >
+	typename ElemAdapter = TransparentSplicer<InElem> >
 class TileSplicer {
 public:
 	TileSplicer(TileIO<InElem>& in, TileIO<OutElem>& out)
@@ -103,7 +103,7 @@ public:
 
 			ssize_t lineelem = std::min(in_.lineremain(), out_.lineremain());
 			lineelem = std::min(nelem, lineelem);
-			splicer_.ncopy(ipos, lineelem, opos);
+			adapter_.ncopy(ipos, lineelem, opos);
 
 			in_.seek_by_elem(lineelem);
 			out_.seek_by_elem(lineelem);
@@ -117,7 +117,7 @@ public:
 protected:
 	TileIO<InElem>& in_;
 	TileIO<OutElem>& out_;
-	Splicer splicer_;
+	ElemAdapter adapter_;
 };
 
 #endif

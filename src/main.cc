@@ -226,7 +226,9 @@ public:
 		// setContextProperty("fps", QString::number(fps()));
 
 		do_camera_move();
+#if 0
 		solar_->update_polar(0.8 * M_PI, double(clock())/CLOCKS_PER_SEC * M_PI);
+#endif
 
 		terrain_->underWaterCulling(QVector4D(0.0, 1.0, 0.0, 0.0));
 		if (camera_->getPosition().y() >= 0) {

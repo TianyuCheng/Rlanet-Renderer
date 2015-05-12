@@ -106,15 +106,20 @@ protected:
 		return &pattern_;
 	}
 
+	void gen_base()
+	{
+		if (!elems_.empty())
+			return ;
+		alloc_memory();
+		typename TileInfo::Generator generator(seed_);
+		generator.gen_terrain(elems_, shape_.nline(), shape_.nelem_in_line());
+	}
+
 	void gen(int LODLevel = 0)
 	{
 		// Allocate the base memory
 		if (LODLevel == 0) {
-			if (!elems_.empty())
-				return ;
-			alloc_memory();
-			typename TileInfo::Generator generator(seed_);
-			generator.gen(elems_);
+			gen_base();
 			return ;
 		}
 
@@ -129,9 +134,7 @@ protected:
 		}
 		if (pattern_.empty()) { // Downsample
 			// Generate the base layer
-			alloc_memory();
-			typename TileInfo::Generator generator(seed_);
-			generator.gen(elems_);
+			gen_base();
 			for(int i = 1; i <= LODLevel; i++) {
 				downsample(shape_.nline() >> (i-1),
 						*access_lod_vec(i-1),
@@ -145,7 +148,7 @@ protected:
 		for(int i = lods_.size() + 1; i > LODLevel; i--) {
 			auto pattern = access_lod_vec(i);
 			auto higher = access_lod_vec(i-1);
-			generator.gen(shape_.nline() >> (i-1), // shape (NxN)
+			generator.gen_from_pattern(shape_.nline() >> (i-1), // shape (NxN)
 				*higher, // LOD to generate
 				*pattern); // pattern
 		}

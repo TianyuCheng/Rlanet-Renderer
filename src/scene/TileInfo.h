@@ -2,6 +2,7 @@
 #define TILE_INFO_H
 
 #include "Vec2D.h"
+#include "Geo.h"
 #include "Noise.h"
 
 template<typename T>
@@ -26,16 +27,17 @@ struct TileShape {
 };
 
 // We also need TileInfo concenpt for sampling purpose
-struct TerrainTileInfo : public TileShape<float> {
-	TerrainTileInfo(const TileShape<float>& tileshape)
+template<typename GeoInfo>
+struct TileMeta : public TileShape<float> {
+	TileMeta(const TileShape<float>& tileshape)
 		:TileShape(tileshape)
 	{
 		recalibre(res);
 	}
 	typedef float FloatType;
-	typedef float TileElement; // Height
+	typedef GeoInfo TileElement; // Height
 	typedef Vec2D<FloatType> Coordinate; // Coordinate
-	typedef BlankNoise Generator;
+	typedef GeoNoise Generator;
 	typedef typename Generator::Seed TileSeed; // Seed for noise generation
 
 	ssize_t get_linear(const Coordinate& coord) const
@@ -79,5 +81,8 @@ private:
 	Vec2D<int> ishape_;
 	size_t nelem_;
 };
+
+typedef TileMeta<GeoInfo> TerrainTileInfo;
+typedef TileMeta<float> TerrainComponoentMeta;
 
 #endif
