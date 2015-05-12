@@ -49,30 +49,33 @@ vec3 fbm(vec2 x) {
 
 void main()
 {
-    // I am going to fake a light here
-    // Uniform for light will be implemented later
-    vec3 n = normalize(frag.normal * fbm(frag.pos.xz / 1024.0));
+    vec3 n;
+    if (distance(frag.pos, uCamera) > 4000.0) 
+        n = normalize(frag.normal * texture(uNoisemap, frag.pos.xz / 4096.0).xyz);
+    else 
+        n = normalize(frag.normal * fbm(frag.pos.xz / 1024.0));
     vec3 v = normalize(-frag.view);
     vec3 l = normalize(lightPos - frag.view);
 
     float height = texture(uHeightmap, frag.heightUV).x;
 
     vec3 decal;
-    if (height < 0.5) 
+    if (height < 0.4) {
         decal = texture(uDecalmap0, frag.texCoords).xyz;
-    else if (height < 0.6) 
+    }
+    else if (height < 0.6) {
+        float factor1 = texture(uNoisemap, frag.pos.xz / 12497.0).x;
+        float factor2 = clamp((height - 0.4) * 5.0, 0.0, 1.0);
         decal = mix(
-                    texture(uDecalmap0, frag.texCoords).xyz,
-                    texture(uDecalmap1, frag.texCoords).xyz,
-                    (height - 0.5) * 10.0
-                );
-    else if (height < 0.8) 
-        decal = texture(uDecalmap1, frag.texCoords).xyz;
-    else if (height < 0.9) 
+                texture(uDecalmap0, frag.texCoords).xyz,
+                texture(uDecalmap1, frag.texCoords).xyz,
+                clamp( factor2, 0.0, 1.0));
+    }
+    else if (height < 0.7) 
         decal = mix(
                     texture(uDecalmap1, frag.texCoords).xyz,
                     texture(uDecalmap2, frag.texCoords).xyz,
-                    (height - 0.8) * 10.0
+                    (height - 0.6) * 10.0
                 );
     else 
         decal = texture(uDecalmap2, frag.texCoords).xyz;
@@ -84,7 +87,7 @@ void main()
     if (uCamera.y < 0 && frag.pos.y < 0) 
         underWaterEffects = vec3(0.3, 0.3, 0.3) + 0.7 * texture(uWaterCaustics, frag.pos.xz / 1024.0 + uTime / 16.0).xyz;
 
-    vec3 color = (ambient + diffuse) * decal * underWaterEffects;
+    vec3 color = (ambient + diffuse) * decal * underWaterEffects * 1.2;
     frag_color = vec4(color, 1.0);
     gl_FragDepth = frag.linearZ;
 }
