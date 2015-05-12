@@ -32,7 +32,7 @@ vec3 hemisphere(float radius, vec2 xz, float y) {
 void main()
 {
     // perform the vertex transformation
-    vec3 pos = hemisphere(9000.0, aVertex.xz, 0.0);
+    vec3 pos = hemisphere(5000.0, aVertex.xz, 0.0);
     vWorld = pos;
 
     pos.xz += uCenter.xz;

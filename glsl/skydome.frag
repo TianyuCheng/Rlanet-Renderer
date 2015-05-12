@@ -79,7 +79,7 @@ float fbm(vec2 pos)
 }
 
 const float rad = 100.0;
-const float skyrad = 9000.0;
+const float skyrad = 5000.0;
 const float factor = (skyrad - rad) * 2 * PI;
 
 void main()

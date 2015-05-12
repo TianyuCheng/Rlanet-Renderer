@@ -40,7 +40,7 @@ void Solar::render()
 
 void Solar::update_gloc()
 {
-	double rho = 9000.0;
+	double rho = 5000.0;
 	pos_ = QVector3D(rho * cos(theta_) * cos(phi_),
 			rho * sin(phi_),
 			rho * sin(theta_) * cos(phi_));
