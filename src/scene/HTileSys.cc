@@ -19,6 +19,7 @@ HTileSys::~HTileSys()
 void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 {
 	QVector3D pos = cam.getPosition();
+#if 1
 #if 0
 	if (pos != last_pos_) {
 		fprintf(stderr, "Camera pos (%f, %f, %f)\n",
@@ -27,9 +28,11 @@ void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 				pos.z());
 		last_pos_ = pos;
 	}
-	if (done_)
+#endif
+	if (init_)
 		return;
 #endif
+#if 0
 	if (init_ &&
 		(std::abs(last_pos_.x() - pos.x()) < 5e4 ||
 		 std::abs(last_pos_.y() - pos.y()) < 5e4 ))
@@ -37,7 +40,7 @@ void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 #if 0
 	Tile<TerrainComponoentMeta> target_tile(
 			TerrainTileInfo(TileShape<float>(
-					{0.0f, 0.0f},
+					{0.0f, 0.0f}kk
 					{512.0f, 512.0f},
 					0.5)),
 			0);
@@ -62,7 +65,8 @@ void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 		fprintf(stderr, "%f\t", data[i]);
 	fprintf(stderr, "\n");
 #endif
-#if 0
+#endif
+#if 1
 	// Generate heightmap using seed
 	int r = 128;
 	int w  = r * 2 * M_PI;

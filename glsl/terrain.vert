@@ -69,7 +69,7 @@ vec3 wrap(float radius, vec3 morphedPos) {
  */
 float terrainHeight(vec2 uv) {
     float coarse = texture(uHeightmap, uv).x * 3200.0 - 1600.0;
-    return coarse + fbm(uv) * 50.0;
+    return coarse + fbm(uv) * 20.0;
 }
 
 /**

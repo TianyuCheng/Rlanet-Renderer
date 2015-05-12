@@ -193,6 +193,9 @@ public:
 
 		// OpenGL settings
 		glEnable(GL_DEPTH_TEST);
+
+        glEnable(GL_POLYGON_SMOOTH);
+        glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	}
 
 	void do_camera_move()
