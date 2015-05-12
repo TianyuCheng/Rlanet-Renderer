@@ -51,7 +51,7 @@ void HTileSys::upload_heightmap(QOpenGLTexture* tex, Camera& cam)
 			pos.z());
 	Tile<TerrainComponoentMeta> target_tile(
 			TerrainTileInfo(TileShape<float>(
-					{pos.x() - 1e5, pos.z() - 1e5},
+					{pos.x() - 1e5f, pos.z() - 1e5f},
 					{2e5, 2e5},
 					2e5/1024.0)),
 			0);
