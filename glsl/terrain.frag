@@ -64,12 +64,11 @@ void main()
         decal = texture(uDecalmap0, frag.texCoords).xyz;
     }
     else if (height < 0.6) {
-        float factor1 = texture(uNoisemap, frag.pos.xz / 12497.0).x;
         float factor2 = clamp((height - 0.4) * 5.0, 0.0, 1.0);
         decal = mix(
                 texture(uDecalmap0, frag.texCoords).xyz,
                 texture(uDecalmap1, frag.texCoords).xyz,
-                clamp( factor2, 0.0, 1.0));
+                clamp(factor2, 0.0, 1.0));
     }
     else if (height < 0.7) 
         decal = mix(
