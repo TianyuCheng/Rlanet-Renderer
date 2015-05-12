@@ -33,6 +33,8 @@ struct TileIO {
 
 	Elem* now() const
 	{
+		if (gpos_ > nline_ * stride_in_bytes_)
+			return nullptr;
 		char* newloc = gpos_ + reinterpret_cast<char*>(buf_);
 		return reinterpret_cast<Elem*>(newloc);
 	}
@@ -59,16 +61,18 @@ struct TileIO {
 			linepos_ += nelem;
 			gpos_ += nelem * sizeof(Elem);
 		} else {
-			nelem += linepos_;
 			// Seek to the start of the line
 			gpos_ -= linepos_ * sizeof(Elem);
 			linepos_ = 0;
+			nelem += linepos_;
 			// Move some lines
 			seek_by_line(nelem/linenelem_);
 			// And move by the number of remaining elements
-			seek_by_elem(nelem&linenelem_);
+			seek_by_elem(nelem % linenelem_);
 		}
 	}
+
+	intptr_t tell() { return gpos_; }
 private:
 	Elem* buf_;
 	intptr_t linepos_;
@@ -100,6 +104,8 @@ public:
 			//fprintf(stderr, "Line: %d nelem %ld\n", nline++, nelem);
 			InElem* ipos = in_.now();
 			OutElem* opos = out_.now();
+			if (!ipos || !opos)
+				break;
 
 			ssize_t lineelem = std::min(in_.lineremain(), out_.lineremain());
 			lineelem = std::min(nelem, lineelem);

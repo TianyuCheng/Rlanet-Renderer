@@ -148,9 +148,10 @@ public:
 		reflectCamera_->setPerspective(45.0, (float)width/(float)height, 1.0, 10000.0);
 
 		// For terrain navigation
+		float cc = 524288.0f;
 		camera_->lookAt(
-				QVector3D(2e6, 150.0, 2e6),
-				QVector3D(2e6, 150.0, 2e6+100.0),
+				QVector3D(cc, 150.0, cc),
+				QVector3D(cc, 150.0, cc+100.0),
 				QVector3D(0.0, 1.0, 0.0)
 			       );
 

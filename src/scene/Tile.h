@@ -46,15 +46,28 @@ public:
 		intptr_t stride;
 		Element* buf = access_lod(LODLevel, start, &stride);
 		stride *= sizeof(Element);
+		size_t nline = imaxs.x - imins.x;
 
-		fprintf(stderr, "\t%s, accessing LOD %d with size %lu\n",
+		auto lodvec = access_lod_vec(LODLevel);
+		fprintf(stderr, "\t[%s], accessing LOD %d with size %lu\n",
 				__func__,
-				LODLevel, access_lod_vec(LODLevel)->size());
+				LODLevel, lodvec->size());
+		fprintf(stderr, "\t[%s], start block (%d, %d),"
+				" end block(%d, %d),"
+				" addr range %p - %p"
+				" within %p - %p\n",
+				__func__,
+				imins.x, imins.y,
+				imaxs.x, imaxs.y,
+				buf, buf+stride*(nline - 1)+imaxs.y - imins.y,
+				lodvec->data(),
+				lodvec->data() + lodvec->size()
+				);
 
 		return TileIO<Element>(buf,
 				block_lineelem,
 				stride,
-				imaxs.x - imins.x);
+				nline);
 	}
 
 	Element* access_lod(int LODLevel, ssize_t offset, intptr_t* pstride)
@@ -62,6 +75,17 @@ public:
 		gen(LODLevel);
 		*pstride = shape_.nelem_in_line() >> LODLevel;
 		return access_lod_vec(LODLevel)->data() + offset;
+	}
+
+	std::vector<Element>* access_lod_vec(int LODLevel)
+	{
+		if (LODLevel == 0) {
+			return &elems_;
+		}
+		if (LODLevel <= lods_.size()) {
+			return &lods_[LODLevel-1];
+		}
+		return &pattern_;
 	}
 
 	const TileInfo& get_shape_info() const { return shape_; }
@@ -94,17 +118,6 @@ protected:
 			size_t nelem = shape_.nelement();
 			elems_.resize(nelem);
 		}
-	}
-
-	std::vector<Element>* access_lod_vec(int LODLevel)
-	{
-		if (LODLevel == 0) {
-			return &elems_;
-		}
-		if (LODLevel <= lods_.size()) {
-			return &lods_[LODLevel-1];
-		}
-		return &pattern_;
 	}
 
 	void gen_base()
@@ -147,8 +160,10 @@ protected:
 			}
 			return ;
 		}
+#if 0
 		fprintf(stderr, "Tile %p is generating LOD from Pattern %p\n",
 				this, pattern_.data());
+#endif
 		typename TileInfo::Generator generator(seed_);
 		for(int i = lods_.size() + 1; i > LODLevel; i--) {
 			auto pattern = access_lod_vec(i);
@@ -160,6 +175,7 @@ protected:
 				*pattern,
 				lodseeds_[i]
 				); // pattern
+#if 0
 			fprintf(stderr, "\t\tGenerating LOD %d from LOD %d"
 					", %lu <- %lu "
 					"Seed: %lu\n"
@@ -167,6 +183,7 @@ protected:
 					higher->size(), pattern->size(),
 					lodseeds_[i-1]
 					);
+#endif
 		}
 	}
 };

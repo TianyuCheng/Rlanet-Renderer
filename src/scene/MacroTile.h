@@ -110,7 +110,10 @@ public:
 			auto iblock = blit_cursor.current_iblock();
 			auto oblock = blit_cursor.current_oblock();
 			TileSplicer<Element, typename SecondTile::Element, Adaptor> splicer(iblock, oblock);
-			splicer.splice(oblock.nelem());
+			size_t nelem = splicer.splice(oblock.nelem());
+			fprintf(stderr, "\t\t%lu elements copied, should be %lu\n",
+					nelem,
+					oblock.nelem());
 		} while (blit_cursor.next());
 		return true;
 	}
@@ -146,10 +149,12 @@ public:
 		if (pancestors) {
 			*pancestors = ancestors;
 		}
+		TileInfo lodshape = cursor->get_shape_info();
+		lodshape.recalibre(cursor->get_resolution(leastlod));
 		return Cursor(pos,
 				ancestors,
 				leastlod,
-				cursor->get_shape_info().get_block(area.init_pos())
+				lodshape.get_block(area.init_pos())
 				);
 	}
 
@@ -181,7 +186,19 @@ public:
 		ti.init_coord.x = id.x * ti.shape.x;
 		ti.init_coord.y = id.y * ti.shape.y;
 		ti.init_coord += this->shape_.init_pos();
+		fprintf(stderr, "#####[%s] self at (%f, %f), shape (%f, %f)\t"
+				"new at (%f, %f), shape (%f, %f)\n",
+				__func__,
+				this->shape_.init_pos().x,
+				this->shape_.init_pos().y,
+				this->shape_.shape.x,
+				this->shape_.shape.y,
+				ti.init_coord.x,
+				ti.init_coord.y,
+				ti.shape.x,
+				ti.shape.y);
 
+		/* Pattern */
 		this->gen(); // ensure details are there
 		Element* start = &this->elems_[0];
 		Vec2D<int> subshape(this->shape_.nline() / nchild,

@@ -13,8 +13,20 @@ struct GeoInfo {
 struct GeoHeightExtractor {
 	void ncopy(GeoInfo* src, size_t n, float* dst)
 	{
-		for(size_t i : boost::irange(0UL, n))
-			dst[i] = src[i].height;
+		for(size_t i : boost::irange(0UL, n)) {
+			dst[i] = 0.5 + 0.5 * src[i].height;
+			//dst[i] = src[i].height;
+#if 0
+			if (i < 4)
+				fprintf(stderr, "****\t%f = %f\t\t*(%p) = *(%p)\n",
+					dst[i], src[i].height,
+					&dst[i], &src[i]
+					);
+#endif
+		}
+#if 0
+		fprintf(stderr, "\n");
+#endif
 	}
 };
 

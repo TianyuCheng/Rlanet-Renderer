@@ -88,6 +88,7 @@ void downsample(size_t nline, const std::vector<T>& higher, std::vector<T>& lowe
 
 inline void geo_expand(GeoInfo& detail, const GeoInfo& pattern, float noise)
 {
+#if 0
 	float ph = pattern.height;
 	float pdh = pattern.dheight;
 	float nh = ph + noise * pdh;
@@ -100,6 +101,17 @@ inline void geo_expand(GeoInfo& detail, const GeoInfo& pattern, float noise)
 			std::abs(nh - ph),
 			ndh);
 	detail.dheight = ndh;
+#endif
+#if 1
+	float ph = pattern.height;
+	float pdh = pattern.dheight;
+	float nh = ph + noise * pdh/2;
+	detail.height = nh;
+	detail.dheight = pdh/2;
+#else
+	detail.height = noise;
+	detail.dheight = pattern.dheight/2;
+#endif
 }
 
 inline void geo_expand(float& detail, const float& pattern, float noise)
@@ -178,7 +190,6 @@ public:
 		perlin.SetOctaveCount(6);
 		perlin.SetFrequency(1.0);
 
-		height *= sizeof(T)/sizeof(float);
 		height += 1;
 
 		noise::utils::NoiseMap noiseMap;
@@ -194,7 +205,16 @@ public:
 
 		const float* idata = noiseMap.GetConstSlabPtr();
 		idata += width;
+#if 0
 		fprintf(stderr, "\tSEED\t%ld, SIZE %lu, width %d, height %d\n", seed_, obuf.size(), height, width);
+		size_t s = std::min(64UL, obuf.size());
+		for(size_t i = 0; i < s; i++) {
+			fprintf(stderr, "\t%f", fabsf(idata[i]));
+			if (i % 16 == 15)
+				fprintf(stderr, "\n");
+		}
+		fprintf(stderr, "========================================\n");
+#endif
 #if 0
 		size_t ip = 0;
 		for(size_t i = 0; i < obuf.size(); i++) {
@@ -206,13 +226,6 @@ public:
 				fprintf(stderr, "\n");
 		}
 #endif
-		size_t s = std::min(64UL, obuf.size());
-		for(size_t i = 0; i < s; i++) {
-			fprintf(stderr, "\t%f", fabsf(idata[i]));
-			if (i % 16 == 15)
-				fprintf(stderr, "\n");
-		}
-		fprintf(stderr, "========================================\n");
 		for(size_t i = 0; i < obuf.size(); i++) {
 			geo_set_from_noise(obuf[i], idata[i], width);
 		}
@@ -223,7 +236,7 @@ public:
 	template<typename T>
 	void showall(std::vector<T>& obuf)
 	{
-#if 1
+#if 0
 		size_t s = std::min(64UL, obuf.size());
 		for(size_t i = 0; i < s; i++) {
 			show(obuf[i]);

@@ -211,7 +211,7 @@ public:
 		fprintf(stderr, "\tmins\t"); mins.tell();
 		fprintf(stderr, "\tnow\t"); this->now.tell();
 #endif
-		if (collide_le(maxs, this->now) || collide_l(this->now, mins)) {
+		if (collide_l(maxs, this->now) || collide_l(this->now, mins)) {
 			fprintf(stderr, "\n\t OOB at "); this->now.tell();
 			return true;
 		}
@@ -221,6 +221,12 @@ public:
 	void tell(bool linefeed = true)
 	{
 		fprintf(stderr, "BlitterFromMTile current: "); this->now.tell(linefeed);
+		auto nt = this->current_tile();
+		auto shape = nt->get_shape_info();
+		fprintf(stderr, "\t\tShape (%f, %f), size (%f, %f), LOD 0 res: %f",
+				shape.init_coord.x, shape.init_coord.y,
+				shape.shape.x, shape.shape.y,
+				shape.res);
 	}
 	/*
  	 * Time to learn the original meaning of these two words
@@ -250,16 +256,18 @@ public:
 
 	void get_blitting_region(Coord& min, Coord& max)
 	{
-		SourceTile *now = this->current_tile();
-		min = now->init_pos();
-		max = now->tail_pos();
-		min.clamp_min(sectile.init_pos());
-		max.clamp_max(sectile.tail_pos());
+		SourceTile *nt = this->current_tile();
+		min = nt->init_pos();
+		max = nt->tail_pos();
+		auto secmin = sectile.init_pos();
+		auto secmax = sectile.tail_pos();
+		min.clamp_min(secmin);
+		max.clamp_max(secmax);
 	}
 
 	TileIO<SourceElement> current_iblock()
 	{
-		SourceTile *now = this->current_tile();
+		SourceTile *nt = this->current_tile();
 		Coord min, max;
 		get_blitting_region(min, max);
 #if TILE_DEBUG
@@ -267,19 +275,22 @@ public:
 				min.x, min.y,
 				max.x, max.y);
 #endif
-		return now->get_ioblock(min, max, this->LODLevel);
+		return nt->get_ioblock(min, max, this->LODLevel);
 	}
 
 	TileIO<TargetElement> current_oblock()
 	{
 		Coord min, max;
 		get_blitting_region(min, max);
-#if TILE_DEBUG
+#if 1 // TILE_DEBUG
 		fprintf(stderr, "oblock (%f, %f) - (%f, %f)\n",
 				min.x, min.y,
 				max.x, max.y);
-#endif
+		auto ret = sectile.get_ioblock(min, max, 0);
+		return ret;
+#else
 		return sectile.get_ioblock(min, max, 0);
+#endif
 	}
 
 	bool next()
@@ -312,7 +323,7 @@ create_blitter(TargetTile& target, SourceTile& source)
 	shapecorner.init_coord = target.tail_pos();
 	auto cursor_max = source.find_best_match(shapecorner);
 	fprintf(stderr, "cursor_max "); cursor_max.now.tell();
-	fprintf(stderr, "Max resolution: %f\n", shapecorner.get_resolution(0));
+	//fprintf(stderr, "Max resolution: %f\n", shapecorner.get_resolution(0));
 
 	target.adjust_resolution(cursor_min.get_resolution());
 	auto relocoord = ancestors.back()->get_shape_info()
@@ -322,7 +333,8 @@ create_blitter(TargetTile& target, SourceTile& source)
 	fprintf(stderr, "adjust input, new location (%f, %f) resolution to %f\n",
 			newplace.init_coord.x,
 			newplace.init_coord.y,
-			target.get_resolution(0));
+			cursor_min.get_resolution()
+	       );
 
 	return BlitterFromMTile<SourceTile, TargetTile>(cursor_min,
 			ancestors,
