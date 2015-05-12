@@ -104,7 +104,7 @@ void main()
 	float siny = (sin(lightPolar.y) + 0.1) / 1.1;
 	float sinyp = pow(siny, 0.25);
 	float sinypc = clamp(sinyp, 0.1, 1.0);
-	vec4 enhancered = vec4(normalize(vec3(1.0, sinypc, sinypc)), 1.0);
+	vec4 enhancered = vec4(normalize(vec3(1.0, sinypc, sinypc * 0.75)), 1.0);
 	frag_color = clamp(sinyp* c * enhancered * vec4(pic, 1.0), 0.0, 1.0);
 
 	/* // fBm-based sky, slow */
