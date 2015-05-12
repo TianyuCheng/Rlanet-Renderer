@@ -9,6 +9,16 @@ public:
 };
 
 class Solar : public Light {
+private:
+	QVector3D pos_;
+	float theta_;
+	float phi_;
+	float radius_;
+	QVector3D amb_;
+	QVector3D diff_;
+	QVector3D spec_;
+
+	void update_gloc();
 public:
 	Solar(const QString& name,
 		float theta,
@@ -27,17 +37,17 @@ public:
 		update_gloc();
 	}
 
+#define GET_ATTR(NAME)	decltype(NAME ## _) get_##NAME () const { return NAME ## _; }
 
-private:
-	QVector3D pos_;
-	float theta_;
-	float phi_;
-	float radius_;
-	QVector3D amb_;
-	QVector3D diff_;
-	QVector3D spec_;
+	GET_ATTR(pos)
+	GET_ATTR(theta)
+	GET_ATTR(phi)
+	GET_ATTR(radius)
+	GET_ATTR(amb)
+	GET_ATTR(diff)
+	GET_ATTR(spec)
 
-	void update_gloc();
+#undef GET_ATTR
 };
 
 #endif
