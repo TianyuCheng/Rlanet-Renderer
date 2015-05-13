@@ -38,6 +38,7 @@ public slots:
 	virtual void mouseDragging(int x, int y) {}
 	virtual void mouseDragFinished(int x, int y) {}
 	virtual void see_sun() {}
+	virtual void sun_tweak_fixed() {}
 
 public:
 	int fps() { return _fpsVal; }

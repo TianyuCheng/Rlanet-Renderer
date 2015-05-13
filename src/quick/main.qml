@@ -33,6 +33,7 @@ Item {
         signal mousedragging(int x, int y);
         signal mousedragfinished(int x, int y);
         signal findsun();
+        signal fixsun();
 
 		/*
 		 * Step 2: accept keyboard signals, and translate them to UI
@@ -99,11 +100,17 @@ Item {
         }
 
         RoundButton {
+		id: findsunbutton
             anchors { left: quitbutton.right; verticalCenter: parent.verticalCenter }
             text: "Find Sun"
             onClicked: renderer.findsun();
         }
 
+        RoundButton {
+            anchors { left: findsunbutton.right; verticalCenter: parent.verticalCenter }
+            text: "Fix the Sun"
+            onClicked: renderer.fixsun();
+        }
         // Text {
         //     id: fpsText
         //     anchors.right: parent.right

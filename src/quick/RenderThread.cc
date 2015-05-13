@@ -202,6 +202,12 @@ void RenderThread::setup_ui_signals(QObject* ui)
 		renderMgr,
 		SLOT(see_sun()),
 		Qt::QueuedConnection);
+
+	connect(ui,
+		SIGNAL(fixsun()),
+		renderMgr,
+		SLOT(sun_tweak_fixed()),
+		Qt::QueuedConnection);
 	// Note: In theory we don't need to specify Qt::QueuedConnection because
 	// Qt::connect will use QueuedConnection for object in different threads,
 	// which is just our case. However I don't want to take the risk.

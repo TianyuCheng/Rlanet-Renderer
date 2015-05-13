@@ -36,6 +36,9 @@ class PlanetRenderManager : public RenderManager {
 			DEFINE_ACTION(CAMERA_PITCH_DOWN)
 	};
 #undef DEFINE_ACTION
+
+	bool sun_fixed_ = false;
+	double init_clock_;
 public:
 
 	/**
@@ -144,6 +147,11 @@ public:
 				QVector3D(0.0, 1.0, 0.1));
 	}
 
+	void sun_tweak_fixed()
+	{
+		sun_fixed_ = !sun_fixed_;
+	}
+
 	void prepare() {
 		int width = resolution.width();
 		int height = resolution.height();
@@ -211,8 +219,10 @@ public:
 		// OpenGL settings
 		glEnable(GL_DEPTH_TEST);
 
-        glEnable(GL_POLYGON_SMOOTH);
-        glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+		glEnable(GL_POLYGON_SMOOTH);
+		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+
+		init_clock_ = clock();
 	}
 
 	void do_camera_move()
@@ -241,22 +251,25 @@ public:
 	}
 
 	void render(QOpenGLFramebufferObject *fbo) {
-		static double init_clock(clock());
 
 		// qDebug() << fps();
 		// setContextProperty("fps", QString::number(fps()));
 
 		do_camera_move();
-#if 1
-		double relsec = (double(clock()) - init_clock)/CLOCKS_PER_SEC;
-		solar_->update_polar(0.0 * M_PI,
-				 init_phi + relsec * time_factor * M_PI);
+
+		if (sun_fixed_) {
+			solar_->update_polar(0.0 * M_PI,
+					0.45 * M_PI);
+		} else {
+			double relsec = (double(clock()) - init_clock_)/CLOCKS_PER_SEC;
+			solar_->update_polar(0.0 * M_PI,
+					init_phi + relsec * time_factor * M_PI);
+		}
 #if 0
 		fprintf(stderr, "Solar (%f, %f, %f)\n", 
 				solar_->get_pos().x(),
 				solar_->get_pos().y(),
 				solar_->get_pos().z());
-#endif
 #endif
 
 		terrain_->underWaterCulling(QVector4D(0.0, 1.0, 0.0, 0.0));
