@@ -82,8 +82,10 @@ void main()
 
     vec3 ambient = lightAmbient;
     vec3 diffuse = lightDiffuse * clamp(0.0, 1.0, max(0.0, dot(n, l)));
-    if (lightPolar.y < 1/1.5)
-    	    diffuse = vec3(0,0,0);
+    float siny = clamp((sin(lightPolar.y) - 0.31) / (1 - 0.31), 0, 1);
+    float sinyp = pow(siny, 0.25);
+    float sinypc = clamp(sinyp, 0.1, 1.0);
+    diffuse = diffuse * sinypc;
 
     vec3 underWaterEffects = vec3(1.0, 1.0, 1.0);
     if (uCamera.y < 0 && frag.pos.y < 0) 
