@@ -82,9 +82,9 @@ Item {
 
 	Audio {
 		id: playMusic
-		source: appPath+"/e922d4ffdee2345071e146039b970aea1d4c3d5c.aac"
+		source: appPath+"/morning.ogg"
 		autoPlay: true
-		loops: Audio.Infinite
+		//loops: Audio.Infinite
 	}
 
     FontLoader { id: neuropolFont; source: "qrc:/fonts/neuropol x rg.ttf" }

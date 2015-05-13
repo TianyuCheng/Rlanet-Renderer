@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <iostream>
 #include <Application.h>
 #include <RenderManager.h>
 
@@ -9,6 +10,11 @@
 #include <Grass.h>
 #include <Tree.h>
 #include "Solar.h"
+
+const float init_phi = M_PI * 0.1;
+const float time_factor = (1/90.0);
+//const float init_phi = M_PI * 0.45;
+//const float time_factor = 1.0;
 
 class PlanetRenderManager : public RenderManager {
 	enum ACTION_BIT {
@@ -143,8 +149,8 @@ public:
 		int height = resolution.height();
 
 		solar_ = new Solar("Solar",
-				0.0,
-				M_PI * 0.45,
+				0.0 * M_PI,
+				init_phi,
 				100.0,
 				{0.1, 0.1, 0.1},
 				{1.1, 1.1, 1.1},
@@ -159,8 +165,9 @@ public:
 		// For terrain navigation
 		float cc = 524288.0f;
 		camera_->lookAt(
-				QVector3D(cc, 150.0, cc),
-				QVector3D(cc, 150.0, cc+100.0),
+				QVector3D(cc, 250.0, cc),
+				//QVector3D(cc, 150.0, cc+100.0),
+				solar_->get_pos(),
 				QVector3D(0.0, 1.0, 0.0)
 			       );
 
@@ -234,13 +241,22 @@ public:
 	}
 
 	void render(QOpenGLFramebufferObject *fbo) {
+		static double init_clock(clock());
 
 		// qDebug() << fps();
 		// setContextProperty("fps", QString::number(fps()));
 
 		do_camera_move();
 #if 1
-		solar_->update_polar(0.8 * M_PI, double(clock())/CLOCKS_PER_SEC * 0.25 * M_PI);
+		double relsec = (double(clock()) - init_clock)/CLOCKS_PER_SEC;
+		solar_->update_polar(0.0 * M_PI,
+				 init_phi + relsec * time_factor * M_PI);
+#if 0
+		fprintf(stderr, "Solar (%f, %f, %f)\n", 
+				solar_->get_pos().x(),
+				solar_->get_pos().y(),
+				solar_->get_pos().z());
+#endif
 #endif
 
 		terrain_->underWaterCulling(QVector4D(0.0, 1.0, 0.0, 0.0));

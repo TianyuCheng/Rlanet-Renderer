@@ -193,14 +193,15 @@ public:
 		height += 1;
 
 		noise::utils::NoiseMap noiseMap;
-		noise::utils::NoiseMapBuilderSphere noiseMapBuilder;
-		//noise::utils::NoiseMapBuilderPlane noiseMapBuilder;
+		//noise::utils::NoiseMapBuilderSphere noiseMapBuilder;
+		noise::utils::NoiseMapBuilderPlane noiseMapBuilder;
 
 		noiseMapBuilder.SetSourceModule(perlin);
 		noiseMapBuilder.SetDestNoiseMap(noiseMap);
 		noiseMapBuilder.SetDestSize (width, height);
-		noiseMapBuilder.SetBounds (-90.0, 90.0, -90.0, 90.0);
-		//noiseMapBuilder.SetBounds (0.0, 1024.0, 0.0, 1024.0);
+		//noiseMapBuilder.SetBounds (-90.0, 90.0, -90.0, 90.0);
+		noiseMapBuilder.SetBounds (512.0, 512.0 + 1.5, 512.0, 512.0 + 4.0);
+		noiseMapBuilder.EnableSeamless();
 		noiseMapBuilder.Build();
 
 		const float* idata = noiseMap.GetConstSlabPtr();
