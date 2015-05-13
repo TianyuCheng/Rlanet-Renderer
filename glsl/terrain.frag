@@ -7,6 +7,7 @@ uniform sampler2D uDecalmap2;
 uniform sampler2D uNoisemap;
 uniform sampler2D uWaterCaustics;
 
+uniform vec2 lightPolar;
 uniform vec3 lightPos;
 uniform vec3 lightAmbient;
 uniform vec3 lightDiffuse;
@@ -81,6 +82,8 @@ void main()
 
     vec3 ambient = lightAmbient;
     vec3 diffuse = lightDiffuse * clamp(0.0, 1.0, max(0.0, dot(n, l)));
+    if (lightPolar.y < 1/1.5)
+    	    diffuse = vec3(0,0,0);
 
     vec3 underWaterEffects = vec3(1.0, 1.0, 1.0);
     if (uCamera.y < 0 && frag.pos.y < 0) 

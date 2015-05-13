@@ -92,20 +92,22 @@ void main()
 	vec3 pic = texture(uDecalmap, uv).rgb;
 	float d = distance(vWorld, lightPos);
 	float c;
+	vec4 channel_factor = vec4(1.0, 1.0, 1.0, 1.0);
 	if (d < 2 * rad) {
 		d = d / (2 * rad);
 		c = 1/ pow(d, 3);
+		channel_factor = vec4(1.0, 0.9, 0.5, 1.0);
 	} else if (d < factor) {
 		d -= rad;
 		d = (factor - d)/(factor - rad);
 		d = clamp(d, 0.0, 1.0);
 		c = pow(d, 0.5);
 	}
-	float siny = (sin(lightPolar.y) + 0.1) / 1.1;
+	float siny = clamp((sin(lightPolar.y) + 0.5) / 1.5, 0, 1);
 	float sinyp = pow(siny, 0.25);
 	float sinypc = clamp(sinyp, 0.1, 1.0);
-	vec4 enhancered = vec4(normalize(vec3(1.0, sinypc, sinypc * 0.75)), 1.0);
-	frag_color = clamp(sinyp* c * enhancered * vec4(pic, 1.0), 0.0, 1.0);
+	vec4 enhancered = vec4(normalize(vec3(1.0, sinypc, sinypc)), 1.0);
+	frag_color = clamp(sinyp* c * enhancered * channel_factor * vec4(pic, 1.0), 0.0, 1.0);
 
 	/* // fBm-based sky, slow */
 	/* float cloud = fbm(vUV); */

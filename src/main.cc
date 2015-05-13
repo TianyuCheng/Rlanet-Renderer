@@ -230,7 +230,7 @@ public:
 		// setContextProperty("fps", QString::number(fps()));
 
 		do_camera_move();
-#if 0
+#if 1
 		solar_->update_polar(0.8 * M_PI, double(clock())/CLOCKS_PER_SEC * M_PI);
 #endif
 
