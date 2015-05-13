@@ -231,7 +231,7 @@ public:
 
 		do_camera_move();
 #if 1
-		solar_->update_polar(0.8 * M_PI, double(clock())/CLOCKS_PER_SEC * M_PI);
+		solar_->update_polar(0.8 * M_PI, double(clock())/CLOCKS_PER_SEC * 0.25 * M_PI);
 #endif
 
 		terrain_->underWaterCulling(QVector4D(0.0, 1.0, 0.0, 0.0));
