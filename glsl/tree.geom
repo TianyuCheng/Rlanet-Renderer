@@ -81,7 +81,7 @@ void main(void) {
     float posy = terrainHeight(uv);
 
     // do not generate tree under water
-    if (posy >= 0.0) {
+    if (posy >= 0.0 && texture(uHeightmap, uv).x < 0.7) {
         pos = vec3(pos.x, posy, pos.z);
         float angle = rand(pos.zx);
 
