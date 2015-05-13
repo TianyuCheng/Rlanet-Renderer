@@ -105,8 +105,8 @@ void main()
 		//float v = (logfar - log(t))/logfar;
 		float v = 1/t - 1/solar_r;
 		vec4 channel_factor = vec4(1.0, 1.0, 0.5, 1.0);
-		vec4 enhancered = vec4(1.0, sinypc, sinypc, 1.0);
-		frag_color = clamp(enhancered * (v * channel_factor + siny * vec4(pic, 1.0)), 0.0, 1.0);
+		vec4 enhancered = vec4(1.0, pow(sinypc, 0.5), sinypc, 1.0);
+		frag_color = clamp(enhancered * (v * channel_factor + sinypc * vec4(pic, 1.0)), 0.0, 1.0);
 	} else {
 		frag_color = vec4(0.0, 0.0, 0.0, 0.0);
 #if 0

@@ -11,7 +11,7 @@
 #include <Tree.h>
 #include "Solar.h"
 
-const float init_phi = M_PI * 0.1;
+const float init_phi = M_PI * 0.07;
 const float time_factor = (1/90.0);
 //const float init_phi = M_PI * 0.45;
 //const float time_factor = 1.0;
@@ -173,7 +173,7 @@ public:
 		// For terrain navigation
 		float cc = 524288.0f;
 		camera_->lookAt(
-				QVector3D(cc, 250.0, cc),
+				QVector3D(cc, 300.0, cc),
 				//QVector3D(cc, 150.0, cc+100.0),
 				solar_->get_pos(),
 				QVector3D(0.0, 1.0, 0.0)
