@@ -81,6 +81,8 @@ float fbm(vec2 pos)
 const float rad = 100.0;
 const float skyrad = 5000.0;
 const float factor = (skyrad - rad) * 2 * PI;
+const float solar_r = factor/rad; //10.0;
+const float logfar = log(solar_r);
 
 void main()
 {
@@ -92,27 +94,33 @@ void main()
 	vec3 pic = texture(uDecalmap, uv).rgb;
 	float d = distance(vWorld, lightPos);
 	float c;
-	vec4 channel_factor = vec4(1.0, 1.0, 1.0, 1.0);
 	float siny = clamp((sin(lightPolar.y) - 0.31) / (1 - 0.31), 0, 1);
 	float sinyp = pow(siny, 0.25);
-	vec4 base = vec4(0.0, 0.0, 0.0, 0.0);
 
-	if (d < 1.2 * rad) {
-		d = d / (2 * rad);
-		c = 1/ pow(d, 2.5);
-		channel_factor = normalize(vec4(1.0, 0.9, 0.5, 1.0));
-		sinyp = clamp(sinyp, 1.0, 100.0);
-		if (d > rad)
-			base = vec4(pic, 1.0);
-	} else if (d < factor) {
+	if (d < solar_r * rad) {
+		float sinypc = clamp(pow(siny, 0.5), 0.0, 1.0);
+		float t = d / (rad);
+		//float v = solar_r - sqrt(solar_r*solar_r - (t - solar_r) * (t - solar_r) );
+		//v /= (solar_r);
+		//float v = (logfar - log(t))/logfar;
+		float v = 1/t - 1/solar_r;
+		vec4 channel_factor = vec4(1.0, 1.0, 0.5, 1.0);
+		vec4 enhancered = vec4(1.0, sinypc, sinypc, 1.0);
+		frag_color = clamp(enhancered * (v * channel_factor + siny * vec4(pic, 1.0)), 0.0, 1.0);
+	} else {
+		frag_color = vec4(0.0, 0.0, 0.0, 0.0);
+#if 0
 		d -= rad;
 		d = (factor - d)/(factor - rad);
 		d = clamp(d, 0.0, 1.0);
 		c = pow(d, 0.5);
+
+		float sinypc = clamp(sinyp, 0.1, 1.0);
+		vec4 enhancered = vec4(normalize(vec3(1.0, sinypc, sinypc)), 1.0);
+		frag_color = clamp(sinyp * c * enhancered * vec4(pic, 1.0), 0.0, 1.0);
+#endif
 	}
-	float sinypc = clamp(sinyp, 0.1, 1.0);
-	vec4 enhancered = vec4(normalize(vec3(1.0, sinypc, sinypc)), 1.0);
-	frag_color = clamp(sinyp * c * enhancered * channel_factor * vec4(pic, 1.0) + base, 0.0, 1.0);
+
 
 	/* // fBm-based sky, slow */
 	/* float cloud = fbm(vUV); */
