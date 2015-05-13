@@ -46,7 +46,7 @@ void main()
     vec3 diffuse = lightDiffuse * clamp(0.0, 1.0, max(0.0, dot(n, l)));
     vec3 specular = lightSpecular * clamp(0.0, 1.0, pow(dot(n, h), 5.0));
 
-    vec3 color = (ambient + diffuse + specular) * decal * 0.4;
+    vec3 color = (ambient + diffuse) * decal * 0.4 + specular * decal;
     frag_color = vec4(color, 0.5);
     gl_FragDepth = frag.linearZ;
 }

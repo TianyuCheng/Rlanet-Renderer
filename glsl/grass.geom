@@ -78,7 +78,7 @@ void main(void) {
     vec3 pos = gl_in[0].gl_Position.xyz;
     float height = pos.y;
     vec2 uv = pos.xz / 16384.0 - vec2(0.5, 0.5);
-    float posy = terrainHeight(uv) + 10.0;
+    float posy = terrainHeight(uv) + 20.0;
 
     // do not show grass under water
     if (posy >= 0.0 && texture(uHeightmap, uv).x < 0.65) {
