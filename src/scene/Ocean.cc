@@ -21,6 +21,10 @@ void Ocean::uniform() {
     decalmap[0]->bind(1);
     int decalLocation0 = program.uniformLocation("uVertexDisplacement");
     program.setUniformValue(decalLocation0, 1);
+	heightmap->bind(2);
+	int heightloc = program.uniformLocation("uHeightmap");
+	fprintf(stderr, "UHMap loc %d\n", heightloc);
+	program.setUniformValue(heightloc, 2);
 
     float elapsedTime = float(time.elapsed()) / 1e3;
     program.setUniformValue("uTime", elapsedTime);

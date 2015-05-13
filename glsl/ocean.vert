@@ -209,7 +209,6 @@ void main()
     /* float morphK = computeMorphK(aVertex.xz, pos);  */
     /* vec3 morphedPos = vec3(morphVertex(aVertex.xz, pos.xz, morphK), 0.0).xzy; */
     vec3 morphedPos = pos;
-    vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
     /* morphedPos.y = waves(morphedPos.xz); */
     morphedPos = gerstnerWaves(morphedPos.xz);
     vec4 noproj = uMVMatrix * uTransform * vec4(morphedPos, 1.0);
@@ -219,5 +218,6 @@ void main()
     vertex.linearZ = (-noproj.z-1.0)/(10000.0-1.0);
     vertex.texCoords = pos.xz / 512.0;
     vertex.view = (uMVMatrix * vec4(morphedPos, 1.0)).xyz;
+    vec2 uv = morphedPos.xz / 16384.0 - vec2(0.5, 0.5);
     vertex.heightUV = uv;
 }

@@ -64,8 +64,13 @@ void main(void)
     /*     EndPrimitive(); */
     /* } */
 
+    bool emmit = false;
     for (int i = 0; i < gl_in.length(); i++)
     {
+        float height = texture(uHeightmap, vertices[i].heightUV).x;
+        if (height < 0.5) {
+        	emmit = true;
+	}
         gl_Position = gl_in[i].gl_Position;
         frag.pos = vertices[i].pos;
         frag.view = vertices[i].view;
@@ -75,5 +80,6 @@ void main(void)
         frag.linearZ = vertices[i].linearZ;
         EmitVertex();
     }
-    EndPrimitive();
+    if (emmit)
+	    EndPrimitive();
 }
