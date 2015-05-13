@@ -23,7 +23,6 @@ void Ocean::uniform() {
     program.setUniformValue(decalLocation0, 1);
 	heightmap->bind(2);
 	int heightloc = program.uniformLocation("uHeightmap");
-	fprintf(stderr, "UHMap loc %d\n", heightloc);
 	program.setUniformValue(heightloc, 2);
 
     float elapsedTime = float(time.elapsed()) / 1e3;
