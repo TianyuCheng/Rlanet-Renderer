@@ -197,6 +197,11 @@ void RenderThread::setup_ui_signals(QObject* ui)
 		SLOT(mouseDragging(int, int)),
 		Qt::QueuedConnection); // Must be QueuedConnection
 
+	connect(ui,
+		SIGNAL(findsun()),
+		renderMgr,
+		SLOT(see_sun()),
+		Qt::QueuedConnection);
 	// Note: In theory we don't need to specify Qt::QueuedConnection because
 	// Qt::connect will use QueuedConnection for object in different threads,
 	// which is just our case. However I don't want to take the risk.

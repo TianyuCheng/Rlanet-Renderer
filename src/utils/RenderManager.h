@@ -37,6 +37,7 @@ public slots:
 	virtual void mouseDragStarted(int x, int y) {}
 	virtual void mouseDragging(int x, int y) {}
 	virtual void mouseDragFinished(int x, int y) {}
+	virtual void see_sun() {}
 
 public:
 	int fps() { return _fpsVal; }

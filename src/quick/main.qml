@@ -32,6 +32,7 @@ Item {
         signal mousedragstarted(int x, int y);
         signal mousedragging(int x, int y);
         signal mousedragfinished(int x, int y);
+        signal findsun();
 
 		/*
 		 * Step 2: accept keyboard signals, and translate them to UI
@@ -91,9 +92,16 @@ Item {
     Bar {
         id: toolbar
         RoundButton {
+        	id: quitbutton
             anchors { left: parent.left; verticalCenter: parent.verticalCenter }
             text: "Quit"
             onClicked: Qt.quit()
+        }
+
+        RoundButton {
+            anchors { left: quitbutton.right; verticalCenter: parent.verticalCenter }
+            text: "Find Sun"
+            onClicked: renderer.findsun();
         }
 
         // Text {
@@ -102,6 +110,7 @@ Item {
         //     text: "fps: " + fps
         // }
     }
+
     
     Popup {
         id: menu

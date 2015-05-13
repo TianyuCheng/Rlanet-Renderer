@@ -129,6 +129,15 @@ public:
 		camera_->lookUp(angleY);
 	}
 
+	void see_sun()
+	{
+		QVector3D sunpos = camera_->getPosition() + solar_->get_pos();
+		sunpos += QVector3D(0.0, -1600.0, 0.0);
+		camera_->lookAt(camera_->getPosition(),
+				sunpos,
+				QVector3D(0.0, 1.0, 0.1));
+	}
+
 	void prepare() {
 		int width = resolution.width();
 		int height = resolution.height();
