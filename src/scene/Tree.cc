@@ -79,8 +79,8 @@ TreeFactory::~TreeFactory() {
     treeBladeAlpha.clear();
 }
 
-Tree* TreeFactory::createTree(TreeType treeType, QVector2D center, double radius, double spacing, double size, double height, int seed) {
+Tree* TreeFactory::createTree(TreeType treeType, QVector2D center, double radius, double spacing, double size, double height, int seed, double chance) {
     Tree* tree = new Tree(this, treeType);
-    createBillboard(tree, center, radius, spacing, size, height, seed);
+    createBillboard(tree, center, radius, spacing, size, height, seed, chance);
     return tree;
 }

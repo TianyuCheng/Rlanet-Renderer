@@ -39,13 +39,21 @@ BillboardFactory::BillboardFactory(QString name)
 BillboardFactory::~BillboardFactory() {
 }
 
+static double random_factor() // -1 to 1
+{
+	return -1.0 + 2.0 * drand48();
+}
+
 void BillboardFactory::createBillboard(Billboard *billboard,
 		QVector2D center,
 		double radius,
 		double spacing,
 		double size,
 		double height,
-		int seed) {
+		int seed,
+		double chance
+		)
+{
 	if (!seed)
 		seed = clock();
 	srand(seed);
@@ -58,8 +66,13 @@ void BillboardFactory::createBillboard(Billboard *billboard,
 			QVector2D point(x, y);
 			// Check if the point is in the circle
 			if (point.length() <= radius) {
+				if (drand48() >= chance)
+					continue;
 				double rnd = ((rand() / (float)RAND_MAX) * 0.25 - 0.125) * height;
-				billboard->placeBillboard(QVector2D(cx + x, cy + y), height + rnd);
+				billboard->placeBillboard(
+					QVector2D(cx + x + spacing * 0.5 * random_factor(),
+						cy + y + spacing * 0.5 * random_factor()),
+					height + rnd);
 			}
 		}
 	}

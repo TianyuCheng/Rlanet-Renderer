@@ -93,7 +93,7 @@ void main()
 	float d = distance(vWorld, lightPos);
 	float c;
 	vec4 channel_factor = vec4(1.0, 1.0, 1.0, 1.0);
-	float siny = clamp((sin(lightPolar.y) + 0.5) / 1.5, 0, 1);
+	float siny = clamp((sin(lightPolar.y) - 0.31) / (1 - 0.31), 0, 1);
 	float sinyp = pow(siny, 0.25);
 	vec4 base = vec4(0.0, 0.0, 0.0, 0.0);
 

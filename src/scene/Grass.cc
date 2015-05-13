@@ -69,6 +69,14 @@ GrassFactory::~GrassFactory() {
 
 Grass* GrassFactory::createGrass(QVector2D center, double radius, double spacing, double size, double height, int seed) {
 	Grass* grass = new Grass(this);
-	createBillboard(grass, center, radius, spacing, size, height, seed);
+	createBillboard(grass,
+			center,
+			radius,
+			spacing,
+			size,
+			height,
+			seed,
+			2.0
+			);
 	return grass;
 }

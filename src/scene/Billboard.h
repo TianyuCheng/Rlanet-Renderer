@@ -53,7 +53,9 @@ public:
 			double spacing,
 			double size,
 			double height,
-			int seed = 0);
+			int seed = 0,
+			double chance = 1.0
+			);
 };
 
 #endif /* end of include guard: BILLBOARD_H */
