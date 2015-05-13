@@ -49,11 +49,10 @@ public:
 	/* void render */
 	void render() {} 
 
-	Grass* createGrass(QVector2D center, double radius, double spacing, double size, double height, int seed = 0);
+	Grass* createGrass(QVector2D center, double radius, double spacing, double size, double height, int seed = 0, double chance = 1.0);
 
 private:
 	std::unique_ptr<QOpenGLTexture> grassBlade;
-	std::unique_ptr<QOpenGLTexture> grassBladeAlpha;
 	Terrain *terrain;
 };
 

@@ -59,7 +59,6 @@ public:
 
 private:
 	QVector<QOpenGLTexture*> treeBlade;
-	QVector<QOpenGLTexture*> treeBladeAlpha;
 	Terrain *terrain;
 };
 

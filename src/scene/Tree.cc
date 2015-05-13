@@ -20,9 +20,7 @@ void Tree::uniform() {
 
 	// uniform the tree texture and alpha map
 	factory->treeBlade[int(treeType)]->bind(2);
-	factory->treeBladeAlpha[int(treeType)]->bind(3);
 	program.setUniformValue("uDecalmap", 2);
-	program.setUniformValue("uAlphamap", 3);
 	CHECK_GL_ERROR("Tree After uAlphamap");
 
 	// uniform the size of tree
@@ -41,13 +39,11 @@ TreeFactory::TreeFactory(Terrain *t)
     setShader(QOpenGLShader::Fragment, "../glsl/billboard.frag");
 
     for (int i = 0; i < int(TreeType::NUM_TREES); i++) {
-        QString filename = QString("../textures/billboard/tree%1.jpg");
-        QString filenameAlpha = QString("../textures/billboard/tree_alpha%1.jpg");
+        QString filename = QString("../textures/billboard/tree%1.png");
 
         QImage tree(filename.arg(QString::number(i + 1)));
-        QImage treeAlpha(filenameAlpha.arg(QString::number(i + 1)));
 
-        if (tree.isNull() || treeAlpha.isNull()) {
+        if (tree.isNull()) {
             qDebug() << "Tree texture has not been found!";
             exit(-1);
         }
@@ -58,14 +54,7 @@ TreeFactory::TreeFactory(Terrain *t)
         blade->setMagnificationFilter(QOpenGLTexture::Linear);
         blade->setWrapMode(QOpenGLTexture::Repeat);
 
-        QOpenGLTexture *bladeAlpha = new QOpenGLTexture(treeAlpha);
-        bladeAlpha->setWrapMode(QOpenGLTexture::Repeat);
-        bladeAlpha->setMinificationFilter(QOpenGLTexture::Linear);
-        bladeAlpha->setMagnificationFilter(QOpenGLTexture::Linear);
-        bladeAlpha->setWrapMode(QOpenGLTexture::Repeat);
-
         treeBlade << blade;
-        treeBladeAlpha << bladeAlpha;
     }
 
 }
@@ -73,10 +62,8 @@ TreeFactory::TreeFactory(Terrain *t)
 TreeFactory::~TreeFactory() {
     for (int i = 0; i < treeBlade.size(); i++) {
         delete treeBlade[i];
-        delete treeBladeAlpha[i];
     }
     treeBlade.clear();
-    treeBladeAlpha.clear();
 }
 
 Tree* TreeFactory::createTree(TreeType treeType, QVector2D center, double radius, double spacing, double size, double height, int seed, double chance) {

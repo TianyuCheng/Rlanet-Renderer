@@ -167,7 +167,7 @@ public:
 		ocean_.reset(new Ocean(32, 5, finalPass_.get()));
 
 		grassFactory_.reset(new GrassFactory(terrain_.get()));
-		grass_.reset(grassFactory_->createGrass(QVector2D(cc+1000, cc+1000), 1000.0, 40.0, 80.0, 40.0));
+		grass_.reset(grassFactory_->createGrass(QVector2D(cc+1000, cc+1000), 10000.0, 10.0, 80.0, 40.0, 68435, 0.125));
 
 		treeFactory_.reset(new TreeFactory(terrain_.get()));
 		tree1_.reset(treeFactory_->createTree(TreeType::PALM, QVector2D(cc+2000, cc+2000), 10000.0, 200.0, 140.0, 200.0, 3389, 0.25));

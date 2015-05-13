@@ -24,11 +24,9 @@ vec3 qtransform(vec4 q, vec3 v) {
 }
 
 vec4 quarternionFromAxisAndAngle(vec3 axis, float angle) {
-    float qx = axis.x * sin(angle/2);
-    float qy = axis.y * sin(angle/2);
-    float qz = axis.z * sin(angle/2);
+    axis *= sin(angle/2);
     float qw = cos(angle/2);
-    return vec4(qx, qy, qz, qw);
+    return vec4(axis, qw);
 }
 
 vec4 transform(vec3 pos) {
@@ -44,23 +42,25 @@ void createFace(float angle, float displacement, float height, vec3 pos) {
     vec3 pt2 = vec3( 1.0, 1.0, 0.0);
     vec3 pt3 = vec3(-1.0, 0.0, 0.0);
     vec3 pt4 = vec3(-1.0, 1.0, 0.0);
+    vec3 qt = qtransform(q, vec3(0.0, 0.0, -displacement));
+    vec3 factor = vec3(uSize, height, uSize);
 
-    vec3 tpt1 = qtransform(q, pt1) + qtransform(q, vec3(0.0, 0.0, -displacement)); tpt1.xz *= uSize; tpt1.y *= height;
+    vec3 tpt1 = qtransform(q, pt1) + qt; tpt1 *= factor;
     gl_Position = transform(tpt1 + pos); 
     vTexCoords = vec2(0.0, 1.0);
     EmitVertex();
 
-    vec3 tpt2 = qtransform(q, pt2) + qtransform(q, vec3(0.0, 0.0, -displacement)); tpt2.xz *= uSize; tpt2.y *= height;
+    vec3 tpt2 = qtransform(q, pt2) + qt; tpt2 *= factor;
     gl_Position = transform(tpt2 + pos); 
     vTexCoords = vec2(0.0, 0.0);
     EmitVertex();
 
-    vec3 tpt3 = qtransform(q, pt3) + qtransform(q, vec3(0.0, 0.0, -displacement)); tpt3.xz *= uSize; tpt3.y *= height;
+    vec3 tpt3 = qtransform(q, pt3) + qt; tpt3 *= factor;
     gl_Position = transform(tpt3 + pos); 
     vTexCoords = vec2(1.0, 1.0);
     EmitVertex();
 
-    vec3 tpt4 = qtransform(q, pt4) + qtransform(q, vec3(0.0, 0.0, -displacement)); tpt4.xz *= uSize; tpt4.y *= height;
+    vec3 tpt4 = qtransform(q, pt4) + qt; tpt4 *= factor;
     gl_Position = transform(tpt4 + pos); 
     vTexCoords = vec2(1.0, 0.0);
     EmitVertex();
@@ -81,7 +81,7 @@ void main(void) {
     float posy = terrainHeight(uv) + 50.0;
 
     // do not show grass under water
-    if (posy >= 0.0) {
+    if (posy >= 0.0 && texture(uHeightmap, uv).x < 0.65) {
         pos = vec3(pos.x, posy, pos.z);
 
         float angle = rand(pos.zx);
