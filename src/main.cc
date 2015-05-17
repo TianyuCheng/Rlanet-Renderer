@@ -280,6 +280,7 @@ public:
 			// reflection
 			camera_->reflectCamera(QVector4D(0.0, 1.0, 0.0, 0.0), reflectCamera_.get());
 			reflection_->setCamera(reflectCamera_.get());
+			reflection_->set_center(camera_->getPosition());
 		} else {
 			// refraction
 			reflection_->setCamera(camera_.get());

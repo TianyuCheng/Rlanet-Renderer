@@ -53,6 +53,9 @@ public:
 	void setCamera(Camera *cam) { camera = cam; }
 	Camera* getCamera() { return camera; }
 
+	void set_center(const QVector3D& center) { center_ = center; }
+	QVector3D get_center() const { if (has_center_) return center_; else return camera->getPosition(); }
+
 	void resize(QSize res);
 
 	void discardTexture() { lastPass = -1; }
@@ -81,6 +84,9 @@ private:
 
 	bool fbo_ready;
 	int lastPass;
+
+	bool has_center_ = false;
+	QVector3D center_;
 };
 
 #endif /* end of include guard: SCENE_H */

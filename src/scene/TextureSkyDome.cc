@@ -50,9 +50,8 @@ void TextureSkyDome::uniform() {
     program.setUniformValue(decalLocation, 1);
     
 
-    Camera* camera = dynamic_cast<Scene*>(parent)->getCamera();
-    QVector3D cameraPos = camera->getPosition();
-    program.setUniformValue("uCenter", cameraPos);
+    QVector3D center = dynamic_cast<Scene*>(parent)->get_center();
+    program.setUniformValue("uCenter", center);
 
     CHECK_GL_ERROR(device, "after sets uniforms");
 }
