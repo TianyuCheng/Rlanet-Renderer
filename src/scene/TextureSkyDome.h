@@ -12,7 +12,7 @@ using std::unique_ptr;
 
 class TextureSkyDome : public SceneObject {
 public:
-    TextureSkyDome(int grid, Scene *scene);
+    TextureSkyDome(GraphicsDevice *device, int grid, Scene *scene);
 
     virtual ~TextureSkyDome ();
 

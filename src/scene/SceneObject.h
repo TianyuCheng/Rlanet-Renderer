@@ -13,22 +13,34 @@ using std::unique_ptr;
 #include <QVector3D>
 #include <QOpenGLShader>
 #include <QOpenGLBuffer>
-#include "SelectGL.h"
+
+#include <SelectGL.h>
+#include <GraphicsDevice.h>
 
 class Scene;
 
-class SceneObject : protected GLCore {
+class SceneObject {
 	friend class Scene;
 public:
 
 	// Constructor with only name
-	SceneObject(QString n, SceneObject *parent = nullptr);
+	SceneObject(GraphicsDevice *device, 
+                QString n, 
+                SceneObject *parent = nullptr);
 
 	// Constructor with name and shader sources
-	SceneObject(QString n, QString _vShader, QString _fShader, SceneObject *parent = nullptr);
+	SceneObject(GraphicsDevice *device, 
+                QString n, 
+                QString _vShader, 
+                QString _fShader, 
+                SceneObject *parent = nullptr);
 
 	// Constructor with name and shader
-	SceneObject(QString n, QOpenGLShader *_vShader, QOpenGLShader *_fShader, SceneObject *parent = nullptr);
+	SceneObject(GraphicsDevice *device, 
+                QString n, 
+                QOpenGLShader *_vShader, 
+                QOpenGLShader *_fShader, 
+                SceneObject *parent = nullptr);
 
 #if 0
 	// Copy Constructor
@@ -140,6 +152,7 @@ protected:
 	GLuint texcoordLocation_;
 
 	bool initialized = false;
+    GraphicsDevice *device;
 };
 
 #endif /* end of include guard: SCENEOBJECT_H */

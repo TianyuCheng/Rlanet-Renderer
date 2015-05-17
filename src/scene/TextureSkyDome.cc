@@ -1,7 +1,7 @@
 #include "TextureSkyDome.h"
 
-TextureSkyDome::TextureSkyDome(int grid, Scene *parent) 
-    : SceneObject("Textued SkyDome", "../glsl/skydome.vert", "../glsl/skydome.frag", parent) 
+TextureSkyDome::TextureSkyDome(GraphicsDevice *device, int grid, Scene *parent) 
+    : SceneObject(device, "Textued SkyDome", "../glsl/skydome.vert", "../glsl/skydome.frag", parent) 
 {
     // drawMode = GL_LINE;
     // Load texture
@@ -54,7 +54,7 @@ void TextureSkyDome::uniform() {
     QVector3D cameraPos = camera->getPosition();
     program.setUniformValue("uCenter", cameraPos);
 
-    CHECK_GL_ERROR("after sets uniforms");
+    CHECK_GL_ERROR(device, "after sets uniforms");
 }
 
 void TextureSkyDome::update() {
@@ -62,14 +62,14 @@ void TextureSkyDome::update() {
 
 void TextureSkyDome::render() {
     drawMode = GL_FILL;
-	glPolygonMode( GL_FRONT_AND_BACK, drawMode );
-	CHECK_GL_ERROR("set polygon mode");
+	device->glPolygonMode( GL_FRONT_AND_BACK, drawMode );
+	CHECK_GL_ERROR(device, "set polygon mode");
 
-    glDisable(GL_DEPTH_TEST);
-    glDepthMask(false);
+    device->glDisable(GL_DEPTH_TEST);
+    device->glDepthMask(false);
 
     SceneObject::render();
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(true);
+    device->glEnable(GL_DEPTH_TEST);
+    device->glDepthMask(true);
 }

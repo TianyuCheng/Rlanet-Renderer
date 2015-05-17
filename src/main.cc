@@ -37,7 +37,8 @@ class PlanetRenderManager : public RenderManager {
 	};
 #undef DEFINE_ACTION
 
-	bool sun_fixed_ = false;
+	// bool sun_fixed_ = false;
+	bool sun_fixed_ = true;
 	double init_clock_;
 public:
 
@@ -153,6 +154,8 @@ public:
 	}
 
 	void prepare() {
+        GraphicsDevice *device = getGL();
+
 		int width = resolution.width();
 		int height = resolution.height();
 
@@ -180,25 +183,25 @@ public:
 			       );
 
 		// Create two passes
-		reflection_.reset(new Scene("reflection", resolution));
+		reflection_.reset(new Scene(device, "reflection", resolution));
 
-		finalPass_.reset(new Scene("final result", resolution));
+		finalPass_.reset(new Scene(device, "final result", resolution));
 		finalPass_->setCamera(camera_.get());
 
 		// Instantiate scene objects
-		skydome_.reset(new TextureSkyDome(64, finalPass_.get()));
-		terrain_.reset(new Terrain(32, 5, finalPass_.get()));
-		ocean_.reset(new Ocean(32, 5, finalPass_.get()));
+		skydome_.reset(new TextureSkyDome(device, 64, finalPass_.get()));
+		terrain_.reset(new Terrain(device, 32, 5, finalPass_.get()));
+		ocean_.reset(new Ocean(device, 32, 5, finalPass_.get()));
 
-		grassFactory_.reset(new GrassFactory(terrain_.get()));
+		grassFactory_.reset(new GrassFactory(device, terrain_.get()));
 		grass_.reset(grassFactory_->createGrass(QVector2D(cc+1000, cc+1000), 10000.0, 10.0, 80.0, 40.0, 68435, 0.125));
 
-		treeFactory_.reset(new TreeFactory(terrain_.get()));
+		treeFactory_.reset(new TreeFactory(device, terrain_.get()));
 		tree1_.reset(treeFactory_->createTree(TreeType::PALM, QVector2D(cc+2000, cc+2000), 10000.0, 200.0, 140.0, 200.0, 3389, 0.25));
 		tree2_.reset(treeFactory_->createTree(TreeType::TREE1, QVector2D(cc+3100, cc+3100), 10000.0, 200.0, 140.0, 200.0, 9527, 0.25));
 
 		// Adding objects into reflection pass
-		reflection_->add_light(solar_);
+		reflection_->addLight(solar_);
 		reflection_->addObject(skydome_.get());
 		reflection_->addObject(terrain_.get());
 		reflection_->addObject(grass_.get());
@@ -206,7 +209,7 @@ public:
 		reflection_->addObject(tree2_.get());
 
 		// Adding objects into final pass
-		finalPass_->add_light(solar_);
+		finalPass_->addLight(solar_);
 		finalPass_->addObject(skydome_.get());
 		finalPass_->addObject(terrain_.get());
 		finalPass_->addObject(ocean_.get());

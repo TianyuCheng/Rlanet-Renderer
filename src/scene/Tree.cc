@@ -14,25 +14,25 @@ Tree::~Tree() {
 
 void Tree::uniform() {
 	// uniform height map
-	CHECK_GL_ERROR("Tree: before bind uHeightmap");
+	CHECK_GL_ERROR(factory->device, "Tree: before bind uHeightmap");
 	factory->terrain->bindHeightmap(program, "uHeightmap", 1);
-	CHECK_GL_ERROR("Tree: After uniform uHeightmap");
+	CHECK_GL_ERROR(factory->device, "Tree: After uniform uHeightmap");
 
 	// uniform the tree texture and alpha map
 	factory->treeBlade[int(treeType)]->bind(2);
 	program.setUniformValue("uDecalmap", 2);
-	CHECK_GL_ERROR("Tree After uAlphamap");
+	CHECK_GL_ERROR(factory->device, "Tree After uAlphamap");
 
 	// uniform the size of tree
 	program.setUniformValue("uSize", float(size));
-	CHECK_GL_ERROR("Tree: After uSize");
+	CHECK_GL_ERROR(factory->device, "Tree: After uSize");
 }
 
 void Tree::update() {
 }
 
-TreeFactory::TreeFactory(Terrain *t) 
-    : BillboardFactory("Tree Factory"), terrain(t) {
+TreeFactory::TreeFactory(GraphicsDevice *device, Terrain *t) 
+    : BillboardFactory(device, "Tree Factory"), terrain(t) {
 
     setShader(QOpenGLShader::Vertex, "../glsl/billboard.vert");
     setShader(QOpenGLShader::Geometry, "../glsl/tree.geom");

@@ -1,24 +1,37 @@
 #ifndef RENDERMANAGER_H
 #define RENDERMANAGER_H
 
+#include <memory>
+
 #include <QTime>
 #include <QQmlContext>
 #include <QOpenGLFramebufferObject>
 
 #include <Camera.h>
+#include <GraphicsDevice.h>
 
 class RenderManager : public QObject {
 	Q_OBJECT;
 public:
 	RenderManager() { lastTime = 0; _fpsVal = 0; }
-	virtual ~RenderManager() {}
+	virtual ~RenderManager() {
+        glDevice_.reset();
+    }
 
+    void initializeGL() {
+        glDevice_.reset(new GraphicsDevice());
+    }
 	/**
 	 * Do not override this function because the method
 	 * is doing book-keeping for fps.
 	 * */
 	void beforeRender();
 
+    /**
+     * prepare(): initialize your rendering components
+     * render(): render scenes
+     * shutdown(): clean up your rendering components
+     * */
 	virtual void prepare() = 0;
 	virtual void render(QOpenGLFramebufferObject *) = 0;
 	virtual void shutdown()  = 0;
@@ -49,6 +62,8 @@ public:
 		context->setContextProperty(key, val);
 	}
 
+    GraphicsDevice* getGL() const { return glDevice_.get(); }
+
 	/**
 	 * Time Utils
 	 * Scene time control with start, pause, resume, and restart.
@@ -61,6 +76,7 @@ public:
 	void restart();
 	double timeElapsed() const;
 	double getInterval() const;
+
 private:
 	int _fpsVal;
 	int _fps;
@@ -71,6 +87,9 @@ private:
 	int elapsedTime;
 	int lastTime;
 	int timeStep;
+
+    // OpenGL 3.3
+    std::unique_ptr<GraphicsDevice> glDevice_;
 };
 
 

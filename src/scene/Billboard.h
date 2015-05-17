@@ -14,12 +14,14 @@
 #include <QOpenGLTexture>
 #include <QOpenGLShader>
 
+#include <GraphicsDevice.h>
 #include <SceneObject.h>
 #include <Terrain.h>
 
 class BillboardFactory;
 
 class Billboard : public SceneObject {
+    friend class BillboardFactory;
 public:
 	Billboard(BillboardFactory *factory);
 	virtual ~Billboard();
@@ -41,7 +43,7 @@ protected:
 class BillboardFactory : protected SceneObject {
 	friend class Billboard;
 public:
-	BillboardFactory(QString name);
+	BillboardFactory(GraphicsDevice *device, QString name);
 	virtual ~BillboardFactory();
 
 	/* void the render procedure */

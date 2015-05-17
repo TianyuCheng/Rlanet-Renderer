@@ -1,8 +1,8 @@
 #include "Scene.h"
 #include "Solar.h"
 
-Scene::Scene(QString n, QSize r) 
-	: SceneObject(n), 
+Scene::Scene(GraphicsDevice *device, QString n, QSize r) 
+	: SceneObject(device, n), 
 	name(n), resolution(r), camera(nullptr), 
 	fbo_ready(false), lastPass(-1)
 {
@@ -42,7 +42,7 @@ void Scene::addObject(SceneObject* object)
 	if (!object->isInitialized()) object->initialize();
 }
 
-void Scene::add_light(Light* light)
+void Scene::addLight(Light* light)
 {
 	lights_.emplace_back(light);
 }
@@ -62,16 +62,14 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
 		fbo_->bind();
 	}
 
-	CHECK_GL_ERROR("Before Clear\n");
+	CHECK_GL_ERROR(device, "Before Clear\n");
 
 	// Change the viewport to the whole screen
-	glViewport(0, 0, resolution.width(), resolution.height());
+	device->glViewport(0, 0, resolution.width(), resolution.height());
 	// Clear out buffer before drawing anything
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	//glClearColor(drand48(), drand48(), drand48(), 1.0);
-	//glClearColor(sin(::time(NULL)), 0.0, 0.0, 0.0);
-	CHECK_GL_ERROR("After Clear\n");
+	device->glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	device->glClearColor(0.0, 0.0, 0.0, 0.0);
+	CHECK_GL_ERROR(device, "After Clear\n");
 
 	// Render all objects in the scene.
 	// This could be done in a smarter way
@@ -95,8 +93,8 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
 		 * assigned a texture unit
 		 */
 		if (lastPass >= 0) {
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, lastPass);
+			device->glActiveTexture(GL_TEXTURE0);
+			device->glBindTexture(GL_TEXTURE_2D, lastPass);
 			object->program.setUniformValue("uRenderTexture", 0);
 		}
 
@@ -107,15 +105,15 @@ void Scene::renderScene(QOpenGLFramebufferObject* fbo)
 
 		// User defined uniform variables
 		object->uniform();
-		CHECK_GL_ERROR("Before render some Obj");
+		CHECK_GL_ERROR(device, "Before render some Obj");
 		object->render();
-		CHECK_GL_ERROR("After render some Obj");
+		CHECK_GL_ERROR(device, "After render some Obj");
 		object->program.release();
-		CHECK_GL_ERROR("After release the program of some Obj");
+		CHECK_GL_ERROR(device, "After release the program of some Obj");
 	}
 
-	glFlush();
-	CHECK_GL_ERROR("After flush");
+	device->glFlush();
+	CHECK_GL_ERROR(device, "After flush");
 
 	if (fbo)
 		fbo->release();

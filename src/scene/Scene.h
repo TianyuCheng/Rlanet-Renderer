@@ -19,14 +19,14 @@ class Light;
 class Scene : public SceneObject
 {
 public:
-	Scene(QString name, QSize resolution);
+	Scene(GraphicsDevice *device, QString name, QSize resolution);
 	virtual ~Scene();
 
 	/**
 	 * Add object into the scene
 	 * */
 	void addObject(SceneObject* object);
-	void add_light(Light*);
+	void addLight(Light*);
 
 	/**
 	 * Render all visible objects to framebuffer.

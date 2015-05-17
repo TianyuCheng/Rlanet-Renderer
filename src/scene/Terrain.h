@@ -64,7 +64,7 @@ class Terrain : public SceneObject {
 public:
 	// Must provide a scene, because it needs to update 
 	// according to the move of camera
-	Terrain(int grid, int levels, Scene *parent);
+	Terrain(GraphicsDevice *device, int grid, int levels, Scene *parent);
 
 	virtual ~Terrain ();
 

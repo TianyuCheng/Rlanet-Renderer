@@ -1,7 +1,11 @@
 #include "Noise.h"
 #include "Ocean.h"
 
-Ocean::Ocean(int grid, int levels, Scene *parent) : Terrain(grid, levels, parent) {
+Ocean::Ocean(
+        GraphicsDevice *device, 
+        int grid, 
+        int levels, 
+        Scene *parent) : Terrain(device, grid, levels, parent) {
 
 }
 
@@ -34,7 +38,7 @@ void Ocean::uniform() {
     QVector3D cameraPos = camera->getPosition();
     program.setUniformValue("uCamera", cameraPos);
 
-    CHECK_GL_ERROR("after sets uniforms");
+    CHECK_GL_ERROR(device, "after sets uniforms");
     // this->setDrawMode(GL_LINE);
 }
 
