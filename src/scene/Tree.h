@@ -49,7 +49,7 @@ private:
 class TreeFactory : public BillboardFactory {
 	friend class Tree;
 public:
-	TreeFactory(GraphicsDevice *device, Terrain *terrain);
+	TreeFactory(Terrain *terrain);
 	virtual ~TreeFactory();
 
 	/* void render() function */

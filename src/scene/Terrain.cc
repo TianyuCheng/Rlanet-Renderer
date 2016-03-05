@@ -85,8 +85,8 @@ void TerrainPatch::initializeChildren() {
 
 // Terrain class
 
-Terrain::Terrain(GraphicsDevice *d, int g, int l, Scene *parent) :
-	SceneObject(d, QString("CDLOD Terrain"), parent), 
+Terrain::Terrain(int g, int l, Scene *parent) :
+	SceneObject(QString("CDLOD Terrain"), parent), 
 	grid(g), levels(l)
 {
 	init_gl_resource();
@@ -282,7 +282,7 @@ void Terrain::uniform() {
 	float elapsedTime = float(time.elapsed()) / 1e3;
 	program.setUniformValue("uTime", elapsedTime);
 
-	CHECK_GL_ERROR(device, "after sets uniforms");
+	CHECK_GL_ERROR("after sets uniforms");
 }
 
 void Terrain::update() {
@@ -304,16 +304,23 @@ void Terrain::render()
 	//qDebug("uOffset location: %d", loc);
 	// Drawing only using line mode for LOD visualization
 	// drawMode = GL_LINE;
-	device->glPolygonMode( GL_FRONT_AND_BACK, drawMode );
-	CHECK_GL_ERROR(device, "set polygon mode");
+	glPolygonMode( GL_FRONT_AND_BACK, drawMode );
+	CHECK_GL_ERROR("set polygon mode");
 
 	vbo_.bind();
-	CHECK_GL_ERROR(device, "After vbo bind");
+	CHECK_GL_ERROR("After vbo bind");
 	program.setAttributeBuffer(vertexLocation_, GL_FLOAT, 0, 3);
 	program.enableAttributeArray(vertexLocation_);
-	CHECK_GL_ERROR(device, "After set vertex location");
+	CHECK_GL_ERROR("After set vertex location");
 	ibo_.bind();
-	CHECK_GL_ERROR(device, "After ibo bind");
+	CHECK_GL_ERROR("After ibo bind");
+
+#if 0
+	int vbname, ibname;
+	glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &vbname);
+	glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &ibname);
+	qDebug("VB binded to %d, IB binded to %d\n", vbname, ibname);
+#endif
 
 	// qDebug() << "Children:" << children.size() << "Selected:" << selectedPatches.size();
 	for (int i = 0; i < selectedPatches.size(); i++) {
@@ -321,21 +328,21 @@ void Terrain::render()
 		double scaleFactor = ranges[patch->level].first;
 		QVector2D scale(scaleFactor, scaleFactor);
 		program.setUniformValue("uOffset", patch->pos);
-		CHECK_GL_ERROR(device, "After Terrian bind uOffset");
+		CHECK_GL_ERROR("After Terrian bind uOffset");
 		program.setUniformValue("uScale", scale);
-		CHECK_GL_ERROR(device, "After Terrian bind uScale");
+		CHECK_GL_ERROR("After Terrian bind uScale");
 		program.setUniformValue("uLevel", patch->level);
-		CHECK_GL_ERROR(device, "After Terrian bind uLevel");
+		CHECK_GL_ERROR("After Terrian bind uLevel");
 		QPair<double, double> range = ranges[patch->level];
 		QVector2D ranges = QVector2D(range.first, range.second);
 		program.setUniformValue("uRange", ranges);
 
 		// draw all the triangles
-		device->glDrawElements(GL_TRIANGLES, 
+		glDrawElements(GL_TRIANGLES, 
 				indices.size(),		// count
 				GL_UNSIGNED_INT,	// type
 				0);			// element array buffer offset
-		CHECK_GL_ERROR(device, "After Terrian draws");
+		CHECK_GL_ERROR("After Terrian draws");
 	} // end of for loop
 	program.release();
 }

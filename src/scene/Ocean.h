@@ -6,7 +6,7 @@
 
 class Ocean : public Terrain {
 public:
-    Ocean (GraphicsDevice *device, int grid, int levels, Scene *parent);
+    Ocean (int grid, int levels, Scene *parent);
     virtual ~Ocean ();
 
     void initialize();

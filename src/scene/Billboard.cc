@@ -1,7 +1,7 @@
 #include "Billboard.h"
 
 Billboard::Billboard(BillboardFactory *f)
-	: SceneObject(f->device, QString("Billboard"), f)
+	: SceneObject(QString("Billboard"), f)
 {
 }
 
@@ -16,24 +16,24 @@ void Billboard::placeBillboard(QVector2D coordinate, double height)
 
 void Billboard::render()
 {
-	device->glEnable(GL_BLEND);
-	device->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	vbo_.bind();
 	program.setAttributeBuffer(vertexLocation_, GL_FLOAT, 0, 3);
 	program.enableAttributeArray(vertexLocation_);
-	CHECK_GL_ERROR(device, "After buffer");
+	CHECK_GL_ERROR("After buffer");
 
-	device->glDrawArrays(GL_POINTS, 0, vertices.size());
-	CHECK_GL_ERROR(device, "After render");
+	glDrawArrays(GL_POINTS, 0, vertices.size());
+	CHECK_GL_ERROR("After render");
 
 	vbo_.release();
 
-	device->glDisable(GL_BLEND);
+	glDisable(GL_BLEND);
 }
 
-BillboardFactory::BillboardFactory(GraphicsDevice *device, QString name) 
-	: SceneObject(device, name) {
+BillboardFactory::BillboardFactory(QString name) 
+	: SceneObject(name) {
 	}
 
 BillboardFactory::~BillboardFactory() {

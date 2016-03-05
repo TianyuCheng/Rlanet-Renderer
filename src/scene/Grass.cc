@@ -14,25 +14,25 @@ Grass::~Grass() {
 
 void Grass::uniform() {
 	// uniform height map
-	CHECK_GL_ERROR(factory->device, "Grass: before bind uHeightmap");
+	CHECK_GL_ERROR("Grass: before bind uHeightmap");
 	factory->terrain->bindHeightmap(program, "uHeightmap", 1);
-	CHECK_GL_ERROR(factory->device, "Grass: After uniform uHeightmap");
+	CHECK_GL_ERROR("Grass: After uniform uHeightmap");
 
 	// uniform the grass texture and alpha map
 	factory->grassBlade->bind(2);
 	program.setUniformValue("uDecalmap", 2);
-	CHECK_GL_ERROR(factory->device, "Grass: After set uAlphamap");
+	CHECK_GL_ERROR("Grass: After set uAlphamap");
 
 	// uniform the size of grass
 	program.setUniformValue("uSize", float(size));
-	CHECK_GL_ERROR(factory->device, "Grass: After uSize");
+	CHECK_GL_ERROR("Grass: After uSize");
 }
 
 void Grass::update() {
 }
 
-GrassFactory::GrassFactory(GraphicsDevice *device, Terrain *t) 
-	: BillboardFactory(device, "Grass Factory"), terrain(t)
+GrassFactory::GrassFactory(Terrain *t) 
+	: BillboardFactory("Grass Factory"), terrain(t)
 {
 
 	QImage grass("../textures/billboard/grass.png");

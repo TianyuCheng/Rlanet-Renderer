@@ -43,7 +43,7 @@ class GrassFactory : public BillboardFactory
 {
 	friend class Grass;
 public:
-	GrassFactory(GraphicsDevice *device, Terrain *terrain);
+	GrassFactory(Terrain *terrain);
 	virtual ~GrassFactory();
 
 	/* void render */

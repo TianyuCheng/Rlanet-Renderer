@@ -1,36 +1,23 @@
 #include <SceneObject.h>
 
-SceneObject::SceneObject(
-        GraphicsDevice *d,
-        QString n, 
-        SceneObject *p) : device(d), name(n), parent(p) {
-
+SceneObject::SceneObject(QString n, SceneObject *p) : name(n), parent(p) {
+	initializeOpenGLFunctions();
 	transform.setToIdentity();
 	drawMode = GL_FILL;
 }
 
-SceneObject::SceneObject(
-        GraphicsDevice *d,
-        QString n, 
-        QString _vShader, 
-        QString _fShader, 
-        SceneObject *p)
-    : device(d), name(n), parent(p) {
-
+SceneObject::SceneObject(QString n, QString _vShader, QString _fShader, SceneObject *p)
+    : name(n), parent(p) {
+	initializeOpenGLFunctions();
 	setShader(QOpenGLShader::Vertex, _vShader);
 	setShader(QOpenGLShader::Fragment, _fShader);
 	transform.setToIdentity();
 	drawMode = GL_TRIANGLES;
 }
 
-SceneObject::SceneObject(
-        GraphicsDevice *d,
-        QString n, 
-        QOpenGLShader *_vShader, 
-        QOpenGLShader *_fShader, 
-        SceneObject *p) 
-    : device(d), name(n), parent(p) {
-
+SceneObject::SceneObject(QString n, QOpenGLShader *_vShader, QOpenGLShader *_fShader, SceneObject *p) 
+    : name(n), parent(p) {
+	initializeOpenGLFunctions();
 	setShader(_vShader);
 	setShader(_fShader);
 	transform.setToIdentity();
@@ -137,9 +124,9 @@ void SceneObject::initialize() {
 	tbo_.allocate(size);
 	tbo_.write(0, texcoords.constData(), size);
 
-	REPORT_GL_STATUS(device, "Create GL Buffers");
+	REPORT_GL_STATUS("Create GL Buffers");
 
-	device->glBindFragDataLocation(program.programId(), 0, "frag_color");
+	glBindFragDataLocation(program.programId(), 0, "frag_color");
 
 	vertexLocation_ = program.attributeLocation("aVertex");
 	attributes["vertex"] = vertexLocation_;
@@ -147,6 +134,21 @@ void SceneObject::initialize() {
 	texcoordLocation_ = program.attributeLocation("aTexCoord");
 	attributes["texcoord"] = texcoordLocation_;
 
+	//qDebug("Vertex attribute location %d\n", attributes["vertex"]);
+
+#if 0 // These should be done in render, not here.
+	program.bind();
+	REPORT_GL_STATUS("bind program");
+
+	// Send vertex data
+	vertexLocation = attributes["vertex"];
+	program.enableAttributeArray(vertexLocation);                    // enable attribute array
+	REPORT_GL_STATUS("enable Attribute Array");
+	program.setAttributeArray(vertexLocation, vertices.constData()); // vertices attributes
+	REPORT_GL_STATUS("set Attribute Array");
+
+	program.release();
+#endif
 	ibo_.release();
 	tbo_.release();
 	vbo_.release();
@@ -189,13 +191,13 @@ void SceneObject::render() {
 	program.enableAttributeArray(texcoordLocation_);
 
 	ibo_.bind();
-	CHECK_GL_ERROR(device, "After buffer");
-	device->glDrawElements(
+	CHECK_GL_ERROR("After buffer");
+	glDrawElements(
 			GL_TRIANGLES, 
 			indices.size(),		// count
 			GL_UNSIGNED_INT,	// type
 			NULL);			// Does not matter with ibo
-	CHECK_GL_ERROR(device, "After render");
+	CHECK_GL_ERROR("After render");
 	ibo_.release();
 	tbo_.release();
 	vbo_.release();

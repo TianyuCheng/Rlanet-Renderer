@@ -83,9 +83,8 @@ bool RenderThread::init_renderer()
 	scene_->first_frame();
 #endif
 	if (renderMgr) { 
-        renderMgr->initializeGL();
-		renderMgr->prepare(); 
 		renderMgr->start();
+		renderMgr->prepare(); 
 	}
 	return true;
 }
