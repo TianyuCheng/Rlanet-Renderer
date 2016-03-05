@@ -190,29 +190,29 @@ public:
 		terrain_.reset(new Terrain(32, 5, finalPass_.get()));
 		ocean_.reset(new Ocean(32, 5, finalPass_.get()));
 
-		grassFactory_.reset(new GrassFactory(terrain_.get()));
-		grass_.reset(grassFactory_->createGrass(QVector2D(cc+1000, cc+1000), 10000.0, 10.0, 80.0, 40.0, 68435, 0.125));
+		// grassFactory_.reset(new GrassFactory(terrain_.get()));
+		// grass_.reset(grassFactory_->createGrass(QVector2D(cc+1000, cc+1000), 10000.0, 10.0, 80.0, 40.0, 68435, 0.125));
 
-		treeFactory_.reset(new TreeFactory(terrain_.get()));
-		tree1_.reset(treeFactory_->createTree(TreeType::PALM, QVector2D(cc+2000, cc+2000), 10000.0, 200.0, 140.0, 200.0, 3389, 0.25));
-		tree2_.reset(treeFactory_->createTree(TreeType::TREE1, QVector2D(cc+3100, cc+3100), 10000.0, 200.0, 140.0, 200.0, 9527, 0.25));
+		// treeFactory_.reset(new TreeFactory(terrain_.get()));
+		// tree1_.reset(treeFactory_->createTree(TreeType::PALM, QVector2D(cc+2000, cc+2000), 10000.0, 200.0, 140.0, 200.0, 3389, 0.25));
+		// tree2_.reset(treeFactory_->createTree(TreeType::TREE1, QVector2D(cc+3100, cc+3100), 10000.0, 200.0, 140.0, 200.0, 9527, 0.25));
 
 		// Adding objects into reflection pass
 		reflection_->add_light(solar_);
 		reflection_->addObject(skydome_.get());
 		reflection_->addObject(terrain_.get());
-		reflection_->addObject(grass_.get());
-		reflection_->addObject(tree1_.get());
-		reflection_->addObject(tree2_.get());
+		// reflection_->addObject(grass_.get());
+		// reflection_->addObject(tree1_.get());
+		// reflection_->addObject(tree2_.get());
 
 		// Adding objects into final pass
 		finalPass_->add_light(solar_);
 		finalPass_->addObject(skydome_.get());
 		finalPass_->addObject(terrain_.get());
 		finalPass_->addObject(ocean_.get());
-		finalPass_->addObject(grass_.get());
-		finalPass_->addObject(tree1_.get());
-		finalPass_->addObject(tree2_.get());
+		// finalPass_->addObject(grass_.get());
+		// finalPass_->addObject(tree1_.get());
+		// finalPass_->addObject(tree2_.get());
 
 		// setContextProperty("fps", "0");
 

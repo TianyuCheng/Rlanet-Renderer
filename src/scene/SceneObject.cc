@@ -44,12 +44,6 @@ void SceneObject::setShader(QOpenGLShader *shader) {
 	// Check whether shader is compiled
 	QString where = "SceneObject.cpp: setShader()";
 	QString what  = "%1 Shader of %2 is null";
-	Q_ASSERT_X(
-			type == QOpenGLShader::ShaderType::Vertex || 
-			type == QOpenGLShader::ShaderType::Fragment || 
-			type == QOpenGLShader::ShaderType::Geometry ,
-			__func__,
-			QString("The type of shader for ") + name + QString(" is neither Vertex nor Fragment"));
 	Q_ASSERT_X(shader->isCompiled(), __func__,
 			QString("The type of shader for ") + name + QString(" is not compiled."));
 
@@ -77,11 +71,18 @@ void SceneObject::setShader(QOpenGLShader *shader) {
 	}
 }
 
-void SceneObject::setShader(QOpenGLShader::ShaderType type, QString filename) {
+void SceneObject::setShader(QOpenGLShader::ShaderTypeBit type, QString filename) {
 	// Read from file to compile the source
 	QFile file(QDir::currentPath() + QDir::separator() + filename);
 
 	qDebug() << "Load shader file: " << QDir::currentPath() + QDir::separator() + filename;
+
+	Q_ASSERT_X(
+			type == QOpenGLShader::ShaderTypeBit::Vertex || 
+			type == QOpenGLShader::ShaderTypeBit::Fragment || 
+			type == QOpenGLShader::ShaderTypeBit::Geometry ,
+			__func__,
+			QString("The type of shader for ") + name + QString(" is neither Vertex nor Fragment"));
 
 	// Check for validity of the file
 	if (!file.open(QFile::ReadOnly | QFile::Text)) {

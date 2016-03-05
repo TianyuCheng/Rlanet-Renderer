@@ -40,7 +40,7 @@ public:
 
 	// Set the vertex shader or fragment shader
 	void setShader(QOpenGLShader *shader);
-	void setShader(QOpenGLShader::ShaderType type, QString shaderFile);
+	void setShader(QOpenGLShader::ShaderTypeBit type, QString shaderFile);
 
 	/**
 	 * Initialization of locations
